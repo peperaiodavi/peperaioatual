@@ -1,16 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { Badge } from '../components/ui/badge';
-import { toast } from 'sonner@2.0.3';
-import { LogOut, Edit2, Camera, Upload } from 'lucide-react';
-import { motion } from 'motion/react';
+import { toast } from 'sonner';
+import { LogOut, Edit2, Camera, Shield, Info } from 'lucide-react';
+import './MinhaConta.css';
 
 export default function MinhaConta() {
   const { user, logout, updateUser } = useAuth();
@@ -23,6 +21,33 @@ export default function MinhaConta() {
   });
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || '');
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Generate floating particles
+  useEffect(() => {
+    const particlesContainer = document.querySelector('.minha-conta-particles');
+    if (!particlesContainer) return;
+
+    const particleCount = 25; // Otimizado para performance
+    const particles: HTMLDivElement[] = [];
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = `minha-conta-particle ${i % 3 === 0 ? 'small' : i % 3 === 1 ? 'medium' : 'large'
+        }`;
+
+      // Random position
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.animationDuration = `${15 + Math.random() * 20}s`;
+      particle.style.animationDelay = `${Math.random() * 5}s`;
+
+      particlesContainer.appendChild(particle);
+      particles.push(particle);
+    }
+
+    return () => {
+      particles.forEach(p => p.remove());
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -44,9 +69,9 @@ export default function MinhaConta() {
     setIsAvatarDialogOpen(false);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !user) return;
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -61,99 +86,106 @@ export default function MinhaConta() {
     }
 
     setUploadingImage(true);
-
-    // Convert to base64 for local storage (in production, upload to Supabase Storage)
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      setAvatarUrl(base64String);
-      updateUser({ avatar_url: base64String });
-      setUploadingImage(false);
+    try {
+      // Upload para Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `avatar_${user.id}_${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+      if (error) throw error;
+      // Obter URL pública
+      const { publicUrl } = supabase.storage.from('avatars').getPublicUrl(fileName).data;
+      setAvatarUrl(publicUrl);
+      updateUser({ avatar_url: publicUrl });
       toast.success('Foto atualizada com sucesso!');
-    };
-    reader.onerror = () => {
-      setUploadingImage(false);
-      toast.error('Erro ao carregar a imagem');
-    };
-    reader.readAsDataURL(file);
+    } catch (err: any) {
+      toast.error('Erro ao fazer upload do avatar');
+    }
+    setUploadingImage(false);
   };
 
-  if (!user) return null;
+  if (!user) return <div className="minha-conta-loading">Carregando informações do usuário...</div>;
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-gray-900">Minha Conta</h1>
-        <p className="text-gray-600">Gerencie suas informações pessoais</p>
-      </motion.div>
+    <div className="minha-conta-container">
+      {/* Floating Particles Background */}
+      <div className="minha-conta-particles"></div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-gray-900">Informações do Perfil</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+      {/* Content */}
+      <div className="minha-conta-content">
+        {/* Header */}
+        <div className="minha-conta-header">
+          <h1>Minha Conta</h1>
+          <p>Gerencie suas informações pessoais</p>
+        </div>
+
+        {/* Profile Card */}
+        <div className="minha-conta-profile-card">
+          <div className="minha-conta-card-header">
+            <h2 className="minha-conta-card-title">Informações do Perfil</h2>
+          </div>
+          <div className="minha-conta-card-content">
             {/* Avatar Section */}
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative">
-                <Avatar className="h-32 w-32">
-                  <AvatarImage src={user.avatar_url} />
-                  <AvatarFallback className="text-4xl">{user.nome.charAt(0)}</AvatarFallback>
-                </Avatar>
+            <div className="minha-conta-avatar-section">
+              <div className="minha-conta-avatar-wrapper">
+                <div className="minha-conta-avatar">
+                  {user.avatar_url ? (
+                    <img src={user.avatar_url} alt={user.nome} />
+                  ) : (
+                    <div className="minha-conta-avatar-fallback">
+                      {user.nome.charAt(0)}
+                    </div>
+                  )}
+                </div>
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   onChange={handleFileUpload}
-                  className="hidden"
+                  style={{ display: 'none' }}
                 />
-                <Button
-                  size="icon"
-                  className="absolute bottom-0 right-0 rounded-full"
-                  variant="secondary"
+                <button
+                  className="minha-conta-avatar-upload-btn"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingImage}
                 >
                   {uploadingImage ? (
-                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="minha-conta-spinner" style={{ width: '20px', height: '20px', borderWidth: '2px' }} />
                   ) : (
-                    <Camera className="h-4 w-4" />
+                    <Camera size={20} color="#fff" />
                   )}
-                </Button>
+                </button>
               </div>
-              <p className="text-xs text-gray-500 text-center">
+              <p className="minha-conta-avatar-hint">
                 Clique no ícone para selecionar uma foto<br />
                 (Máximo 5MB)
               </p>
             </div>
 
             {/* User Info */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="text-gray-600">Nome</p>
-                  <p className="text-gray-900">{user.nome}</p>
+            <div className="minha-conta-info-section">
+              {/* Nome */}
+              <div className="minha-conta-info-item">
+                <div className="minha-conta-info-content">
+                  <p className="minha-conta-info-label">Nome</p>
+                  <p className="minha-conta-info-value">{user.nome}</p>
                 </div>
                 <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
+                    <button className="minha-conta-edit-btn">
+                      <Edit2 size={18} />
+                    </button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="minha-conta-dialog-content">
                     <DialogHeader>
-                      <DialogTitle>Editar Nome</DialogTitle>
+                      <DialogTitle className="minha-conta-dialog-title">Editar Nome</DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleUpdateName} className="space-y-4">
-                      <div className="space-y-2">
+                    <form onSubmit={handleUpdateName}>
+                      <div className="minha-conta-form-field">
                         <Label>Nome de Exibição</Label>
                         <Input
                           value={formData.nome}
@@ -161,7 +193,7 @@ export default function MinhaConta() {
                           required
                         />
                       </div>
-                      <Button type="submit" className="w-full">
+                      <Button type="submit" className="minha-conta-btn-submit">
                         Salvar Alterações
                       </Button>
                     </form>
@@ -169,54 +201,52 @@ export default function MinhaConta() {
                 </Dialog>
               </div>
 
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-600">Email</p>
-                <p className="text-gray-900">{user.email}</p>
+              {/* Email */}
+              <div className="minha-conta-info-item">
+                <div className="minha-conta-info-content">
+                  <p className="minha-conta-info-label">Email</p>
+                  <p className="minha-conta-info-value">{user.email}</p>
+                </div>
               </div>
 
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-600 mb-2">Permissão</p>
-                <Badge variant={user.permissao === 'admin' ? 'default' : 'secondary'}>
-                  {user.permissao === 'admin' ? 'Administrador' : 'Visualizador'}
-                </Badge>
+              {/* Permissão */}
+              <div className="minha-conta-info-item">
+                <div className="minha-conta-info-content">
+                  <p className="minha-conta-info-label">Permissão</p>
+                  <div className={`minha-conta-badge ${user.permissao === 'admin' || user.permissao === 'visualizador' ? 'proprietario' : 'viewer'}`}>
+                    <Shield size={16} />
+                    {user.permissao === 'admin' || user.permissao === 'visualizador' ? 'Proprietário' : 'Visualizador'}
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Logout Button */}
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
+            <button className="minha-conta-logout-btn" onClick={handleLogout}>
+              <LogOut size={20} />
               Sair da Conta
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </button>
+          </div>
+        </div>
 
-      {/* Info Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-      >
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="pt-6">
-            <h3 className="text-blue-900 mb-2">Sobre as Permissões</h3>
-            <div className="text-blue-800 space-y-1 text-xs">
-              <p>
-                <strong>Administrador:</strong> Acesso completo ao sistema, pode criar, editar e
-                excluir dados.
-              </p>
-              <p>
-                <strong>Visualizador:</strong> Pode visualizar todos os dados, mas não pode fazer
-                alterações.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+        {/* Info Card */}
+        <div className="minha-conta-info-card">
+          <h3>
+            <Info size={20} />
+            Sobre as Permissões
+          </h3>
+          <div className="minha-conta-info-card-content">
+            <p>
+              <strong>Administrador:</strong> Acesso completo ao sistema, pode criar, editar e
+              excluir dados.
+            </p>
+            <p>
+              <strong>Visualizador:</strong> Pode visualizar todos os dados, mas não pode fazer
+              alterações.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

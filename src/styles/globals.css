@@ -1,122 +1,91 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
+  /* MUI X Dark Theme - Cores Modernas */
+  --background: 30 30 46;
+  --foreground: 224 224 224;
+  --card: 42 45 62;
+  --card-foreground: 224 224 224;
+  --popover: 37 40 55;
+  --popover-foreground: 224 224 224;
+  --primary: 59 130 246;
+  --primary-foreground: 255 255 255;
+  --secondary: 139 92 246;
+  --secondary-foreground: 255 255 255;
+  --muted: 45 49 66;
+  --muted-foreground: 148 163 184;
+  --accent: 59 130 246;
+  --accent-foreground: 255 255 255;
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+  --border: 61 66 89;
+  --input: 42 45 62;
+  --input-background: 37 40 55;
+  --switch-background: 61 66 89;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --ring: 59 130 246;
+  
+  /* Chart Colors - Gradientes modernos */
+  --chart-1: 59 130 246;
+  --chart-2: 139 92 246;
+  --chart-3: 236 72 153;
+  --chart-4: 249 115 22;
+  --chart-5: 251 191 36;
+  --chart-6: 16 185 129;
+  
+  --radius: 0.75rem;
+  --sidebar: 37 40 55;
+  --sidebar-foreground: 224 224 224;
+  --sidebar-primary: 59 130 246;
+  --sidebar-primary-foreground: 255 255 255;
+  --sidebar-accent: 42 45 62;
+  --sidebar-accent-foreground: 224 224 224;
+  --sidebar-border: 61 66 89;
+  --sidebar-ring: 59 130 246;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
-}
+/* Removido bloco .dark para não sobrescrever as cores */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-input-background: var(--input-background);
-  --color-switch-background: var(--switch-background);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+  --color-background: 30 30 46;
+  --color-foreground: 224 224 224;
+  --color-card: 42 45 62;
+  --color-card-foreground: 224 224 224;
+  --color-popover: 37 40 55;
+  --color-popover-foreground: 224 224 224;
+  --color-primary: 59 130 246;
+  --color-primary-foreground: 255 255 255;
+  --color-secondary: 139 92 246;
+  --color-secondary-foreground: 255 255 255;
+  --color-muted: 45 49 66;
+  --color-muted-foreground: 148 163 184;
+  --color-accent: 59 130 246;
+  --color-accent-foreground: 255 255 255;
+  --color-destructive: 239 68 68;
+  --color-destructive-foreground: 255 255 255;
+  --color-border: 61 66 89;
+  --color-input: 42 45 62;
+  --color-input-background: 37 40 55;
+  --color-switch-background: 61 66 89;
+  --color-ring: 59 130 246;
+  --color-chart-1: 59 130 246;
+  --color-chart-2: 139 92 246;
+  --color-chart-3: 236 72 153;
+  --color-chart-4: 249 115 22;
+  --color-chart-5: 251 191 36;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar: 37 40 55;
+  --color-sidebar-foreground: 224 224 224;
+  --color-sidebar-primary: 59 130 246;
+  --color-sidebar-primary-foreground: 255 255 255;
+  --color-sidebar-accent: 42 45 62;
+  --color-sidebar-accent-foreground: 224 224 224;
+  --color-sidebar-border: 61 66 89;
+  --color-sidebar-ring: 59 130 246;
 }
 
 @layer base {
@@ -125,7 +94,16 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    background: linear-gradient(180deg, #071029 0%, #071017 60%) !important;
+    @apply text-foreground;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+  
+  #root {
+    min-height: 100vh;
+    background: transparent;
   }
 }
 
@@ -185,5 +163,97 @@
 }
 
 html {
-  font-size: var(--font-size);
+  font-size: 16px;
 }
+
+body {
+  @apply text-foreground;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Dark */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(37, 40, 55);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(61, 66, 89);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(74, 79, 102);
+}
+
+/* Animações suaves globais */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* ===== PWA & SAFE AREA SUPPORT ===== */
+
+/* Previne bounce scroll no iOS */
+body {
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Suporte completo para safe area em todas as páginas */
+.page-container,
+.dashboard-container,
+.caixa-container,
+.obras-container,
+.propostas-container,
+.funcionarios-container,
+.dividas-container,
+.receber-container {
+  padding-left: max(1.5rem, env(safe-area-inset-left));
+  padding-right: max(1.5rem, env(safe-area-inset-right));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+/* Garante que modais/dialogs também respeitam safe area */
+.dialog-content,
+.modal-content {
+  margin-left: env(safe-area-inset-left);
+  margin-right: env(safe-area-inset-right);
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+/* Fix para botões fixos no bottom respeitarem safe area */
+.fixed-bottom-action,
+.floating-action-button {
+  bottom: max(1rem, calc(1rem + env(safe-area-inset-bottom)));
+}
+
+/* Mobile viewport height fix */
+@supports (-webkit-touch-callout: none) {
+  .full-height,
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Glow effects para interatividade */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.glow-orange {
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+}
+

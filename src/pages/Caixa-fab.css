@@ -1,0 +1,113 @@
+/* FAB Animado para Caixa */
+.caixa-fab-wrapper {
+  position: fixed;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.caixa-fab-main {
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  color: #fff;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  box-shadow: 0 8px 32px rgba(96, 165, 250, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: box-shadow 0.3s, transform 0.3s;
+  position: relative;
+  animation: fabPulse 1.5s infinite;
+}
+
+@keyframes fabPulse {
+  0% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.25); }
+  50% { box-shadow: 0 0 0 16px rgba(96, 165, 250, 0.08); }
+  100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.25); }
+}
+
+.caixa-fab-icon {
+  font-size: 2.5rem;
+  font-weight: bold;
+  line-height: 1;
+  transition: transform 0.3s;
+}
+
+.caixa-fab-toggle:checked + .caixa-fab-main .caixa-fab-icon {
+  transform: rotate(45deg);
+}
+
+.caixa-fab-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.caixa-fab-toggle:checked ~ .caixa-fab-actions {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.caixa-fab-btn {
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #34d399 0%, #60a5fa 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.75rem 2rem 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(52, 211, 153, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.caixa-fab-toggle:checked ~ .caixa-fab-actions .caixa-fab-btn {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.caixa-fab-btn.entrada {
+  background: linear-gradient(135deg, #34d399 0%, #60a5fa 100%);
+}
+
+.caixa-fab-btn.saida {
+  background: linear-gradient(135deg, #f87171 0%, #a78bfa 100%);
+}
+
+.caixa-fab-btn .fab-btn-icon {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .caixa-fab-wrapper {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+  .caixa-fab-main {
+    width: 54px;
+    height: 54px;
+    font-size: 2rem;
+  }
+  .caixa-fab-btn {
+    padding: 0.5rem 1.5rem 0.5rem 1rem;
+    font-size: 1rem;
+  }
+}

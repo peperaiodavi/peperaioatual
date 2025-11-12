@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { usePermissao } from '../context/PermissaoContext';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { DialogDescription } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Progress } from '../components/ui/progress';
-import { toast } from 'sonner@2.0.3';
-import { Plus, DollarSign, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { Plus, DollarSign, Trash2, TrendingUp, CheckCircle, Clock, Building2 } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
-import { motion } from 'motion/react';
+import { supabase } from '../utils/supabaseClient';
+import './Receber.css';
 
 interface Pagamento {
   id: string;
@@ -23,13 +23,63 @@ interface Recebivel {
   cliente: string;
   valor_total: number;
   valor_pago: number;
-  pagamentos: Pagamento[];
+  pagamentos?: Pagamento[];
   data_criacao: string;
 }
 
+interface ObraReceber {
+  id: string;
+  nome: string;
+  orcamento: number;
+  finalizada: boolean;
+  gastos_obra: Array<{ valor: number }>;
+}
+
 export default function Receber() {
+  // Busca recebiveis do Supabase
+  async function fetchRecebiveis() {
+    const { data, error } = await supabase
+      .from('recebiveis')
+      .select('id, cliente, valor_total, valor_pago, data_criacao');
+    if (error) {
+      toast.error('Erro ao buscar recebíveis');
+      setRecebiveis([]);
+      return;
+    }
+    // Buscar pagamentos relacionados
+    const { data: pagamentos, error: errorPag } = await supabase
+      .from('pagamentos_recebivel')
+      .select('id, recebivel_id, valor, data');
+    if (errorPag) {
+      toast.error('Erro ao buscar pagamentos');
+    }
+    const recebiveisCorrigidos = (data || []).map((r: any) => ({
+      ...r,
+      valor_total: typeof r.valor_total === 'number' ? r.valor_total : Number(r.valor_total) || 0,
+      valor_pago: typeof r.valor_pago === 'number' ? r.valor_pago : Number(r.valor_pago) || 0,
+      pagamentos: (pagamentos || []).filter((p: any) => p.recebivel_id === r.id),
+    }));
+    setRecebiveis(recebiveisCorrigidos);
+  }
+
+  // Busca obras não finalizadas
+  async function fetchObrasReceber() {
+    const { data, error } = await supabase
+      .from('obras')
+      .select('id, nome, orcamento, finalizada, gastos_obra(valor)')
+      .eq('finalizada', false);
+    
+    if (error) {
+      toast.error('Erro ao buscar obras pendentes');
+      setObrasReceber([]);
+      return;
+    }
+    setObrasReceber(data || []);
+  }
+
   const { canCreate, canDelete } = usePermissao();
   const [recebiveis, setRecebiveis] = useState<Recebivel[]>([]);
+  const [obrasReceber, setObrasReceber] = useState<ObraReceber[]>([]);
   const [isRecebivelDialogOpen, setIsRecebivelDialogOpen] = useState(false);
   const [isPagamentoDialogOpen, setIsPagamentoDialogOpen] = useState(false);
   const [selectedRecebivel, setSelectedRecebivel] = useState<string | null>(null);
@@ -40,262 +90,273 @@ export default function Receber() {
   const [pagamentoValue, setPagamentoValue] = useState('');
 
   useEffect(() => {
-    loadRecebiveis();
+    fetchRecebiveis();
+    fetchObrasReceber();
   }, []);
 
-  const loadRecebiveis = () => {
-    const saved = localStorage.getItem('receberData');
-    if (saved) {
-      setRecebiveis(JSON.parse(saved));
-    } else {
-      // Mock data
-      const mockData: Recebivel[] = [
-        {
-          id: '1',
-          cliente: 'Empresa ABC Ltda',
-          valor_total: 25000,
-          valor_pago: 10000,
-          pagamentos: [
-            { id: 'p1', valor: 5000, data: '2025-10-10' },
-            { id: 'p2', valor: 5000, data: '2025-10-20' },
-          ],
-          data_criacao: '2025-10-01',
-        },
-        {
-          id: '2',
-          cliente: 'João da Silva',
-          valor_total: 8500,
-          valor_pago: 0,
-          pagamentos: [],
-          data_criacao: '2025-10-15',
-        },
-      ];
-      setRecebiveis(mockData);
-      localStorage.setItem('receberData', JSON.stringify(mockData));
-    }
-  };
 
   const saveRecebiveis = (data: Recebivel[]) => {
-    localStorage.setItem('receberData', JSON.stringify(data));
-    setRecebiveis(data);
+  setRecebiveis(data);
   };
 
-  const handleRecebivelSubmit = (e: React.FormEvent) => {
+  const handleRecebivelSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canCreate) return;
-
-    const recebivel: Recebivel = {
-      id: Date.now().toString(),
+    const recebivel: Omit<Recebivel, 'id'> = {
       cliente: recebivelFormData.cliente,
       valor_total: parseFloat(recebivelFormData.valor_total),
       valor_pago: 0,
-      pagamentos: [],
       data_criacao: new Date().toISOString().split('T')[0],
     };
-
-    const updated = [...recebiveis, recebivel];
-    saveRecebiveis(updated);
+    const { data, error } = await supabase
+      .from('recebiveis')
+      .insert([recebivel])
+      .select();
+    if (error) {
+      toast.error('Erro ao adicionar recebível');
+      return;
+    }
+    await fetchRecebiveis();
     toast.success('Conta a receber adicionada com sucesso!');
     setRecebivelFormData({ cliente: '', valor_total: '' });
     setIsRecebivelDialogOpen(false);
   };
 
-  const handlePagamentoSubmit = (e: React.FormEvent) => {
+  const handlePagamentoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canCreate || !selectedRecebivel) return;
-
     const valor = parseFloat(pagamentoValue);
     const recebivel = recebiveis.find((r) => r.id === selectedRecebivel);
-
     if (!recebivel) return;
-
-    const valorRestante = recebivel.valor_total - recebivel.valor_pago;
+    const valorRestante = (recebivel.valor_total || 0) - (recebivel.valor_pago || 0);
     if (valor > valorRestante) {
       toast.error('Valor excede o montante restante!');
       return;
     }
-
-    const pagamento: Pagamento = {
-      id: Date.now().toString(),
+    // Adiciona pagamento na tabela pagamentos_recebivel
+    const pagamento = {
+      recebivel_id: selectedRecebivel,
       valor,
       data: new Date().toISOString().split('T')[0],
     };
-
-    const updated = recebiveis.map((r) =>
-      r.id === selectedRecebivel
-        ? {
-            ...r,
-            valor_pago: r.valor_pago + valor,
-            pagamentos: [...r.pagamentos, pagamento],
-          }
-        : r
-    );
-
-    saveRecebiveis(updated);
-
-    // Add to caixa
-    const caixaData = JSON.parse(localStorage.getItem('caixaData') || '[]');
-    caixaData.push({
-      id: Date.now().toString(),
+    const { error: errorPag } = await supabase
+      .from('pagamentos_recebivel')
+      .insert([pagamento]);
+    if (errorPag) {
+      toast.error('Erro ao registrar pagamento');
+      return;
+    }
+    // Atualiza valor_pago no recebivel
+    const { error: errorRec } = await supabase
+      .from('recebiveis')
+      .update({ valor_pago: (recebivel.valor_pago || 0) + valor })
+      .eq('id', selectedRecebivel);
+    if (errorRec) {
+      toast.error('Erro ao atualizar recebível');
+      return;
+    }
+    // Adiciona entrada no caixa
+  await supabase.from('transacoes').insert({
       tipo: 'entrada',
       valor,
       origem: `Recebimento - ${recebivel.cliente}`,
       data: new Date().toISOString().split('T')[0],
       observacao: 'Pagamento parcial de cliente',
     });
-    localStorage.setItem('caixaData', JSON.stringify(caixaData));
-
+    await fetchRecebiveis();
     toast.success('Pagamento registrado com sucesso!');
     setPagamentoValue('');
     setIsPagamentoDialogOpen(false);
     setSelectedRecebivel(null);
   };
 
-  const handleDeletePagamento = (recebivelId: string, pagamentoId: string) => {
+  const handleDeletePagamento = async (recebivelId: string, pagamentoId: string) => {
     if (!canDelete) return;
-
     const recebivel = recebiveis.find((r) => r.id === recebivelId);
     if (!recebivel) return;
-
-    const pagamento = recebivel.pagamentos.find((p) => p.id === pagamentoId);
+    const pagamento = recebivel.pagamentos?.find((p) => p.id === pagamentoId);
     if (!pagamento) return;
-
-    const updated = recebiveis.map((r) =>
-      r.id === recebivelId
-        ? {
-            ...r,
-            valor_pago: r.valor_pago - pagamento.valor,
-            pagamentos: r.pagamentos.filter((p) => p.id !== pagamentoId),
-          }
-        : r
-    );
-
-    saveRecebiveis(updated);
+    // Remove pagamento da tabela pagamentos_recebivel
+    const { error: errorDel } = await supabase
+      .from('pagamentos_recebivel')
+      .delete()
+      .eq('id', pagamentoId);
+    if (errorDel) {
+      toast.error('Erro ao remover pagamento');
+      return;
+    }
+    // Remove transação de entrada do caixa associada ao pagamento
+    await supabase
+      .from('transacoes')
+      .delete()
+      .eq('origem', `Recebimento - ${recebivel.cliente}`)
+      .eq('valor', pagamento.valor)
+      .eq('data', pagamento.data);
+    // Atualiza valor_pago no recebivel
+    const { error: errorRec } = await supabase
+      .from('recebiveis')
+      .update({ valor_pago: (recebivel.valor_pago || 0) - pagamento.valor })
+      .eq('id', recebivelId);
+    if (errorRec) {
+      toast.error('Erro ao atualizar recebível');
+      return;
+    }
+    await fetchRecebiveis();
     toast.success('Pagamento removido com sucesso!');
   };
 
   const recebiveisAtivos = recebiveis.filter((r) => r.valor_pago < r.valor_total);
-  const recebiveisQuitados = recebiveis.filter((r) => r.valor_pago >= r.valor_total);
+  const recebiveisQuitados = recebiveis.filter((r) => (r.valor_pago || 0) >= (r.valor_total || 0));
+
+  // Estatísticas
+  const totalAReceber = recebiveis.reduce((acc, r) => acc + (r.valor_total || 0), 0);
+  const totalRecebido = recebiveis.reduce((acc, r) => acc + (r.valor_pago || 0), 0);
+  const totalPendente = totalAReceber - totalRecebido;
+  
+  // Calcula total de obras pendentes (orçamento - gastos)
+  const totalObrasReceber = obrasReceber.reduce((acc, obra) => {
+    const totalGastos = (obra.gastos_obra || []).reduce((sum, g) => sum + (g.valor || 0), 0);
+    const valorRestante = obra.orcamento - totalGastos;
+    return acc + valorRestante;
+  }, 0);
 
   const renderRecebivelCard = (recebivel: Recebivel, index: number) => {
-    const valorRestante = recebivel.valor_total - recebivel.valor_pago;
-    const percentualPago = (recebivel.valor_pago / recebivel.valor_total) * 100;
-    const isQuitado = recebivel.valor_pago >= recebivel.valor_total;
+  const valorRestante = (recebivel.valor_total || 0) - (recebivel.valor_pago || 0);
+  const percentualPago = ((recebivel.valor_pago || 0) / (recebivel.valor_total || 1)) * 100;
+  const isQuitado = (recebivel.valor_pago || 0) >= (recebivel.valor_total || 0);
 
     return (
-      <motion.div
-        key={recebivel.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.1 }}
-      >
-        <Card className={isQuitado ? 'bg-gray-50' : ''}>
-          <CardHeader>
-            <CardTitle className="text-gray-900">{recebivel.cliente}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-gray-600">Valor Total</p>
-                <p className="text-gray-900">{formatCurrency(recebivel.valor_total)}</p>
-              </div>
-              <div>
-                <p className="text-gray-600">Valor Pago</p>
-                <p className="text-green-600">{formatCurrency(recebivel.valor_pago)}</p>
-              </div>
-            </div>
+      <div key={recebivel.id} className={`recebivel-card ${isQuitado ? 'quitado' : 'ativo'}`}>
+        <div className="recebivel-card-header">
+          <h3 className="recebivel-card-title">{recebivel.cliente}</h3>
+          {canDelete && (
+            <button
+              className="recebivel-btn-delete"
+              onClick={() => handleDeleteRecebivel(recebivel.id)}
+              title="Apagar recebível"
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
+        </div>
 
-            <div>
-              <div className="flex justify-between mb-1">
-                <p className="text-gray-600">Progresso</p>
-                <p className="text-gray-900">{percentualPago.toFixed(1)}%</p>
-              </div>
-              <Progress value={percentualPago} className="h-2" />
+        <div className="recebivel-info">
+          <div className="recebivel-info-row">
+            <span className="recebivel-info-label">Valor Total</span>
+            <span className="recebivel-info-value total">{formatCurrency(recebivel.valor_total)}</span>
+          </div>
+          <div className="recebivel-info-row">
+            <span className="recebivel-info-label">Valor Pago</span>
+            <span className="recebivel-info-value pago">{formatCurrency(recebivel.valor_pago)}</span>
+          </div>
+          {!isQuitado && (
+            <div className="recebivel-info-row">
+              <span className="recebivel-info-label">Restante</span>
+              <span className="recebivel-info-value restante">{formatCurrency(valorRestante)}</span>
             </div>
+          )}
+        </div>
 
-            {!isQuitado && (
-              <div>
-                <p className="text-gray-600">Restante</p>
-                <p className="text-orange-600">{formatCurrency(valorRestante)}</p>
-              </div>
+        <div className="recebivel-progress-section">
+          <div className="recebivel-progress-header">
+            <span className="recebivel-progress-label">Progresso</span>
+            <span className="recebivel-progress-percentage">{percentualPago.toFixed(1)}%</span>
+          </div>
+          <div className="recebivel-progress-bar">
+            <div 
+              className="recebivel-progress-fill" 
+              style={{ width: `${Math.min(percentualPago, 100)}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="recebivel-pagamentos-section">
+          <div className="recebivel-pagamentos-header">
+            <span className="recebivel-pagamentos-title">
+              Pagamentos ({Array.isArray(recebivel.pagamentos) ? recebivel.pagamentos.length : 0})
+            </span>
+            {canCreate && !isQuitado && (
+              <button
+                className="recebivel-btn-add-pagamento"
+                onClick={() => {
+                  setSelectedRecebivel(recebivel.id);
+                  setIsPagamentoDialogOpen(true);
+                }}
+              >
+                <Plus size={14} />
+                Adicionar
+              </button>
             )}
+          </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-gray-600">
-                  Pagamentos ({recebivel.pagamentos.length})
-                </p>
-                {canCreate && !isQuitado && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedRecebivel(recebivel.id);
-                      setIsPagamentoDialogOpen(true);
-                    }}
-                  >
-                    <Plus className="h-3 w-3 mr-1" />
-                    Pagamento
-                  </Button>
-                )}
-              </div>
-
-              {recebivel.pagamentos.length > 0 && (
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {recebivel.pagamentos.map((pagamento) => (
-                    <div
-                      key={pagamento.id}
-                      className="flex items-center justify-between p-2 bg-gray-50 rounded"
-                    >
-                      <div>
-                        <p className="text-gray-900">{formatCurrency(pagamento.valor)}</p>
-                        <p className="text-gray-500 text-xs">
-                          {new Date(pagamento.data).toLocaleDateString('pt-BR')}
-                        </p>
-                      </div>
-                      {canDelete && !isQuitado && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            handleDeletePagamento(recebivel.id, pagamento.id)
-                          }
-                        >
-                          <Trash2 className="h-3 w-3 text-red-600" />
-                        </Button>
-                      )}
+          {Array.isArray(recebivel.pagamentos) && recebivel.pagamentos.length > 0 && (
+            <div className="recebivel-pagamentos-list">
+              {recebivel.pagamentos.map((pagamento) => (
+                <div key={pagamento.id} className="recebivel-pagamento-item">
+                  <div className="recebivel-pagamento-info">
+                    <div className="recebivel-pagamento-valor">{formatCurrency(pagamento.valor)}</div>
+                    <div className="recebivel-pagamento-data">
+                      {new Date(pagamento.data.replace(/-/g, '/')).toLocaleDateString('pt-BR')}
                     </div>
-                  ))}
+                  </div>
+                  {canDelete && !isQuitado && (
+                    <button
+                      className="recebivel-btn-delete-pagamento"
+                      onClick={() => handleDeletePagamento(recebivel.id, pagamento.id)}
+                      title="Remover pagamento"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          )}
+        </div>
+      </div>
     );
+  // Função para apagar recebível
+  async function handleDeleteRecebivel(recebivelId: string) {
+    if (!canDelete) return;
+    // Apaga todos os pagamentos_recebivel associados
+    await supabase.from('pagamentos_recebivel').delete().eq('recebivel_id', recebivelId);
+    // Apaga todas as transações de caixa associadas
+  await supabase.from('transacoes').delete().eq('origem', `Recebimento - ${recebiveis.find(r => r.id === recebivelId)?.cliente || ''}`);
+    // Apaga o recebível
+    const { error } = await supabase.from('recebiveis').delete().eq('id', recebivelId);
+    if (error) {
+      toast.error('Erro ao apagar recebível');
+      return;
+    }
+    await fetchRecebiveis();
+    toast.success('Recebível apagado com sucesso!');
+  }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-gray-900">A Receber</h1>
-          <p className="text-gray-600">Gerencie contas de clientes</p>
+    <div className="receber-container">
+      <div className="receber-header">
+        <div className="receber-header-content">
+          <h1>A Receber</h1>
+          <p>Gerencie contas de clientes e pagamentos</p>
         </div>
         {canCreate && (
           <Dialog open={isRecebivelDialogOpen} onOpenChange={setIsRecebivelDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+              <button className="receber-btn receber-btn-primary">
+                <Plus size={20} />
                 Nova Conta
-              </Button>
+              </button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="receber-dialog-content">
               <DialogHeader>
-                <DialogTitle>Nova Conta a Receber</DialogTitle>
+                <DialogTitle className="receber-dialog-title">Nova Conta a Receber</DialogTitle>
+                <DialogDescription className="receber-dialog-description">
+                  Preencha os dados para adicionar uma nova conta a receber de cliente.
+                </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleRecebivelSubmit} className="space-y-4">
-                <div className="space-y-2">
+              <form onSubmit={handleRecebivelSubmit}>
+                <div className="receber-form-field">
                   <Label>Cliente</Label>
                   <Input
                     value={recebivelFormData.cliente}
@@ -306,9 +367,10 @@ export default function Receber() {
                       })
                     }
                     required
+                    placeholder="Nome do cliente"
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="receber-form-field">
                   <Label>Valor Total</Label>
                   <Input
                     type="number"
@@ -321,6 +383,7 @@ export default function Receber() {
                       })
                     }
                     required
+                    placeholder="0,00"
                   />
                 </div>
                 <Button type="submit" className="w-full">
@@ -332,8 +395,112 @@ export default function Receber() {
         )}
       </div>
 
-      <Tabs defaultValue="ativos" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+      <div className="receber-summary">
+        <div className="receber-summary-card total">
+          <div className="receber-summary-header">
+            <div className="receber-summary-icon">
+              <TrendingUp size={24} />
+            </div>
+            <div className="receber-summary-info">
+              <h3>Total a Receber</h3>
+              <p>{formatCurrency(totalAReceber)}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="receber-summary-card recebido">
+          <div className="receber-summary-header">
+            <div className="receber-summary-icon">
+              <CheckCircle size={24} />
+            </div>
+            <div className="receber-summary-info">
+              <h3>Total Recebido</h3>
+              <p>{formatCurrency(totalRecebido)}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="receber-summary-card pendente">
+          <div className="receber-summary-header">
+            <div className="receber-summary-icon">
+              <Clock size={24} />
+            </div>
+            <div className="receber-summary-info">
+              <h3>Total Pendente</h3>
+              <p>{formatCurrency(totalPendente)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="receber-summary-card obras-pendentes">
+          <div className="receber-summary-header">
+            <div className="receber-summary-icon">
+              <Building2 size={24} />
+            </div>
+            <div className="receber-summary-info">
+              <h3>Obras Pendentes</h3>
+              <p>{formatCurrency(totalObrasReceber)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* OBRAS PENDENTES */}
+      {obrasReceber.length > 0 && (
+        <div className="receber-obras-section">
+          <div className="receber-obras-header">
+            <h2>Obras em Andamento</h2>
+            <p>Valores de obras não finalizadas</p>
+          </div>
+          <div className="receber-obras-grid">
+            {obrasReceber.map((obra) => {
+              const totalGastos = (obra.gastos_obra || []).reduce((sum, g) => sum + (g.valor || 0), 0);
+              const valorRestante = obra.orcamento - totalGastos;
+              const percentualGasto = obra.orcamento > 0 ? (totalGastos / obra.orcamento) * 100 : 0;
+              
+              return (
+                <div key={obra.id} className="receber-obra-card">
+                  <div className="receber-obra-icon">
+                    <Building2 size={20} />
+                  </div>
+                  <div className="receber-obra-info">
+                    <h3>{obra.nome}</h3>
+                    <div className="receber-obra-valores">
+                      <div className="receber-obra-valor-principal">
+                        <span className="receber-obra-label">A Receber:</span>
+                        <p className="receber-obra-valor">{formatCurrency(valorRestante)}</p>
+                      </div>
+                      <div className="receber-obra-detalhes">
+                        <div className="receber-obra-detalhe">
+                          <span>Orçamento:</span>
+                          <span>{formatCurrency(obra.orcamento)}</span>
+                        </div>
+                        <div className="receber-obra-detalhe">
+                          <span>Gastos:</span>
+                          <span className="gastos-valor">-{formatCurrency(totalGastos)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="receber-obra-progress">
+                      <div className="receber-obra-progress-bar">
+                        <div 
+                          className="receber-obra-progress-fill" 
+                          style={{ width: `${percentualGasto}%` }}
+                        />
+                      </div>
+                      <span className="receber-obra-progress-text">{percentualGasto.toFixed(1)}% gasto</span>
+                    </div>
+                    <span className="receber-obra-badge">Em Andamento</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <Tabs defaultValue="ativos" className="receber-tabs">
+        <TabsList>
           <TabsTrigger value="ativos">
             Ativos ({recebiveisAtivos.length})
           </TabsTrigger>
@@ -341,31 +508,48 @@ export default function Receber() {
             Quitados ({recebiveisQuitados.length})
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="ativos" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recebiveisAtivos.map((recebivel, index) => renderRecebivelCard(recebivel, index))}
-          </div>
-          {recebiveisAtivos.length === 0 && (
-            <p className="text-center text-gray-500 py-8">Nenhuma conta ativa</p>
+        <TabsContent value="ativos">
+          {recebiveisAtivos.length > 0 ? (
+            <div className="receber-grid">
+              {recebiveisAtivos.map((recebivel, index) => renderRecebivelCard(recebivel, index))}
+            </div>
+          ) : (
+            <div className="receber-empty">
+              <div className="receber-empty-icon">
+                <DollarSign size={40} />
+              </div>
+              <h3>Nenhuma conta ativa</h3>
+              <p>Adicione uma nova conta a receber para começar</p>
+            </div>
           )}
         </TabsContent>
-        <TabsContent value="quitados" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recebiveisQuitados.map((recebivel, index) => renderRecebivelCard(recebivel, index))}
-          </div>
-          {recebiveisQuitados.length === 0 && (
-            <p className="text-center text-gray-500 py-8">Nenhuma conta quitada</p>
+        <TabsContent value="quitados">
+          {recebiveisQuitados.length > 0 ? (
+            <div className="receber-grid">
+              {recebiveisQuitados.map((recebivel, index) => renderRecebivelCard(recebivel, index))}
+            </div>
+          ) : (
+            <div className="receber-empty">
+              <div className="receber-empty-icon">
+                <CheckCircle size={40} />
+              </div>
+              <h3>Nenhuma conta quitada</h3>
+              <p>Contas quitadas aparecerão aqui</p>
+            </div>
           )}
         </TabsContent>
       </Tabs>
 
       <Dialog open={isPagamentoDialogOpen} onOpenChange={setIsPagamentoDialogOpen}>
-        <DialogContent>
+        <DialogContent className="receber-dialog-content">
           <DialogHeader>
-            <DialogTitle>Registrar Pagamento</DialogTitle>
+            <DialogTitle className="receber-dialog-title">Registrar Pagamento</DialogTitle>
+            <DialogDescription className="receber-dialog-description">
+              Informe o valor do pagamento para registrar na conta selecionada.
+            </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handlePagamentoSubmit} className="space-y-4">
-            <div className="space-y-2">
+          <form onSubmit={handlePagamentoSubmit}>
+            <div className="receber-form-field">
               <Label>Valor do Pagamento</Label>
               <Input
                 type="number"
@@ -376,7 +560,7 @@ export default function Receber() {
                 placeholder="0,00"
               />
               {selectedRecebivel && (
-                <p className="text-xs text-gray-500">
+                <p className="receber-form-hint">
                   Restante:{' '}
                   {formatCurrency(
                     (recebiveis.find((r) => r.id === selectedRecebivel)?.valor_total || 0) -
@@ -386,7 +570,7 @@ export default function Receber() {
               )}
             </div>
             <Button type="submit" className="w-full">
-              <DollarSign className="h-4 w-4 mr-2" />
+              <DollarSign size={18} style={{ marginRight: '0.5rem' }} />
               Registrar Pagamento
             </Button>
           </form>

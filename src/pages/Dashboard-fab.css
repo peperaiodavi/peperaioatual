@@ -1,0 +1,93 @@
+/* FAB centralizado, próximo do limite inferior, opções lado a lado e animação aprimorada */
+.dashboard-fab {
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  bottom: 1.2rem;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+}
+
+.dashboard-fab .caixa-fab-main {
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(96, 165, 250, 0.25);
+}
+
+.dashboard-fab .caixa-fab-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transition: opacity 0.4s cubic-bezier(.4,0,.2,1), transform 0.4s cubic-bezier(.4,0,.2,1);
+}
+
+.dashboard-fab .caixa-fab-toggle:checked ~ .caixa-fab-actions {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(-60px) scale(1.05);
+}
+
+.dashboard-fab .caixa-fab-btn {
+  margin: 0 0.5rem;
+  background: linear-gradient(135deg, #34d399 0%, #60a5fa 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.75rem 2rem 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(52, 211, 153, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transition: opacity 0.4s cubic-bezier(.4,0,.2,1), transform 0.4s cubic-bezier(.4,0,.2,1);
+}
+
+.dashboard-fab .caixa-fab-toggle:checked ~ .caixa-fab-actions .caixa-fab-btn {
+  opacity: 1;
+  transform: translateY(0) scale(1.05);
+  animation: fabExpand 0.5s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes fabExpand {
+  0% { opacity: 0; transform: translateY(40px) scale(0.8); }
+  60% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+  100% { opacity: 1; transform: translateY(0) scale(1.05); }
+}
+
+.dashboard-fab .caixa-fab-btn.entrada {
+  background: linear-gradient(135deg, #34d399 0%, #60a5fa 100%);
+}
+
+.dashboard-fab .caixa-fab-btn.saida {
+  background: linear-gradient(135deg, #f87171 0%, #a78bfa 100%);
+}
+
+.dashboard-fab .caixa-fab-btn .fab-btn-icon {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .dashboard-fab {
+    bottom: 0.7rem;
+  }
+  .dashboard-fab .caixa-fab-main {
+    width: 54px;
+    height: 54px;
+    font-size: 2rem;
+  }
+  .dashboard-fab .caixa-fab-btn {
+    padding: 0.5rem 1.5rem 0.5rem 1rem;
+    font-size: 1rem;
+  }
+}

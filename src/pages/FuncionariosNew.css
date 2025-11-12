@@ -1,0 +1,2126 @@
+/* ==========================================
+   FUNCIONÁRIOS - DESIGN SYSTEM PEPERAIO
+   ========================================== */
+
+/* ===== PAGE CONTAINER ===== */
+.funcionarios-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #071029 0%, #0b1220 100%);
+  padding: 32px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background decorativo com efeitos radiais */
+.funcionarios-page::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: pulse 8s ease-in-out infinite;
+}
+
+.funcionarios-page::after {
+  content: '';
+  position: absolute;
+  bottom: -50%;
+  left: -20%;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: pulse 10s ease-in-out infinite reverse;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* Container principal */
+.funcionarios-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.funcionarios-header {
+  margin-bottom: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.funcionarios-header-left {
+  flex: 1;
+}
+
+.funcionarios-title {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #fb923c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  letter-spacing: -1px;
+  position: relative;
+}
+
+.funcionarios-title svg {
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 0 16px rgba(96, 165, 250, 0.7));
+  color: #60a5fa;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.funcionarios-subtitle {
+  font-size: 18px;
+  color: #94a3b8;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+}
+
+/* Botão Adicionar */
+.funcionarios-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 8px 24px rgba(96, 165, 250, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.funcionarios-add-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.funcionarios-add-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 12px 32px rgba(96, 165, 250, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.funcionarios-add-btn:hover::before {
+  opacity: 1;
+}
+
+.funcionarios-add-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.funcionarios-add-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ===== TABS ===== */
+.funcionarios-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 40px;
+  padding: 10px;
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 18px;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.funcionarios-tab {
+  padding: 16px 32px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 13px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.3px;
+}
+
+.funcionarios-tab svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s;
+}
+
+.funcionarios-tab:hover {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+  transform: translateY(-2px);
+}
+
+.funcionarios-tab:hover svg {
+  transform: scale(1.1);
+}
+
+.funcionarios-tab.active {
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  color: #ffffff;
+  box-shadow: 
+    0 8px 24px rgba(96, 165, 250, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.funcionarios-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #60a5fa 0%, #7c3aed 100%);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.6);
+}
+
+/* ===== GRID DE CARDS ===== */
+.funcionarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 28px;
+  margin-bottom: 48px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== CARD DE FUNCIONÁRIO ===== */
+.funcionario-card {
+  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Borda superior gradient animada */
+.funcionario-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  right: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #60a5fa, #7c3aed, #fb923c, transparent);
+  transition: all 0.6s;
+}
+
+.funcionario-card:hover::before {
+  left: 100%;
+  right: -100%;
+}
+
+.funcionario-card:hover {
+  box-shadow: 
+    0 16px 48px rgba(96, 165, 250, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+
+/* Header do Card */
+.funcionario-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+/* Avatar */
+.funcionario-avatar-wrapper {
+  position: relative;
+}
+
+.funcionario-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 3px solid rgba(96, 165, 250, 0.3);
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.25);
+  transition: all 0.3s;
+}
+
+.funcionario-card:hover .funcionario-avatar {
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 12px 32px rgba(96, 165, 250, 0.4);
+  transform: scale(1.05);
+}
+
+.funcionario-avatar-fallback {
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 28px;
+  border: 3px solid rgba(96, 165, 250, 0.3);
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.25);
+  transition: all 0.3s;
+}
+
+.funcionario-card:hover .funcionario-avatar-fallback {
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 12px 32px rgba(96, 165, 250, 0.4);
+  transform: scale(1.05);
+}
+
+/* Info do Funcionário */
+.funcionario-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.funcionario-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+
+.funcionario-cargo {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Badges de Categoria */
+.funcionario-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.funcionario-badge-clt {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white;
+}
+
+.funcionario-badge-contrato {
+  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  color: white;
+}
+
+.funcionario-badge-dono {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(251, 146, 60, 0.4);
+}
+
+/* Ações do Card */
+.funcionario-actions {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.funcionario-action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.funcionario-action-btn:hover {
+  background: rgba(96, 165, 250, 0.2);
+  border-color: #60a5fa;
+  color: #60a5fa;
+  transform: scale(1.1);
+}
+
+.funcionario-action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ===== STATS DO CARD ===== */
+.funcionario-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 16px;
+  border: 1px solid rgba(96, 165, 250, 0.1);
+}
+
+.funcionario-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.funcionario-stat-label {
+  font-size: 12px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.funcionario-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #f1f5f9;
+  letter-spacing: -0.5px;
+}
+
+.funcionario-stat-value.positive {
+  color: #34d399;
+}
+
+.funcionario-stat-value.negative {
+  color: #f87171;
+}
+
+/* ===== SALÁRIO DOS DONOS ===== */
+.funcionario-dono-salary-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.funcionario-salary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.funcionario-salary-toggle {
+  background: rgba(96, 165, 250, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: #60a5fa;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.funcionario-salary-toggle:hover {
+  background: rgba(96, 165, 250, 0.25);
+  border-color: #60a5fa;
+  transform: scale(1.05);
+}
+
+.funcionario-salary-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Boxes de Salário */
+.funcionario-salary-base,
+.funcionario-salary-deduct,
+.funcionario-salary-liquid {
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 2px solid;
+  transition: all 0.3s;
+}
+
+.funcionario-salary-base {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.12) 0%, rgba(249, 115, 22, 0.08) 100%);
+  border-color: rgba(251, 146, 60, 0.3);
+}
+
+.funcionario-salary-base:hover {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.18) 0%, rgba(249, 115, 22, 0.12) 100%);
+  border-color: rgba(251, 146, 60, 0.5);
+  transform: translateX(4px);
+}
+
+.funcionario-salary-deduct {
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.12) 0%, rgba(239, 68, 68, 0.08) 100%);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+.funcionario-salary-deduct:hover {
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.18) 0%, rgba(239, 68, 68, 0.12) 100%);
+  border-color: rgba(248, 113, 113, 0.5);
+  transform: translateX(4px);
+}
+
+.funcionario-salary-liquid {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+  border-color: rgba(52, 211, 153, 0.4);
+  box-shadow: 0 8px 24px rgba(52, 211, 153, 0.2);
+}
+
+.funcionario-salary-liquid:hover {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.22) 0%, rgba(16, 185, 129, 0.15) 100%);
+  border-color: rgba(52, 211, 153, 0.6);
+  transform: translateX(4px);
+  box-shadow: 0 12px 32px rgba(52, 211, 153, 0.3);
+}
+
+.funcionario-salary-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.funcionario-salary-base .funcionario-salary-label {
+  color: #fb923c;
+}
+
+.funcionario-salary-deduct .funcionario-salary-label {
+  color: #f87171;
+}
+
+.funcionario-salary-liquid .funcionario-salary-label {
+  color: #34d399;
+}
+
+.funcionario-salary-value {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.8px;
+}
+
+.funcionario-salary-base .funcionario-salary-value {
+  color: #fb923c;
+}
+
+.funcionario-salary-deduct .funcionario-salary-value {
+  color: #f87171;
+}
+
+.funcionario-salary-liquid .funcionario-salary-value {
+  color: #34d399;
+  font-size: 32px;
+}
+
+/* ===== EXPAND BUTTON ===== */
+.funcionario-expand-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px 20px;
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 12px;
+  color: #60a5fa;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  letter-spacing: 0.3px;
+}
+
+.funcionario-expand-btn:hover {
+  background: rgba(96, 165, 250, 0.18);
+  border-color: #60a5fa;
+  transform: translateY(-2px);
+}
+
+.funcionario-expand-btn.expanded {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: #60a5fa;
+}
+
+.funcionario-expand-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s;
+}
+
+.funcionario-expand-btn.expanded .funcionario-expand-icon {
+  transform: rotate(180deg);
+}
+
+/* ===== EXPANDED CONTENT ===== */
+.funcionario-expanded {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(96, 165, 250, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== ACTION GROUP (BOTÕES) ===== */
+.funcionario-action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.funcionario-primary-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+}
+
+.funcionario-primary-btn:hover {
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.45);
+  transform: translateY(-3px) scale(1.02);
+}
+
+.funcionario-primary-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.funcionario-btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Variações de botões específicos */
+.funcionario-saida-btn {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  box-shadow: 0 4px 16px rgba(248, 113, 113, 0.3);
+}
+
+.funcionario-saida-btn:hover {
+  box-shadow: 0 8px 24px rgba(248, 113, 113, 0.45);
+}
+
+.funcionario-payment-btn {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3);
+}
+
+.funcionario-payment-btn:hover {
+  box-shadow: 0 8px 24px rgba(52, 211, 153, 0.45);
+}
+
+.funcionario-salary-edit-btn {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  box-shadow: 0 4px 16px rgba(251, 146, 60, 0.3);
+}
+
+.funcionario-salary-edit-btn:hover {
+  box-shadow: 0 8px 24px rgba(251, 146, 60, 0.45);
+}
+
+.funcionario-vale-btn {
+  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.3);
+}
+
+.funcionario-vale-btn:hover {
+  box-shadow: 0 8px 24px rgba(167, 139, 250, 0.45);
+}
+
+.funcionario-pagamento-btn,
+.funcionario-diaria-btn {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+}
+
+.funcionario-pagamento-btn:hover,
+.funcionario-diaria-btn:hover {
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.45);
+}
+
+/* ===== WARNING E SUCCESS BOXES ===== */
+.funcionario-warning-box,
+.funcionario-success-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-top: 16px;
+  border: 2px solid;
+}
+
+.funcionario-warning-box {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.12) 0%, rgba(249, 115, 22, 0.08) 100%);
+  border-color: rgba(251, 146, 60, 0.4);
+}
+
+.funcionario-success-box {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.funcionario-warning-icon,
+.funcionario-success-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.funcionario-warning-text,
+.funcionario-success-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.funcionario-warning-text strong,
+.funcionario-success-text strong {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.funcionario-warning-text strong {
+  color: #fb923c;
+}
+
+.funcionario-success-text strong {
+  color: #34d399;
+}
+
+.funcionario-warning-text span,
+.funcionario-success-text span {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+/* ===== VALES E SAÍDAS SECTIONS ===== */
+.funcionario-vales-section,
+.funcionario-saidas-section {
+  margin-top: 24px;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 14px;
+  border: 1px solid rgba(96, 165, 250, 0.1);
+}
+
+.funcionario-vales-title,
+.funcionario-saidas-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #60a5fa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.funcionario-vales-title svg,
+.funcionario-saidas-title svg {
+  width: 18px;
+  height: 18px;
+}
+
+.funcionario-vales-list,
+.funcionario-saidas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.funcionario-vale-item,
+.funcionario-saida-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(96, 165, 250, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  transition: all 0.3s;
+}
+
+.funcionario-vale-item:hover,
+.funcionario-saida-item:hover {
+  background: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.25);
+  transform: translateX(4px);
+}
+
+.funcionario-vale-date,
+.funcionario-saida-date {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.funcionario-vale-value,
+.funcionario-saida-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f1f5f9;
+  letter-spacing: -0.3px;
+}
+
+.funcionario-vale-delete,
+.funcionario-saida-delete {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.funcionario-vale-delete:hover,
+.funcionario-saida-delete:hover {
+  background: rgba(248, 113, 113, 0.25);
+  border-color: #f87171;
+  transform: scale(1.1);
+}
+
+.funcionario-vale-delete-icon,
+.funcionario-saida-delete-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.funcionario-vales-total,
+.funcionario-saidas-total {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(96, 165, 250, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.funcionario-vales-total-label,
+.funcionario-saidas-total-label {
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.funcionario-vales-total-value,
+.funcionario-saidas-total-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: #60a5fa;
+  letter-spacing: -0.5px;
+}
+
+/* Observação das saídas */
+.funcionario-saida-obs {
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ===== SALÁRIO INFO (CLT/CONTRATO) ===== */
+.funcionario-salary {
+  padding: 16px 20px;
+  background: rgba(96, 165, 250, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  margin-top: 16px;
+  transition: all 0.3s;
+}
+
+.funcionario-salary:hover {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.4);
+  transform: translateX(4px);
+}
+
+.funcionario-salary-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #60a5fa;
+}
+
+.funcionario-salary-value {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: #f1f5f9;
+}
+
+/* ===== BOTÕES DE AÇÃO ===== */
+.funcionario-card-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(96, 165, 250, 0.1);
+}
+
+.funcionario-btn {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.3px;
+}
+
+.funcionario-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.funcionario-btn-primary {
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+}
+
+.funcionario-btn-primary:hover {
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.4);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.funcionario-btn-secondary {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.funcionario-btn-secondary:hover {
+  background: rgba(96, 165, 250, 0.2);
+  border-color: #60a5fa;
+  transform: translateY(-2px);
+}
+
+.funcionario-btn-success {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(52, 211, 153, 0.3);
+}
+
+.funcionario-btn-success:hover {
+  box-shadow: 0 8px 24px rgba(52, 211, 153, 0.4);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.funcionario-btn-warning {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(251, 146, 60, 0.3);
+}
+
+.funcionario-btn-warning:hover {
+  box-shadow: 0 8px 24px rgba(251, 146, 60, 0.4);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* ===== MODAL DE PAGAMENTO ===== */
+.funcionario-payment-summary {
+  background: linear-gradient(135deg, #0f172a 0%, #151a2e 100%);
+  padding: 24px;
+  border-radius: 16px;
+  margin: 24px 0;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.funcionario-payment-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(96, 165, 250, 0.1);
+}
+
+.funcionario-payment-summary-row:last-child {
+  border-bottom: none;
+}
+
+.funcionario-payment-summary-label {
+  font-size: 14px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.funcionario-payment-summary-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+.funcionario-payment-summary-total {
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  padding: 20px;
+  border-radius: 14px;
+  margin-top: 16px;
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.3);
+}
+
+.funcionario-payment-summary-total .funcionario-payment-summary-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.funcionario-payment-summary-total .funcionario-payment-summary-value {
+  color: white;
+  font-size: 28px;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 1400px) {
+  .funcionarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .funcionarios-title {
+    font-size: 38px;
+  }
+
+  .funcionarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .funcionarios-page {
+    padding: 20px;
+  }
+
+  .funcionarios-title {
+    font-size: 32px;
+    gap: 12px;
+  }
+
+  .funcionarios-title svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .funcionarios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .funcionarios-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .funcionario-card-footer {
+    flex-direction: column;
+  }
+
+  .funcionario-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== LOADING E EMPTY STATES ===== */
+.funcionarios-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #94a3b8;
+}
+
+.funcionarios-loading svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 20px;
+  animation: spin 1s linear infinite;
+  color: #60a5fa;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.funcionarios-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 40px;
+}
+
+.funcionarios-empty svg {
+  width: 96px;
+  height: 96px;
+  color: rgba(96, 165, 250, 0.3);
+  margin-bottom: 24px;
+}
+
+.funcionarios-empty-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 12px;
+}
+
+.funcionarios-empty-description {
+  font-size: 16px;
+  color: #94a3b8;
+  margin-bottom: 24px;
+}
+
+/* ==========================================
+   DIALOGS / MODALS - ESTILIZAÇÃO COMPLETA
+   ========================================== */
+
+/* Força global para todos os dialogs */
+[data-radix-dialog-overlay],
+[role="dialog"] ~ div,
+div[style*="position: fixed"][style*="inset: 0"],
+.DialogOverlay,
+[data-state="open"][data-radix-collection-item] {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+/* Overlay do modal (fundo escuro) */
+.DialogOverlay,
+[data-radix-dialog-overlay] {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  animation: overlayShow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes overlayShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Container do modal - FORÇA O ESTILO */
+.DialogContent,
+[role="dialog"],
+[data-radix-dialog-content],
+div[role="dialog"] {
+  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%) !important;
+  border-radius: 20px !important;
+  box-shadow: 
+    0 24px 80px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  
+  /* CENTRALIZAÇÃO ABSOLUTA - MÁXIMA PRIORIDADE */
+  position: fixed !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: auto !important;
+  
+  /* TAMANHO DO CONTEÚDO */
+  width: 90vw !important;
+  max-width: 480px !important;
+  max-height: 85vh !important;
+  height: fit-content !important;
+  
+  overflow-y: auto !important;
+  padding: 0 !important;
+  z-index: 10000 !important;
+  border: 1px solid rgba(96, 165, 250, 0.25) !important;
+  animation: contentShow 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* FORÇA centralização absoluta em qualquer estado */
+[role="dialog"][style*="transform"],
+[role="dialog"][style*="position"],
+[role="dialog"][data-state] {
+  position: fixed !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: auto !important;
+  transform: none !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+}
+
+/* Remove padding padrão dos dialogs do Radix */
+[role="dialog"] > * {
+  color: #f1f5f9 !important;
+}
+
+@keyframes contentShow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Remove padding padrão dos dialogs do Radix */
+[role="dialog"] > * {
+  color: #f1f5f9 !important;
+}
+
+@keyframes contentShow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Header do modal */
+.DialogHeader,
+[role="dialog"] > div:first-child,
+h2[id*="radix"] {
+  padding: 28px 28px 20px 28px !important;
+  border-bottom: 1px solid rgba(96, 165, 250, 0.15) !important;
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(124, 58, 237, 0.05) 100%) !important;
+  position: relative !important;
+  border-radius: 20px 20px 0 0 !important;
+}
+
+.DialogHeader::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #60a5fa, #7c3aed, transparent);
+  border-radius: 2px;
+}
+
+.DialogTitle,
+h2[id*="radix"],
+[role="dialog"] h2 {
+  margin: 0 !important;
+  font-weight: 800 !important;
+  font-size: 22px !important;
+  color: #f1f5f9 !important;
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  letter-spacing: -0.3px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.DialogTitle svg,
+h2[id*="radix"] svg {
+  width: 24px !important;
+  height: 24px !important;
+  color: #60a5fa !important;
+  filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.6)) !important;
+}
+
+.DialogDescription,
+[role="dialog"] p {
+  margin: 8px 0 0 0 !important;
+  font-size: 13px !important;
+  color: #94a3b8 !important;
+  line-height: 1.6 !important;
+}
+
+/* Corpo do modal */
+.DialogContent > form,
+.DialogContent > div:not(.DialogHeader),
+[role="dialog"] > form,
+[role="dialog"] > div:not(:first-child) {
+  padding: 28px !important;
+  background: transparent !important;
+}
+
+/* Botão de fechar (X) */
+.DialogClose {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.DialogClose:hover {
+  background: rgba(248, 113, 113, 0.2);
+  border-color: #f87171;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 4px 16px rgba(248, 113, 113, 0.4);
+}
+
+.DialogClose svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ===== CAMPOS DE FORMULÁRIO ===== */
+
+/* Labels - FORÇA TEXTO CLARO */
+label,
+.Label,
+[role="dialog"] label,
+form label {
+  display: block !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #94a3b8 !important;
+  margin-bottom: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+}
+
+/* Inputs, Selects, Textareas - FORÇA ESTILO ESCURO */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="date"],
+textarea,
+select,
+.Input,
+.Textarea,
+[role="dialog"] input,
+[role="dialog"] textarea,
+[role="dialog"] select {
+  width: 100% !important;
+  padding: 13px 16px !important;
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 2px solid rgba(96, 165, 250, 0.25) !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  color: #f1f5f9 !important;
+  font-weight: 500 !important;
+  transition: all 0.3s !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus,
+.Input:focus,
+.Textarea:focus {
+  background: rgba(15, 23, 42, 1);
+  border-color: #60a5fa;
+  box-shadow: 
+    0 0 0 3px rgba(96, 165, 250, 0.15),
+    0 4px 16px rgba(96, 165, 250, 0.25);
+  transform: translateY(-2px);
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder,
+input[type="email"]::placeholder,
+textarea::placeholder {
+  color: #64748b;
+  font-weight: 400;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Select customizado */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 45px;
+  cursor: pointer;
+}
+
+/* Input de data customizado */
+input[type="date"] {
+  cursor: pointer;
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.6) sepia(1) saturate(5) hue-rotate(175deg);
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+/* ===== GRUPOS DE CAMPOS ===== */
+.space-y-2,
+.form-group {
+  margin-bottom: 24px;
+}
+
+.space-y-2:last-of-type,
+.form-group:last-of-type {
+  margin-bottom: 0;
+}
+
+/* ===== BOTÕES DO MODAL ===== */
+
+/* Botão primário (submit) */
+.Button,
+button[type="submit"],
+.dialog-submit-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 
+    0 8px 24px rgba(96, 165, 250, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  margin-top: 32px;
+}
+
+.Button::before,
+button[type="submit"]::before,
+.dialog-submit-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.Button:hover,
+button[type="submit"]:hover,
+.dialog-submit-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 12px 32px rgba(96, 165, 250, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.Button:hover::before,
+button[type="submit"]:hover::before,
+.dialog-submit-btn:hover::before {
+  opacity: 1;
+}
+
+.Button:active,
+button[type="submit"]:active,
+.dialog-submit-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.Button:disabled,
+button[type="submit"]:disabled,
+.dialog-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botão secundário (cancelar) */
+.dialog-cancel-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: rgba(248, 113, 113, 0.15);
+  border: 2px solid rgba(248, 113, 113, 0.3);
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 12px;
+}
+
+.dialog-cancel-btn:hover {
+  background: rgba(248, 113, 113, 0.25);
+  border-color: #f87171;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(248, 113, 113, 0.3);
+}
+
+/* Container de botões lado a lado */
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.dialog-actions .Button,
+.dialog-actions button {
+  flex: 1;
+  margin-top: 0;
+}
+
+/* ===== RESUMO DE PAGAMENTO NO MODAL ===== */
+.funcionario-payment-summary,
+[role="dialog"] .funcionario-payment-summary {
+  background: linear-gradient(135deg, #0f172a 0%, #151a2e 100%) !important;
+  padding: 20px !important;
+  border-radius: 14px !important;
+  margin: 20px 0 !important;
+  border: 1px solid rgba(96, 165, 250, 0.25) !important;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  animation: slideUp 0.4s ease-out !important;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.funcionario-payment-summary-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 14px 0 !important;
+  border-bottom: 1px solid rgba(96, 165, 250, 0.1) !important;
+}
+
+.funcionario-payment-summary-row:last-child {
+  border-bottom: none !important;
+}
+
+.funcionario-payment-summary-label {
+  font-size: 12px !important;
+  color: #94a3b8 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.funcionario-payment-summary-label svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.funcionario-payment-summary-value {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  color: #f1f5f9 !important;
+  letter-spacing: -0.5px !important;
+}
+
+/* Linha de dedução (saídas) */
+.funcionario-payment-summary-row.deduction .funcionario-payment-summary-value {
+  color: #f87171 !important;
+}
+
+/* Linha total destacada */
+.funcionario-payment-summary-total {
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%) !important;
+  padding: 18px !important;
+  border-radius: 12px !important;
+  margin-top: 14px !important;
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.5) !important;
+  animation: pulseShadow 2s ease-in-out infinite !important;
+}
+
+@keyframes pulseShadow {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(96, 165, 250, 0.5);
+  }
+  50% {
+    box-shadow: 0 12px 32px rgba(96, 165, 250, 0.7);
+  }
+}
+
+.funcionario-payment-summary-total .funcionario-payment-summary-label {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-size: 13px !important;
+}
+
+.funcionario-payment-summary-total .funcionario-payment-summary-value {
+  color: white !important;
+  font-size: 28px !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ===== AVISOS NO MODAL ===== */
+.modal-info-box {
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 24px 0;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  animation: slideUp 0.4s ease-out 0.2s both;
+}
+
+.modal-info-box svg {
+  width: 20px;
+  height: 20px;
+  color: #60a5fa;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.modal-info-box p {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.modal-warning-box {
+  background: rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 24px 0;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  animation: slideUp 0.4s ease-out 0.2s both;
+}
+
+.modal-warning-box svg {
+  width: 20px;
+  height: 20px;
+  color: #fb923c;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.modal-warning-box p {
+  margin: 0;
+  font-size: 13px;
+  color: #f1f5f9;
+  line-height: 1.6;
+}
+
+.modal-success-box {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 24px 0;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  animation: slideUp 0.4s ease-out 0.2s both;
+}
+
+.modal-success-box svg {
+  width: 20px;
+  height: 20px;
+  color: #34d399;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.modal-success-box p {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+/* ===== SCROLLBAR CUSTOMIZADA DO MODAL ===== */
+.DialogContent::-webkit-scrollbar {
+  width: 12px;
+}
+
+.DialogContent::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 0 24px 24px 0;
+}
+
+.DialogContent::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  border-radius: 6px;
+  border: 2px solid rgba(15, 23, 42, 0.5);
+}
+
+.DialogContent::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #60a5fa 100%);
+}
+
+/* ===== CALENDÁRIO (se houver) ===== */
+.calendar-wrapper {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  margin: 24px 0;
+}
+
+/* ===== RESPONSIVIDADE DOS MODAIS ===== */
+@media (max-width: 640px) {
+  .DialogContent {
+    max-width: 95vw;
+    max-height: 95vh;
+    border-radius: 20px;
+  }
+
+  .DialogHeader {
+    padding: 24px 20px 20px 20px;
+  }
+
+  .DialogTitle {
+    font-size: 22px;
+  }
+
+  .DialogContent > form,
+  .DialogContent > div:not(.DialogHeader) {
+    padding: 24px 20px;
+  }
+
+  .dialog-actions {
+    flex-direction: column;
+  }
+
+  .funcionario-payment-summary-total .funcionario-payment-summary-value {
+    font-size: 26px;
+  }
+}
+
+/* ==========================================
+   OVERRIDE GLOBAL PARA MODAIS - FORÇA !IMPORTANT
+   ========================================== */
+
+/* FORÇA todos os elementos do modal a terem fundo escuro */
+[role="dialog"],
+[role="dialog"] *:not(svg):not(path) {
+  background-color: transparent !important;
+}
+
+[role="dialog"] {
+  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%) !important;
+}
+
+/* FORÇA todos os textos dentro do modal a serem claros */
+[role="dialog"] h1,
+[role="dialog"] h2,
+[role="dialog"] h3,
+[role="dialog"] h4,
+[role="dialog"] h5,
+[role="dialog"] h6,
+[role="dialog"] p,
+[role="dialog"] span:not([class*="gradient"]),
+[role="dialog"] div:not([class*="gradient"]),
+[role="dialog"] label,
+[role="dialog"] legend {
+  color: #f1f5f9 !important;
+}
+
+/* Textos secundários */
+[role="dialog"] .text-muted,
+[role="dialog"] .text-secondary,
+[role="dialog"] small {
+  color: #94a3b8 !important;
+}
+
+/* FORÇA inputs e campos a terem fundo escuro */
+[role="dialog"] input:not([type="checkbox"]):not([type="radio"]),
+[role="dialog"] textarea,
+[role="dialog"] select {
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(96, 165, 250, 0.25) !important;
+}
+
+/* FORÇA botões padrão do Radix */
+[role="dialog"] button:not([class*="funcionario"]):not([class*="dialog"]) {
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%) !important;
+  color: white !important;
+  border: none !important;
+  padding: 14px 24px !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  transition: all 0.3s !important;
+}
+
+[role="dialog"] button:not([class*="funcionario"]):not([class*="dialog"]):hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.4) !important;
+}
+
+/* Remove fundo branco de qualquer elemento */
+[role="dialog"] [style*="background: white"],
+[role="dialog"] [style*="background: #fff"],
+[role="dialog"] [style*="background: rgb(255"],
+[role="dialog"] [class*="bg-white"] {
+  background: transparent !important;
+}
+
+/* FORÇA cor de texto para evitar preto */
+[role="dialog"] [style*="color: black"],
+[role="dialog"] [style*="color: #000"],
+[role="dialog"] [style*="color: rgb(0"],
+[role="dialog"] [class*="text-black"] {
+  color: #f1f5f9 !important;
+}
+
+/* ===== CALENDAR DIALOG ===== */
+.funcionario-calendar-container {
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 14px;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.funcionario-calendar-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* ===== FIX DIALOG CONTENT ===== */
+.dialog-content {
+  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%) !important;
+  border: 1px solid rgba(96, 165, 250, 0.2) !important;
+  color: #f1f5f9 !important;
+}
+
+.dialog-title {
+  color: #f1f5f9 !important;
+  font-weight: 800 !important;
+}
+
+.dialog-description {
+  color: #94a3b8 !important;
+}
+
+/* Fix para inputs dentro de dialogs */
+.dialog-content input,
+.dialog-content textarea,
+.dialog-content select {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+  color: #f1f5f9 !important;
+}
+
+.dialog-content input:focus,
+.dialog-content textarea:focus,
+.dialog-content select:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+}
+
+/* Fix para labels */
+.dialog-content label {
+  color: #94a3b8 !important;
+  font-weight: 600 !important;
+}
+
+/* ===== CONFIRM DELETE DIALOG ===== */
+.funcionario-delete-dialog {
+  padding: 28px;
+  text-align: center;
+}
+
+.funcionario-delete-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  color: #f87171;
+}
+
+.funcionario-delete-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin-bottom: 12px;
+}
+
+.funcionario-delete-message {
+  font-size: 15px;
+  color: #94a3b8;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.funcionario-delete-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.funcionario-delete-cancel,
+.funcionario-delete-confirm {
+  flex: 1;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.funcionario-delete-cancel {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.funcionario-delete-cancel:hover {
+  background: rgba(96, 165, 250, 0.2);
+  border-color: #60a5fa;
+}
+
+.funcionario-delete-confirm {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(248, 113, 113, 0.3);
+}
+
+.funcionario-delete-confirm:hover {
+  box-shadow: 0 8px 24px rgba(248, 113, 113, 0.45);
+  transform: translateY(-2px);
+}
+
+/* ===== OVERRIDE DE CORES PARA TODO TEXTO ===== */
+.funcionario-card *:not(.funcionario-primary-btn):not(.funcionario-btn-primary):not(.funcionario-btn-success):not(.funcionario-btn-warning) {
+  color: inherit;
+}
+
+/* Garantir que todo texto nos cards seja legível */
+.funcionario-card p,
+.funcionario-card span,
+.funcionario-card div:not([class*="btn"]):not([class*="badge"]) {
+  color: #f1f5f9;
+}
+
+/* Fix específico para o alerta de usuário não vinculado */
+.funcionario-warning-box *,
+.funcionario-success-box * {
+  color: inherit !important;
+}
+
+.funcionario-warning-box strong {
+  color: #fb923c !important;
+}
+
+.funcionario-warning-box span {
+  color: #cbd5e1 !important;
+}
+
+.funcionario-success-box strong {
+  color: #34d399 !important;
+}
+
+.funcionario-success-box span {
+  color: #cbd5e1 !important;
+}
+
+/* ===== FIX PARA TEXTO DENTRO DE LISTAS ===== */
+.funcionario-saidas-list span,
+.funcionario-vales-list span,
+.funcionario-saidas-list div,
+.funcionario-vales-list div {
+  color: #f1f5f9 !important;
+}
+
+.funcionario-saida-obs {
+  color: #94a3b8 !important;
+}
+
+/* ===== MELHORIAS FINAIS ===== */
+/* Garantir contraste em todos os elementos */
+.funcionario-expanded * {
+  color: #f1f5f9;
+}
+
+.funcionario-action-group button {
+  color: white !important;
+}
+
+/* Melhorar visibilidade de todos os textos pequenos */
+.funcionario-card small,
+.funcionario-card .text-sm {
+  color: #94a3b8 !important;
+}
+
+/* Fix para qualquer texto que ainda esteja preto */
+.funcionarios-page * {
+  color: inherit;
+}
+
+.funcionarios-page {
+  color: #f1f5f9;
+}

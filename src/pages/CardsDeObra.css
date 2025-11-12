@@ -1,0 +1,1049 @@
+.cards-obra-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+.page-header {
+  margin-bottom: 30px;
+}
+
+.btn-voltar {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-5px);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: 28px;
+  color: white;
+}
+
+.header-content p {
+  margin: 5px 0 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Botões */
+.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 12px 24px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Filtros e Busca */
+.filtros-section {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.busca-container {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.busca-container svg {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.busca-container input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.busca-container input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.filtros-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filtros-status svg {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.filtros-status button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filtros-status button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.filtros-status button.active {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border-color: transparent;
+  color: white;
+}
+
+/* Grid de Cards */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 20px;
+}
+
+.card-obra-item {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-obra-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow: visible;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: white;
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+/* Botões de ação no card */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.btn-icon {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 6px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.btn-icon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-icon.edit:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.btn-icon.delete:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.card-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.card-cliente {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.card-financeiro-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.financeiro-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.financeiro-item .label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.financeiro-item .valor {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+}
+
+.financeiro-item .valor.saldo {
+  color: #10b981;
+}
+
+.financeiro-item .valor.gasto {
+  color: #ef4444;
+}
+
+.card-progresso-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progresso-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.progresso-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progresso-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+/* Estados */
+.loading-state,
+.empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-state svg {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.empty-state h3 {
+  margin: 0;
+  color: white;
+  font-size: 20px;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Modais */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(20, 20, 40, 0.95));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-detalhes-card {
+  background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(20, 20, 40, 0.95));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  padding: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: white;
+}
+
+.modal-header p {
+  margin: 5px 0 0 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+}
+
+.modal-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-body-detalhes {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Formulários */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: white;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.form-group textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.file-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-input:hover {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.file-input input[type="file"] {
+  display: none;
+}
+
+.file-input svg {
+  color: #8b5cf6;
+}
+
+.file-input span {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+}
+
+.info-box {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.info-box.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  display: flex;
+  gap: 12px;
+}
+
+.info-box.warning svg {
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.info-box p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+}
+
+.info-box p:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+/* Field hints */
+.field-hint {
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.field-hint.warning {
+  color: #f59e0b;
+}
+
+/* Detalhes do Card */
+.resumo-financeiro {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.resumo-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.resumo-item svg {
+  color: #8b5cf6;
+}
+
+.resumo-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resumo-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.resumo-valor {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+}
+
+.resumo-valor.saldo {
+  color: #10b981;
+}
+
+.resumo-valor.gasto {
+  color: #ef4444;
+}
+
+/* Alerta de Saldo Zero */
+.resumo-item.saldo-zero {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+.resumo-item.saldo-zero svg {
+  color: #ef4444;
+}
+
+.aviso-sem-verba {
+  font-size: 11px;
+  color: #ef4444;
+  font-weight: 600;
+  margin-top: 4px;
+  display: inline-block;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Ações do Card */
+.acoes-card {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-acao {
+  flex: 1;
+  min-width: 150px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-acao:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-acao:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-acao.transferir {
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.btn-acao.transferir:hover {
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-acao.despesa {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-acao.despesa:hover {
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-acao.solicitar {
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.btn-acao.solicitar:hover {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.btn-acao.finalizar {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.btn-acao.finalizar:hover {
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-acao.aprovar {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.btn-acao.aprovar:hover {
+  background: rgba(34, 197, 94, 0.1);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.btn-acao.rejeitar {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-acao.rejeitar:hover {
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Seções de Despesas e Solicitações */
+.despesas-section,
+.solicitacoes-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.despesas-section h3,
+.solicitacoes-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.empty-message {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  padding: 20px;
+}
+
+.despesas-lista-detalhes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.despesa-item-detalhes {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.despesa-info {
+  flex: 1;
+}
+
+.despesa-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  color: white;
+}
+
+.despesa-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.despesa-meta .categoria {
+  color: #8b5cf6;
+}
+
+.despesa-meta .data {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.despesa-valor-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.despesa-valor-status .valor {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Solicitações de Verba */
+.solicitacoes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.solicitacao-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.solicitacao-info {
+  flex: 1;
+}
+
+.solicitacao-info .valor {
+  font-size: 18px;
+  font-weight: 700;
+  color: #8b5cf6;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.solicitacao-info .justificativa {
+  margin: 0 0 8px 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.solicitacao-info .data {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Estilização premium para select do modal de vinculação */
+.form-group select {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid #06b6d4;
+  background: rgba(20, 22, 34, 0.95);
+  color: #e0e7ef;
+  font-size: 1.08rem;
+  font-weight: 500;
+  box-shadow: 0 2px 12px rgba(6,182,212,0.08);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.form-group select:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 2px #8b5cf633;
+  background: rgba(30, 32, 48, 0.98);
+}
+
+.form-group option {
+  background: #181a2a;
+  color: #e0e7ef;
+  font-size: 1.05rem;
+  padding: 8px 12px;
+}
+
+/* Label harmonizada */
+.form-group label {
+  color: #e0e7ef;
+  font-weight: 600;
+  font-size: 1.08rem;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Ajuste para encaixar no card/modal */
+.modal-content .form-group {
+  margin-bottom: 18px;
+}
+
+/* Placeholder do select */
+.form-group select:invalid {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Modal de cadastro de funcionário */
+.modal-content .form-group input[type="text"],
+.modal-content .form-group input[type="email"] {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid #06b6d4;
+  background: rgba(20, 22, 34, 0.95);
+  color: #e0e7ef;
+  font-size: 1.08rem;
+  font-weight: 500;
+  box-shadow: 0 2px 12px rgba(6,182,212,0.08);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+.modal-content .form-group input:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 2px #8b5cf633;
+  background: rgba(30, 32, 48, 0.98);
+}
+.modal-content .info-box {
+  background: rgba(6,182,212,0.08);
+  color: #e0e7ef;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-top: 8px;
+  font-size: 0.98rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cards-obra-page {
+    padding: 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-content h1 {
+    font-size: 24px;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtros-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .busca-container {
+    width: 100%;
+  }
+
+  .filtros-status {
+    justify-content: flex-start;
+  }
+
+  .card-financeiro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumo-financeiro {
+    grid-template-columns: 1fr;
+  }
+
+  .acoes-card {
+    flex-direction: column;
+  }
+
+  .btn-acao {
+    width: 100%;
+  }
+
+  .despesa-item-detalhes {
+    flex-direction: column;
+  }
+
+  .despesa-valor-status {
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,312 @@
+/* ==========================================
+   MODALS DE FUNCIONÁRIOS - CENTRALIZAÇÃO PERFEITA
+   ========================================== */
+
+/* FORÇAR CENTRALIZAÇÃO ABSOLUTA - MÁXIMA PRIORIDADE */
+[data-slot="dialog-content"],
+[data-radix-dialog-content],
+[role="dialog"],
+.DialogContent,
+div[data-slot="dialog-content"],
+div[role="dialog"] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  inset: auto !important;
+  z-index: 9999 !important;
+}
+
+/* Remover qualquer posicionamento inline que o Radix UI coloca */
+[data-slot="dialog-content"][style*="transform"],
+[data-radix-dialog-content][style*="transform"],
+[role="dialog"][style*="transform"] {
+  transform: translate(-50%, -50%) !important;
+}
+
+[data-slot="dialog-content"][style*="top"],
+[data-radix-dialog-content][style*="top"],
+[role="dialog"][style*="top"] {
+  top: 50% !important;
+}
+
+[data-slot="dialog-content"][style*="left"],
+[data-radix-dialog-content][style*="left"],
+[role="dialog"][style*="left"] {
+  left: 50% !important;
+}
+
+/* Animação suave ao abrir - MANTENDO CENTRALIZAÇÃO */
+@keyframes dialog-content-show {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+[data-slot="dialog-content"],
+[data-radix-dialog-content],
+[role="dialog"],
+.DialogContent {
+  animation: dialog-content-show 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Overlay escuro - CENTRALIZADO */
+[data-slot="dialog-overlay"],
+[data-radix-dialog-overlay],
+div[data-slot="dialog-overlay"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(4px) !important;
+  z-index: 9998 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Estilo do modal de pagamento de dono */
+.funcionario-dialog-content {
+  max-width: 500px !important;
+  width: 90vw !important;
+  /* GARANTIR CENTRALIZAÇÃO */
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 auto !important;
+}
+
+/* Resumo de pagamento no modal */
+.payment-summary-box {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border: 1px solid #cbd5e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.payment-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.payment-summary-row.base {
+  color: #2d3748;
+}
+
+.payment-summary-row.deduction {
+  color: #e53e3e;
+  font-weight: 500;
+}
+
+.payment-summary-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #cbd5e0, transparent);
+  margin: 0.75rem 0;
+}
+
+.payment-summary-row.total {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #667eea;
+  padding-top: 0.75rem;
+}
+
+.payment-summary-row.total .value {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.25rem;
+}
+
+/* Campos de formulário no modal */
+.dialog-form-group {
+  margin-bottom: 1rem;
+}
+
+.dialog-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.dialog-form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.dialog-form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Botões do modal */
+.dialog-footer {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.dialog-button-cancel {
+  flex: 1;
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dialog-button-cancel:hover {
+  background: #f7fafc;
+  border-color: #a0aec0;
+}
+
+.dialog-button-submit {
+  flex: 1;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.dialog-button-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.dialog-button-submit:active {
+  transform: translateY(0);
+}
+
+/* Modal de edição de salário */
+.salary-input-group {
+  position: relative;
+}
+
+.salary-input-prefix {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #718096;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.salary-input {
+  padding-left: 2.5rem !important;
+}
+
+/* Modal de registro de saída */
+.saida-form-description {
+  font-size: 0.875rem;
+  color: #718096;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+  [data-slot="dialog-content"],
+  [role="dialog"],
+  .DialogContent {
+    width: 95vw !important;
+    max-width: none !important;
+    /* MANTER CENTRALIZAÇÃO NO MOBILE */
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  
+  .payment-summary-row {
+    font-size: 0.875rem;
+  }
+  
+  .payment-summary-row.total {
+    font-size: 1rem;
+  }
+  
+  .payment-summary-row.total .value {
+    font-size: 1.1rem;
+  }
+}
+
+/* ==========================================
+   OVERRIDE GLOBAL - ÚLTIMA PALAVRA
+   ========================================== */
+
+/* Sobrescrever QUALQUER estilo inline ou externo */
+body [data-slot="dialog-content"],
+body [data-radix-dialog-content],
+body [role="dialog"],
+body .DialogContent {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  inset: auto !important;
+}
+
+/* Para qualquer elemento com atributo style inline */
+[data-slot="dialog-content"][style],
+[data-radix-dialog-content][style],
+[role="dialog"][style] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Garantir que o portal também não interfira */
+[data-slot="dialog-portal"],
+[data-radix-portal] {
+  position: fixed !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+}
+
+[data-slot="dialog-portal"] > *,
+[data-radix-portal] > * {
+  pointer-events: auto !important;
+}

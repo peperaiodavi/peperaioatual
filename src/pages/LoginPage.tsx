@@ -1,13 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { toast } from 'sonner@2.0.3';
-import { motion } from 'motion/react';
-import { Building2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { Building2, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import './LoginPage.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -36,63 +32,131 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card className="w-full max-w-md backdrop-blur-sm bg-white/90 shadow-xl">
-          <CardHeader className="space-y-4">
-            <div className="flex justify-center">
-              <div className="bg-primary rounded-full p-3">
-                <Building2 className="h-8 w-8 text-white" />
+    <div className="login-container">
+      {/* Elementos de fundo animados */}
+      <div className="login-bg-blob login-bg-blob-1"></div>
+      <div className="login-bg-blob login-bg-blob-2"></div>
+      <div className="login-bg-blob login-bg-blob-3"></div>
+
+      {/* Partículas flutuantes */}
+      {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          className="login-particle"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 2}s`,
+            animationDuration: `${3 + Math.random() * 2}s`
+          }}
+        />
+      ))}
+
+      <div className="login-card-wrapper">
+        <div className="login-card">
+          {/* Header */}
+          <div className="login-header">
+            {/* Logo com animação */}
+            <div className="login-logo-container">
+              <div className="login-logo-wrapper">
+                <div className="login-logo-glow"></div>
+                <div className="login-logo-box">
+                  <Building2 className="login-logo-icon" />
+                </div>
               </div>
             </div>
-            <div className="text-center">
-              <CardTitle>PEPERAIO Comunicação Visual</CardTitle>
-              <CardDescription>Faça login para acessar o sistema</CardDescription>
+
+            {/* Logo e título */}
+            <div className="login-title-container">
+              <div className="login-brand-wrapper">
+                <h1 className="login-brand-title">PEPERAIO</h1>
+                <p className="login-brand-subtitle">Comunicação Visual</p>
+                <div className="login-brand-bars">
+                  <div className="login-brand-bar login-brand-bar-green"></div>
+                  <div className="login-brand-bar login-brand-bar-red"></div>
+                </div>
+              </div>
+              <p className="login-description">
+                <Sparkles className="login-sparkle-icon" />
+                Faça login para acessar o sistema
+              </p>
             </div>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+          </div>
+
+          {/* Content */}
+          <div className="login-content">
+            <form onSubmit={handleLogin} className="login-form">
+              {/* Campo Email */}
+              <div className="login-field">
+                <label htmlFor="email" className="login-label">Email</label>
+                <div className="login-input-wrapper">
+                  <Mail className="login-input-icon" />
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="login-input"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="senha">Senha</Label>
-                <Input
-                  id="senha"
-                  type="password"
-                  placeholder="••••••••"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  required
-                />
+
+              {/* Campo Senha */}
+              <div className="login-field">
+                <label htmlFor="senha" className="login-label">Senha</label>
+                <div className="login-input-wrapper">
+                  <Lock className="login-input-icon" />
+                  <input
+                    id="senha"
+                    type="password"
+                    placeholder="••••••••"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    required
+                    className="login-input"
+                  />
+                </div>
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Entrando...' : 'Entrar'}
-              </Button>
+
+              {/* Botão de login */}
+              <div className="login-button-wrapper">
+                <button
+                  type="submit"
+                  className="login-button"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="login-spinner"></div>
+                  ) : (
+                    <>
+                      <span>Entrar</span>
+                      <ArrowRight className="login-button-arrow" />
+                    </>
+                  )}
+                </button>
+              </div>
             </form>
 
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-xs text-blue-900 mb-2">Credenciais de teste:</p>
-              <div className="space-y-1 text-xs text-blue-800">
-                <p>Admin: admin@empresa.com / admin123</p>
-                <p>Visualizador: joao@empresa.com / joao123</p>
-              </div>
+            {/* Link de recuperação */}
+            <div className="login-forgot">
+              <button
+                type="button"
+                className="login-forgot-link"
+                onClick={() => {/* Implementar recuperação de senha */}}
+              >
+                Esqueceu sua senha?
+              </button>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <p className="login-copyright">
+          © 2025 PEPERAIO. Todos os direitos reservados.
+        </p>
+      </div>
     </div>
   );
 }

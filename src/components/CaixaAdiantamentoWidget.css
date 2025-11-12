@@ -1,0 +1,232 @@
+/* Caixa Adiantamento Widget Styles */
+.caixa-adiantamento-widget {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  border-radius: 20px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 280px;
+}
+
+.caixa-adiantamento-widget:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(96, 165, 250, 0.3);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+
+.caixa-adiantamento-widget.loading,
+.caixa-adiantamento-widget.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+}
+
+.caixa-adiantamento-widget.empty {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.caixa-adiantamento-widget.empty svg {
+  color: #475569;
+}
+
+.caixa-adiantamento-widget.empty h3 {
+  font-size: 1.125rem;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.caixa-adiantamento-widget.empty p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(96, 165, 250, 0.2);
+  border-top-color: #60a5fa;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.widget-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.widget-title-section {
+  flex: 1;
+}
+
+.widget-title-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.widget-subtitle {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.widget-saldo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: rgba(51, 65, 85, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.saldo-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.saldo-valor {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #60a5fa;
+  text-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
+}
+
+.widget-despesas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.despesas-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.despesas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.despesa-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(51, 65, 85, 0.3);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.despesa-item:hover {
+  background: rgba(51, 65, 85, 0.5);
+}
+
+.despesa-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.despesa-info svg {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.despesa-descricao {
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.despesa-valor-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.despesa-valor {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.despesa-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.widget-ver-mais {
+  margin-top: auto;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.widget-ver-mais:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .caixa-adiantamento-widget {
+    padding: 1.25rem;
+  }
+
+  .saldo-valor {
+    font-size: 1.75rem;
+  }
+
+  .despesa-valor-status {
+    align-items: flex-start;
+  }
+}

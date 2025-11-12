@@ -168,6 +168,58 @@
     line-height: inherit;
   }
 
+  /* ===== SAFE AREA & FULL HEIGHT LAYOUT ===== */
+  html {
+    height: 100%;
+    height: 100vh;
+    height: -webkit-fill-available;
+    /* Previne scroll horizontal */
+    overflow-x: hidden;
+  }
+
+  body {
+    min-height: 100%;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    /* SafeArea para iOS/Android com notch/dynamic island */
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    /* Previne scroll horizontal */
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+  }
+
+  #root {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    width: 100%;
+    /* Garante que o conteúdo preenche a tela */
+    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  /* Fix para iOS Safari 100vh bug */
+  @supports (-webkit-touch-callout: none) {
+    #root {
+      min-height: -webkit-fill-available;
+    }
+  }
+
+  /* Classe auxiliar para webkit-fill-available */
+  .webkit-fill-available {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+
   hr {
     height: 0;
     color: inherit;
@@ -244,7 +296,6 @@
   }
 
   img, svg, video, canvas, audio, iframe, embed, object {
-    vertical-align: middle;
     display: block;
   }
 
@@ -1887,6 +1938,7 @@
   }
 
   :is(.\*\:data-\[slot\=select-value\]\:line-clamp-1 > *)[data-slot="select-value"] {
+    line-clamp: 1;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     display: -webkit-box;

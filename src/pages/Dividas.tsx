@@ -1,21 +1,23 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
 import { usePermissao } from '../context/PermissaoContext';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Badge } from '../components/ui/badge';
-import { toast } from 'sonner@2.0.3';
-import { Plus, Edit2, Trash2, DollarSign, AlertCircle, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { Plus, Edit2, Trash2, DollarSign, AlertCircle, CheckCircle, TrendingDown } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
-import { motion } from 'motion/react';
+import './Dividas.css';
 
 interface Divida {
   id: string;
   nome: string;
   valor: number;
+  categoria?: string;
+  tipo?: 'normal' | 'parcelada';
+  valorParcela?: number;
+  numParcelas?: number;
+  datasParcelas?: string[];
+  parcelasPagas?: boolean[];
+  valorRestante?: number;
   vencimento: string;
   status: 'em_dia' | 'atrasado' | 'quitado';
 }
@@ -28,142 +30,270 @@ export default function Dividas() {
   const [formData, setFormData] = useState({
     nome: '',
     valor: '',
+    categoria: '',
+    tipo: 'normal', // 'normal' ou 'parcelada'
+    valorParcela: '',
+    numParcelas: '',
+    datasParcelas: [] as string[],
     vencimento: '',
+    dataBaseParcelas: '', // NOVO: data base para gerar parcelas
     status: 'em_dia' as Divida['status'],
   });
+
+  // Função para formatar valor monetário brasileiro
+  const formatarValorMonetario = (valor: string): string => {
+    // Remove tudo exceto números
+    const apenasNumeros = valor.replace(/\D/g, '');
+    
+    // Converte para número e divide por 100 para ter centavos
+    const numero = Number(apenasNumeros) / 100;
+    
+    // Formata com vírgula e ponto
+    return numero.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  // Função para converter valor formatado para número
+  const converterParaNumero = (valorFormatado: string): number => {
+    // Remove pontos de milhar e substitui vírgula por ponto
+    return parseFloat(valorFormatado.replace(/\./g, '').replace(',', '.')) || 0;
+  };
 
   useEffect(() => {
     loadDividas();
   }, []);
 
-  const loadDividas = () => {
-    const saved = localStorage.getItem('dividasData');
-    if (saved) {
-      setDividas(JSON.parse(saved));
-    } else {
-      // Mock data
-      const mockData: Divida[] = [
-        {
-          id: '1',
-          nome: 'Aluguel Escritório',
-          valor: 2500,
-          vencimento: '2025-11-05',
-          status: 'em_dia',
-        },
-        {
-          id: '2',
-          nome: 'Fornecedor Material',
-          valor: 5000,
-          vencimento: '2025-10-25',
-          status: 'atrasado',
-        },
-        {
-          id: '3',
-          nome: 'Conta de Energia',
-          valor: 450,
-          vencimento: '2025-09-15',
-          status: 'quitado',
-        },
-      ];
-      setDividas(mockData);
-      localStorage.setItem('dividasData', JSON.stringify(mockData));
+  const loadDividas = async () => {
+    const { data, error } = await supabase.from('dividas').select('*');
+    if (error) {
+      toast.error('Erro ao buscar dívidas!');
+      return;
     }
-  };
-
-  const saveDividas = (data: Divida[]) => {
-    localStorage.setItem('dividasData', JSON.stringify(data));
-    setDividas(data);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canCreate && !editingDivida) return;
-    if (!canEdit && editingDivida) return;
-
-    const dividaData: Divida = {
-      id: editingDivida?.id || Date.now().toString(),
-      nome: formData.nome,
-      valor: parseFloat(formData.valor),
-      vencimento: formData.vencimento,
-      status: formData.status,
-    };
-
-    let updated: Divida[];
-    if (editingDivida) {
-      updated = dividas.map((d) => (d.id === dividaData.id ? dividaData : d));
-      toast.success('Dívida atualizada com sucesso!');
-    } else {
-      updated = [...dividas, dividaData];
-      toast.success('Dívida adicionada com sucesso!');
-    }
-
-    saveDividas(updated);
-    resetForm();
-    setIsDialogOpen(false);
-  };
-
-  const handleDelete = (id: string) => {
-    if (!canDelete) return;
-    const updated = dividas.filter((d) => d.id !== id);
-    saveDividas(updated);
-    toast.success('Dívida removida com sucesso!');
-  };
-
-  const handlePagar = (divida: Divida) => {
-    if (!canEdit) return;
-
-    // Update divida status
-    const updated = dividas.map((d) =>
-      d.id === divida.id ? { ...d, status: 'quitado' as Divida['status'] } : d
-    );
-    saveDividas(updated);
-
-    // Add to caixa
-    const caixaData = JSON.parse(localStorage.getItem('caixaData') || '[]');
-    caixaData.push({
-      id: Date.now().toString(),
-      tipo: 'saida',
-      valor: divida.valor,
-      origem: `Pagamento - ${divida.nome}`,
-      data: new Date().toISOString().split('T')[0],
-      observacao: 'Pagamento de dívida',
-    });
-    localStorage.setItem('caixaData', JSON.stringify(caixaData));
-
-    toast.success('Dívida quitada e registrada no caixa!');
+    // Inicializa campos extras para dívidas parceladas
+    setDividas((data || []).map((d: any) => {
+      if (d.tipo === 'parcelada') {
+        return {
+          ...d,
+          parcelasPagas: d.parcelasPagas || Array(Number(d.numParcelas) || 0).fill(false),
+          valorRestante: d.valorRestante ?? d.valor,
+        };
+      }
+      return d;
+    }));
   };
 
   const resetForm = () => {
-    setFormData({ nome: '', valor: '', vencimento: '', status: 'em_dia' });
+    setFormData({
+      nome: '',
+      valor: '',
+      categoria: '',
+      tipo: 'normal',
+      valorParcela: '',
+      numParcelas: '',
+      datasParcelas: [],
+      vencimento: '',
+      dataBaseParcelas: '',
+      status: 'em_dia',
+    });
     setEditingDivida(null);
   };
 
   const openEditDialog = (divida: Divida) => {
-    if (!canEdit) return;
     setEditingDivida(divida);
     setFormData({
       nome: divida.nome,
-      valor: divida.valor.toString(),
+      valor: divida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      categoria: divida.categoria || '',
+      tipo: divida.tipo || 'normal',
+      valorParcela: divida.valorParcela ? divida.valorParcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '',
+      numParcelas: divida.numParcelas?.toString() || '',
+      datasParcelas: divida.datasParcelas || [],
       vencimento: divida.vencimento,
+      dataBaseParcelas: divida.datasParcelas?.[0] || '',
       status: divida.status,
     });
     setIsDialogOpen(true);
   };
 
-  const getStatusConfig = (status: Divida['status']) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!canCreate && !editingDivida) return;
+    if (!canEdit && editingDivida) return;
+
+    // --- Validação ---
+    const valorNumerico = converterParaNumero(formData.valor);
+    if (isNaN(valorNumerico) || valorNumerico <= 0) {
+      toast.error('O Valor Total deve ser um número positivo.');
+      return;
+    }
+    if (formData.tipo === 'normal' && !formData.vencimento) {
+      toast.error('A Data de Vencimento é obrigatória.');
+      return;
+    }
+    if (formData.tipo === 'parcelada' && (!formData.numParcelas || !formData.dataBaseParcelas)) {
+      toast.error('Nº de Parcelas e Data Base são obrigatórios.');
+      return;
+    }
+    // --- Fim Validação ---
+
+    if (editingDivida) {
+      // --- MODO UPDATE (EDITAR) ---
+      // Na edição, SÓ atualizamos os campos do formulário.
+      // Não mexemos em parcelasPagas ou valorRestante aqui.
+      const dadosUpdate = {
+        nome: formData.nome,
+        categoria: formData.categoria,
+        tipo: formData.tipo,
+        valor: valorNumerico,
+        status: formData.status,
+        
+        vencimento: formData.tipo === 'normal' ? formData.vencimento : null,
+        
+        valorParcela: formData.tipo === 'parcelada' ? converterParaNumero(formData.valorParcela) : null,
+        numParcelas: formData.tipo === 'parcelada' ? parseInt(formData.numParcelas) : null,
+        datasParcelas: formData.tipo === 'parcelada' ? formData.datasParcelas : null,
+      };
+
+      const { error } = await supabase
+        .from('dividas')
+        .update(dadosUpdate)
+        .eq('id', editingDivida.id);
+      if (!error) {
+        toast.success('Dívida atualizada com sucesso!');
+        loadDividas();
+      } else {
+        toast.error('Erro ao atualizar dívida!');
+        console.error("Erro Update Dívida:", error, dadosUpdate);
+      }
+    } else {
+      // --- MODO INSERT (CRIAR) ---
+      const dadosInsert = {
+        nome: formData.nome,
+        categoria: formData.categoria,
+        tipo: formData.tipo,
+        valor: valorNumerico,
+        status: formData.status,
+        
+        vencimento: formData.tipo === 'normal' ? formData.vencimento : null,
+        
+        valorParcela: formData.tipo === 'parcelada' ? converterParaNumero(formData.valorParcela) : null,
+        numParcelas: formData.tipo === 'parcelada' ? parseInt(formData.numParcelas) : null,
+        datasParcelas: formData.tipo === 'parcelada' ? formData.datasParcelas : null,
+        
+        // Campos de controle inicial
+        parcelasPagas: formData.tipo === 'parcelada' 
+          ? Array(parseInt(formData.numParcelas)).fill(false) 
+          : null, // <-- CORRIGIDO: Envia 'null' se for 'normal'
+          
+        valorRestante: valorNumerico, // <-- CORRIGIDO: Valor restante é sempre o total no início
+      };
+
+      const { error } = await supabase
+        .from('dividas')
+        .insert(dadosInsert); // Envia o objeto de insert
+      if (!error) {
+        toast.success('Dívida adicionada com sucesso!');
+        loadDividas();
+      } else {
+        toast.error('Erro ao adicionar dívida!');
+        // Adicionei o log do objeto para facilitar a depuração
+        console.error("Erro Insert Dívida:", error, dadosInsert); 
+      }
+    }
+    resetForm();
+    setIsDialogOpen(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!canDelete) return;
+    const { error } = await supabase.from('dividas').delete().eq('id', id);
+    if (!error) {
+      toast.success('Dívida removida com sucesso!');
+      loadDividas();
+    } else {
+      toast.error('Erro ao remover dívida!');
+    }
+  };
+
+  const handlePagar = async (divida: Divida) => {
+    if (!canEdit) return;
+    if (divida.tipo === 'parcelada') {
+      // Pagar próxima parcela não paga
+      const idx = (divida.parcelasPagas || []).findIndex(p => !p);
+      if (idx === -1) return;
+      const novasParcelasPagas = [...(divida.parcelasPagas || [])];
+      novasParcelasPagas[idx] = true;
+      const novoValorRestante = (divida.valorRestante || divida.valor) - (divida.valorParcela || 0);
+      // Atualiza no banco
+      const { error } = await supabase
+        .from('dividas')
+        .update({
+          parcelasPagas: novasParcelasPagas,
+          valorRestante: novoValorRestante,
+          status: novoValorRestante <= 0 ? 'quitado' : divida.status,
+        })
+        .eq('id', divida.id);
+      if (!error) {
+        // Lança no caixa
+        const data = divida.datasParcelas?.[idx] || new Date().toISOString().split('T')[0];
+        const origem = `Parcela ${idx + 1} - ${divida.nome}`;
+        const categoria = divida.categoria || 'Parcelas';
+        await supabase.from('transacoes').insert({
+          tipo: 'saida',
+          valor: divida.valorParcela,
+          origem,
+          data,
+          categoria,
+          observacao: '',
+        });
+        toast.success('Parcela paga e registrada no caixa!');
+        loadDividas();
+      } else {
+        toast.error('Erro ao pagar parcela!');
+      }
+    } else {
+      // Dívida normal
+      const { error } = await supabase
+        .from('dividas')
+        .update({ status: 'quitado' })
+        .eq('id', divida.id);
+      if (!error) {
+        // Lança no caixa
+        await supabase.from('transacoes').insert({
+          tipo: 'saida',
+          valor: divida.valor,
+          origem: divida.nome,
+          data: divida.vencimento,
+          categoria: divida.categoria || 'Dívidas',
+          observacao: '',
+        });
+        toast.success('Dívida marcada como quitada e registrada no caixa!');
+        loadDividas();
+      } else {
+        toast.error('Erro ao marcar como quitada!');
+      }
+    }
+  };
+
+  const getStatusConfig = (status: Divida['status']): {
+    label: string;
+    variant: 'default' | 'destructive' | 'secondary' | 'outline' | null | undefined;
+    icon: React.ComponentType<any>;
+    color: string;
+    bgColor: string;
+  } => {
     switch (status) {
       case 'em_dia':
         return {
           label: 'Em Dia',
-          variant: 'default' as const,
-          icon: CheckCircle,
-          color: 'text-green-600',
-          bgColor: 'bg-green-50',
+          variant: 'default',
+          icon: AlertCircle,
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50',
         };
       case 'atrasado':
         return {
           label: 'Atrasado',
-          variant: 'destructive' as const,
+          variant: 'destructive',
           icon: AlertCircle,
           color: 'text-red-600',
           bgColor: 'bg-red-50',
@@ -179,151 +309,381 @@ export default function Dividas() {
     }
   };
 
+  // Estatísticas
+  const totalDividas = dividas.reduce((acc, d) => acc + (d.valorRestante || d.valor), 0);
+  const dividasEmDia = dividas.filter(d => d.status === 'em_dia');
+  const dividasAtrasadas = dividas.filter(d => d.status === 'atrasado');
+  const dividasQuitadas = dividas.filter(d => d.status === 'quitado');
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-gray-900">Dívidas</h1>
-          <p className="text-gray-600">Gerencie contas a pagar</p>
+    <div className="dividas-container">
+      <div className="dividas-header">
+        <div className="dividas-header-content">
+          <h1>Dívidas</h1>
+          <p>Gerencie e controle suas contas a pagar</p>
         </div>
         {canCreate && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm}>
-                <Plus className="mr-2 h-4 w-4" />
+              <button className="dividas-btn dividas-btn-primary" onClick={resetForm}>
+                <Plus className="h-4 w-4" />
                 Adicionar Dívida
-              </Button>
+              </button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="dividas-dialog-content">
               <DialogHeader>
-                <DialogTitle>{editingDivida ? 'Editar Dívida' : 'Nova Dívida'}</DialogTitle>
+                <DialogTitle className="dividas-dialog-title">
+                  {editingDivida ? 'Editar Dívida' : 'Nova Dívida'}
+                </DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Nome</Label>
-                  <Input
+              <form onSubmit={handleSubmit} className="dividas-form">
+                <div className="dividas-form-field">
+                  <label>Nome</label>
+                  <input
                     value={formData.nome}
                     onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Valor</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
+                <div className="dividas-form-field">
+                  <label>Categoria</label>
+                  <input
+                    value={formData.categoria}
+                    onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
+                    placeholder="Ex: Aluguel, Fornecedor, Serviços"
+                  />
+                </div>
+                <div className="dividas-form-field">
+                  <label>Tipo</label>
+                  <div className="dividas-tipo-options">
+                    <button
+                      type="button"
+                      className={formData.tipo === 'normal' ? 'active' : ''}
+                      onClick={() => setFormData({ ...formData, tipo: 'normal' })}
+                    >
+                      Normal
+                    </button>
+                    <button
+                      type="button"
+                      className={formData.tipo === 'parcelada' ? 'active' : ''}
+                      onClick={() => setFormData({ ...formData, tipo: 'parcelada' })}
+                    >
+                      Parcelada
+                    </button>
+                  </div>
+                </div>
+                <div className="dividas-form-field">
+                  <label>Valor Total</label>
+                  <input
+                    type="text"
                     value={formData.valor}
-                    onChange={(e) => setFormData({ ...formData, valor: e.target.value })}
+                    onChange={(e) => {
+                      const valorFormatado = formatarValorMonetario(e.target.value);
+                      let novoValorParcela = formData.valorParcela;
+                      if (formData.tipo === 'parcelada' && formData.numParcelas) {
+                        const valorTotal = converterParaNumero(valorFormatado);
+                        const num = parseInt(formData.numParcelas);
+                        if (num > 0) {
+                          const valorParcelaNum = valorTotal / num;
+                          novoValorParcela = valorParcelaNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        }
+                      }
+                      setFormData({ ...formData, valor: valorFormatado, valorParcela: novoValorParcela });
+                    }}
+                    placeholder="0,00"
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Vencimento</Label>
-                  <Input
-                    type="date"
-                    value={formData.vencimento}
-                    onChange={(e) => setFormData({ ...formData, vencimento: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select
+                {formData.tipo === 'parcelada' && (
+                  <>
+                    <div className="dividas-form-field">
+                      <label>Número de Parcelas</label>
+                      <input
+                        type="number"
+                        value={formData.numParcelas}
+                        onChange={(e) => {
+                          const num = Number(e.target.value);
+                          const valorTotal = converterParaNumero(formData.valor);
+                          const valorParcelaNum = num > 0 ? (valorTotal / num) : 0;
+                          const valorParcela = valorParcelaNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                          let datasParcelas: string[] = [];
+                          if (formData.dataBaseParcelas && num > 0) {
+                            const baseDate = new Date(formData.dataBaseParcelas);
+                            for (let i = 0; i < num; i++) {
+                              const d = new Date(baseDate);
+                              d.setMonth(baseDate.getMonth() + i);
+                              datasParcelas.push(d.toISOString().split('T')[0]);
+                            }
+                          }
+                          setFormData({
+                            ...formData,
+                            numParcelas: e.target.value,
+                            valorParcela: valorParcela,
+                            datasParcelas,
+                          });
+                        }}
+                        required
+                      />
+                    </div>
+                    <div className="dividas-form-field">
+                      <label>Valor da Parcela</label>
+                      <input
+                        type="text"
+                        value={formData.valorParcela}
+                        readOnly
+                        placeholder="0,00"
+                        className="readonly"
+                      />
+                    </div>
+                    <div className="dividas-form-field">
+                      <label>Data base de vencimento</label>
+                      <input
+                        type="date"
+                        value={formData.dataBaseParcelas}
+                        onChange={e => {
+                          const base = e.target.value;
+                          const num = Number(formData.numParcelas) || 0;
+                          let datasParcelas: string[] = [];
+                          if (base && num > 0) {
+                            const baseDate = new Date(base);
+                            for (let i = 0; i < num; i++) {
+                              const d = new Date(baseDate);
+                              d.setMonth(baseDate.getMonth() + i);
+                              datasParcelas.push(d.toISOString().split('T')[0]);
+                            }
+                          }
+                          setFormData({ ...formData, dataBaseParcelas: base, datasParcelas });
+                        }}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+                {formData.tipo === 'normal' && (
+                  <div className="dividas-form-field">
+                    <label>Vencimento</label>
+                    <input
+                      type="date"
+                      value={formData.vencimento}
+                      onChange={(e) => setFormData({ ...formData, vencimento: e.target.value })}
+                      required
+                    />
+                  </div>
+                )}
+                <div className="dividas-form-field">
+                  <label>Status</label>
+                  <select
                     value={formData.status}
-                    onValueChange={(value: Divida['status']) =>
-                      setFormData({ ...formData, status: value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as Divida['status'] })}
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="em_dia">Em Dia</SelectItem>
-                      <SelectItem value="atrasado">Atrasado</SelectItem>
-                      <SelectItem value="quitado">Quitado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="em_dia">Em Dia</option>
+                    <option value="atrasado">Atrasado</option>
+                    <option value="quitado">Quitado</option>
+                  </select>
                 </div>
-                <Button type="submit" className="w-full">
+                <button type="submit" className="dividas-btn dividas-btn-primary w-full">
                   {editingDivida ? 'Salvar Alterações' : 'Adicionar'}
-                </Button>
+                </button>
               </form>
             </DialogContent>
           </Dialog>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {dividas.map((divida, index) => {
+      {/* Cards de Resumo */}
+      <div className="dividas-summary">
+        <div className="dividas-summary-card total">
+          <div className="dividas-summary-icon">
+            <DollarSign />
+          </div>
+          <div className="dividas-summary-content">
+            <span className="dividas-summary-label">Total em Dívidas</span>
+            <span className="dividas-summary-value">{formatCurrency(totalDividas)}</span>
+            <span className="dividas-summary-count">{dividas.length} dívida(s)</span>
+          </div>
+        </div>
+
+        <div className="dividas-summary-card emdia">
+          <div className="dividas-summary-icon">
+            <CheckCircle />
+          </div>
+          <div className="dividas-summary-content">
+            <span className="dividas-summary-label">Em Dia</span>
+            <span className="dividas-summary-value">{dividasEmDia.length}</span>
+            <span className="dividas-summary-count">
+              {formatCurrency(dividasEmDia.reduce((acc, d) => acc + (d.valorRestante || d.valor), 0))}
+            </span>
+          </div>
+        </div>
+
+        <div className="dividas-summary-card atrasadas">
+          <div className="dividas-summary-icon">
+            <AlertCircle />
+          </div>
+          <div className="dividas-summary-content">
+            <span className="dividas-summary-label">Atrasadas</span>
+            <span className="dividas-summary-value">{dividasAtrasadas.length}</span>
+            <span className="dividas-summary-count">
+              {formatCurrency(dividasAtrasadas.reduce((acc, d) => acc + (d.valorRestante || d.valor), 0))}
+            </span>
+          </div>
+        </div>
+
+        <div className="dividas-summary-card quitadas">
+          <div className="dividas-summary-icon">
+            <TrendingDown />
+          </div>
+          <div className="dividas-summary-content">
+            <span className="dividas-summary-label">Quitadas</span>
+            <span className="dividas-summary-value">{dividasQuitadas.length}</span>
+            <span className="dividas-summary-count">
+              {formatCurrency(dividasQuitadas.reduce((acc, d) => acc + d.valor, 0))}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid de Dívidas */}
+      <div className="dividas-grid">
+        {dividas.map((divida) => {
           const statusConfig = getStatusConfig(divida.status);
           const StatusIcon = statusConfig.icon;
-
           return (
-            <motion.div
-              key={divida.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className={`${statusConfig.bgColor} border-l-4 ${statusConfig.color}`}>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <StatusIcon className={`h-5 w-5 ${statusConfig.color}`} />
-                        <h3 className="text-gray-900">{divida.nome}</h3>
+            <div key={divida.id} className={`divida-card ${divida.status}`}>
+              <div className="divida-card-header">
+                <div className="divida-card-title">
+                  <StatusIcon className="h-5 w-5" />
+                  <h3>{divida.nome}</h3>
+                </div>
+                <div className="divida-card-actions">
+                  {canEdit && (
+                    <button
+                      className="dividas-btn-icon"
+                      onClick={() => openEditDialog(divida)}
+                      title="Editar"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button
+                      className="dividas-btn-icon delete"
+                      onClick={() => handleDelete(divida.id)}
+                      title="Excluir"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="divida-info">
+                {divida.categoria && (
+                  <div className="divida-categoria">{divida.categoria}</div>
+                )}
+                <div className="divida-info-row">
+                  <span className="divida-info-label">Valor Inicial:</span>
+                  <span className="divida-info-value">{formatCurrency(divida.valor)}</span>
+                </div>
+                
+                {divida.tipo === 'parcelada' ? (
+                  <>
+                    <div className="divida-info-row">
+                      <span className="divida-info-label">Valor Restante:</span>
+                      <span className="divida-info-value highlight">{formatCurrency(divida.valorRestante ?? divida.valor)}</span>
+                    </div>
+                    
+                    {/* Seção de Parcelas */}
+                    <div className="divida-parcelas-section">
+                      <div className="divida-parcelas-header">
+                        <h4>Parcelas</h4>
+                        <span className="divida-parcelas-progress">
+                          {(divida.parcelasPagas || []).filter(p => p).length} / {divida.numParcelas || 0} pagas
+                        </span>
                       </div>
-                      {canEdit && (
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => openEditDialog(divida)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          {canDelete && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDelete(divida.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-600" />
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                      <div className="divida-parcelas-list">
+                        {(divida.datasParcelas || []).map((data, idx) => {
+                          const hoje = new Date();
+                          hoje.setHours(0, 0, 0, 0);
+                          const dataParcela = new Date(data);
+                          dataParcela.setHours(0, 0, 0, 0);
+                          const isPaga = divida.parcelasPagas && divida.parcelasPagas[idx];
+                          const isVencida = dataParcela < hoje && !isPaga;
+                          const isMesAtual = dataParcela.getMonth() === hoje.getMonth() && 
+                                             dataParcela.getFullYear() === hoje.getFullYear();
 
-                    <div>
-                      <p className="text-gray-600">Valor</p>
-                      <p className={`${statusConfig.color}`}>{formatCurrency(divida.valor)}</p>
-                    </div>
+                          let statusClass = 'pendente';
+                          let statusLabel = 'Pendente';
+                          
+                          if (isPaga) {
+                            statusClass = 'paga';
+                            statusLabel = 'Paga';
+                          } else if (isVencida) {
+                            statusClass = 'atrasada';
+                            statusLabel = 'Atrasada';
+                          } else if (isMesAtual) {
+                            statusClass = 'mesatual';
+                            statusLabel = 'Mês Atual';
+                          }
 
-                    <div>
-                      <p className="text-gray-600">Vencimento</p>
-                      <p className="text-gray-900">
+                          // Mostrar apenas parcelas pendentes, atrasadas ou do mês atual
+                          if (!isPaga || isMesAtual || isVencida) {
+                            return (
+                              <div key={idx} className={`divida-parcela-item ${statusClass}`}>
+                                <div className="divida-parcela-info">
+                                  <span className="divida-parcela-numero">Parcela {idx + 1}</span>
+                                  <span className="divida-parcela-data">
+                                    {new Date(data).toLocaleDateString('pt-BR')}
+                                  </span>
+                                </div>
+                                <div className="divida-parcela-valor">
+                                  {formatCurrency(divida.valorParcela || 0)}
+                                </div>
+                                <div className="divida-parcela-status">{statusLabel}</div>
+                                {canEdit && !isPaga && divida.status !== 'quitado' && (
+                                  <button
+                                    className={`dividas-btn-pagar ${isVencida ? 'urgent' : ''}`}
+                                    onClick={() => handlePagar(divida)}
+                                  >
+                                    <DollarSign className="h-3 w-3" />
+                                    Pagar
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="divida-info-row">
+                      <span className="divida-info-label">Vencimento:</span>
+                      <span className="divida-info-value">
                         {new Date(divida.vencimento).toLocaleDateString('pt-BR')}
-                      </p>
+                      </span>
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
+                    <div className="divida-card-footer">
+                      <div className={`divida-status-badge ${divida.status}`}>
+                        <StatusIcon className="h-3 w-3" />
+                        {statusConfig.label}
+                      </div>
                       {canEdit && divida.status !== 'quitado' && (
-                        <Button
-                          size="sm"
-                          variant="outline"
+                        <button
+                          className="dividas-btn-pagar"
                           onClick={() => handlePagar(divida)}
                         >
-                          <DollarSign className="h-3 w-3 mr-1" />
+                          <DollarSign className="h-3 w-3" />
                           Pagar
-                        </Button>
+                        </button>
                       )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                  </>
+                )}
+              </div>
+            </div>
           );
         })}
       </div>

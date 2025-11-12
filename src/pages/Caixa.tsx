@@ -10,10 +10,56 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, TrendingUp, TrendingDown, FileDown, Wallet, Trash2, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Minus, TrendingUp, TrendingDown, FileDown, Wallet, Trash2, Tag, ChevronLeft, ChevronRight, History, RotateCcw } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
-import { motion } from 'motion/react';
 import jsPDF from 'jspdf';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import './Caixa.css';
+import './Caixa-fab.css';
+
+// Função auxiliar para detectar mobile
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
+// Função auxiliar para download de PDF em mobile
+const downloadPDFMobile = async (doc: jsPDF, filename: string) => {
+  try {
+    if (isMobileDevice()) {
+      // Mobile: sempre usa compartilhamento
+      const blob = doc.output('blob');
+      const file = new File([blob], filename, { type: 'application/pdf' });
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'Extrato do Caixa',
+            text: 'Extrato financeiro gerado pelo sistema PEPERAIO'
+          });
+          toast.success('PDF compartilhado com sucesso!');
+        } catch (error: any) {
+          if (error.name !== 'AbortError') {
+            console.error('Erro ao compartilhar:', error);
+            toast.error('Erro ao compartilhar PDF');
+          }
+        }
+      } else {
+        // Fallback: abre em nova aba se Web Share API não disponível
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        toast.info('PDF aberto em nova aba');
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      }
+    } else {
+      // Desktop: download tradicional
+      doc.save(filename);
+      toast.success('PDF exportado com sucesso!');
+    }
+  } catch (error) {
+    console.error('Erro ao exportar PDF:', error);
+    toast.error('Erro ao exportar PDF. Tente novamente.');
+  }
+};
 
 interface Transacao {
   id: string;
@@ -23,6 +69,11 @@ interface Transacao {
   data: string;
   observacao: string;
   categoria: string;
+}
+
+interface TransacaoExcluida extends Transacao {
+  data_exclusao: string;
+  excluido_por?: string;
 }
 
 interface Categoria {
@@ -37,14 +88,18 @@ export default function Caixa() {
   // ...hooks e funções auxiliares...
   const { canCreate, canDelete } = usePermissao();
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
+  const [historico, setHistorico] = useState<TransacaoExcluida[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [isEntradaDialogOpen, setIsEntradaDialogOpen] = useState(false);
   const [isSaidaDialogOpen, setIsSaidaDialogOpen] = useState(false);
   const [isCategoriaDialogOpen, setIsCategoriaDialogOpen] = useState(false);
+  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState<{ isOpen: boolean; id: string | null }>({ isOpen: false, id: null });
   const [filtroTipo, setFiltroTipo] = useState<'data' | 'mes'>('data');
   const [filtroData, setFiltroData] = useState('');
   const [filtroMes, setFiltroMes] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalReceber, setTotalReceber] = useState(0);
+  const [dividasAtivas, setDividasAtivas] = useState(0);
   const [entradaFormData, setEntradaFormData] = useState({
     valor: '',
     origem: '',
@@ -67,7 +122,27 @@ export default function Caixa() {
   useEffect(() => {
     loadTransacoes();
     loadCategorias();
+    loadResumoFinanceiro();
+    loadHistorico();
   }, []);
+
+  const loadResumoFinanceiro = async () => {
+    // Busca recebiveis
+    const { data: receber } = await supabase.from('recebiveis').select('*');
+    const receberData = receber || [];
+    const totalReceberCalc = receberData.reduce((acc: number, r: any) => {
+      return acc + (Number(r.valor_total) || 0) - (Number(r.valor_pago) || 0);
+    }, 0);
+    setTotalReceber(totalReceberCalc);
+
+    // Busca dividas
+    const { data: dividas } = await supabase.from('dividas').select('*');
+    const dividasData = dividas || [];
+    const dividasAtivasCalc = dividasData
+      .filter((d: any) => d.status !== 'quitado')
+      .reduce((acc: number, d: any) => acc + (d.valorRestante ?? d.valor ?? 0), 0);
+    setDividasAtivas(dividasAtivasCalc);
+  };
 
   const loadCategorias = () => {
     supabase.from('categorias').select('*').then(({ data, error }) => {
@@ -85,11 +160,24 @@ export default function Caixa() {
   };
 
   const loadTransacoes = () => {
-    supabase.from('transacoes').select('*').then(({ data, error }) => {
+    supabase
+      .from('transacoes')
+      .select('*')
+      .order('data', { ascending: false })
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setTransacoes(data);
+        } else {
+          toast.error('Erro ao buscar transações!');
+        }
+      });
+  };
+
+  const loadHistorico = () => {
+    supabase.from('transacoes_excluidas').select('*').order('data_exclusao', { ascending: false }).then(({ data, error }) => {
       if (!error && data) {
-        setTransacoes(data);
-      } else {
-        toast.error('Erro ao buscar transações!');
+        setHistorico(data);
       }
     });
   };
@@ -127,6 +215,7 @@ export default function Caixa() {
         toast.error('Erro ao registrar entrada!');
       }
     })();
+  } // <-- FALTAVA FECHAR AQUI
 
   const handleSaidaSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,6 +245,7 @@ export default function Caixa() {
         toast.error('Erro ao registrar saída!');
       }
     })();
+  } // <-- FALTAVA FECHAR AQUI
 
   const handleCategoriaSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,6 +264,7 @@ export default function Caixa() {
         toast.error('Erro ao criar categoria!');
       }
     })();
+  } // <-- FALTAVA FECHAR AQUI
 
   const handleDeleteCategoria = (id: string) => {
     if (!canDelete) return;
@@ -186,7 +277,9 @@ export default function Caixa() {
         toast.error('Erro ao remover categoria!');
       }
     })();
+  } // <-- FALTAVA FECHAR ESSA FUNÇÃO
 
+  // Funções de cálculo e renderização
   const calcularSaldo = () => {
     return transacoes.reduce((acc, t) => {
       return t.tipo === 'entrada' ? acc + t.valor : acc - t.valor;
@@ -234,55 +327,467 @@ export default function Caixa() {
     return lista.slice(startIndex, endIndex);
   };
 
-
-
-
-
-
-  const exportarExtrato = () => {
+  // Função para exportar o extrato em PDF
+  async function exportarExtrato() {
     const doc = new jsPDF();
-    const filtradas = filtrarTransacoes();
-
-    doc.setFontSize(18);
-    doc.text('Extrato de Caixa', 20, 20);
-
-    doc.setFontSize(12);
-    doc.text(`Data de emissão: ${new Date().toLocaleDateString('pt-BR')}`, 20, 35);
-    doc.text(`Saldo Total: ${formatCurrency(calcularSaldo())}`, 20, 45);
-    doc.text(`Total Entradas: ${formatCurrency(calcularTotalEntradas())}`, 20, 55);
-    doc.text(`Total Saídas: ${formatCurrency(calcularTotalSaidas())}`, 20, 65);
-
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    
+    // Determina lista filtrada para exportação
+    // Exporta exatamente o que está sendo exibido na tab ativa e filtro
+    let transacoesExportar = todasTransacoes;
+    const tabAtiva = document.querySelector('.caixa-tabs-list .caixa-tab-trigger[aria-selected="true"]');
+    if (tabAtiva) {
+      const tab = tabAtiva.textContent;
+      if (tab?.includes('Entradas')) transacoesExportar = entradas;
+      else if (tab?.includes('Saídas')) transacoesExportar = saidas;
+      else transacoesExportar = todasTransacoes;
+    }
+    // Se filtro de data/mês estiver ativo, filtra também
     if (filtroTipo === 'data' && filtroData) {
-      doc.text(`Filtrado a partir de: ${new Date(filtroData).toLocaleDateString('pt-BR')}`, 20, 75);
+      // Se filtroData tem formato YYYY-MM-DD, filtra pelo dia exato
+      transacoesExportar = transacoesExportar.filter((t) => t.data === filtroData);
     } else if (filtroTipo === 'mes' && filtroMes) {
       const [year, month] = filtroMes.split('-');
-      const date = new Date(parseInt(year), parseInt(month) - 1);
-      doc.text(`Mês: ${date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`, 20, 75);
+      transacoesExportar = transacoesExportar.filter((t) => {
+        const tDate = new Date(t.data);
+        return (
+          tDate.getFullYear() === parseInt(year) &&
+          tDate.getMonth() + 1 === parseInt(month)
+        );
+      });
     }
+    // Calcular totais
+    const totalEntradas = transacoesExportar
+      .filter((t) => t.tipo === 'entrada')
+      .reduce((acc, t) => acc + t.valor, 0);
+    const totalSaidas = transacoesExportar
+      .filter((t) => t.tipo === 'saida')
+      .reduce((acc, t) => acc + t.valor, 0);
+    const saldoFinal = totalEntradas - totalSaidas;
 
-    doc.text('Transações:', 20, 90);
-    let yPos = 100;
-    filtradas.forEach((transacao) => {
-      doc.setFontSize(10);
-      const tipo = transacao.tipo === 'entrada' ? 'Entrada' : 'Saída';
-      const sinal = transacao.tipo === 'entrada' ? '+' : '-';
-      doc.text(
-        `${new Date(transacao.data).toLocaleDateString('pt-BR')} | ${tipo} | ${sinal}${formatCurrency(transacao.valor)}`,
-        25,
-        yPos
-      );
-      doc.text(`${transacao.origem} - ${transacao.categoria}`, 30, yPos + 5);
-      yPos += 12;
+    // ===== BACKGROUND ESCURO =====
+    doc.setFillColor(15, 23, 42); // #0f172a - Fundo escuro suave
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+    
+    // ===== CABEÇALHO PRINCIPAL =====
+    doc.setFillColor(7, 16, 41); // #071029 - Cor do sistema
+    doc.rect(0, 0, 210, 35, 'F');
+    
+    // Barra de destaque azul no topo
+    doc.setFillColor(96, 165, 250); // #60a5fa
+    doc.rect(0, 0, 210, 3, 'F');
+    
+    // Logo/Título
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(230, 238, 248); // #e6eef8 - Texto claro
+    doc.text('PEPERAIO', 105, 15, { align: 'center' });
+    
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Comunicação Visual', 105, 23, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(148, 163, 184); // #94a3b8
+    doc.text('EXTRATO DO CAIXA', 105, 30, { align: 'center' });
 
-      if (yPos > 270) {
+    // ===== INFORMAÇÕES DO EXTRATO =====
+    let yPos = 45;
+    
+    // Box de informações principais
+    doc.setFillColor(21, 26, 46); // #151a2e
+    doc.setDrawColor(35, 42, 69); // #232a45
+    doc.setLineWidth(0.5);
+    doc.roundedRect(15, yPos, 180, 50, 3, 3, 'FD');
+    
+    yPos += 8;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(96, 165, 250); // #60a5fa - Azul destaque
+    doc.text('Movimentações Financeiras', 20, yPos);
+    
+    yPos += 7;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(148, 163, 184); // #94a3b8 - Texto secundário
+    doc.text(`Data de Geração: ${new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`, 20, yPos);
+
+    // Cards de resumo em 3 colunas
+    yPos += 10;
+    const cardWidth = 54;
+    const cardHeight = 22;
+    const cardSpacing = 6;
+    
+  // Card 1 - Entradas
+  doc.setFillColor(21, 26, 46); // #151a2e - Fundo do card
+  doc.setDrawColor(52, 211, 153); // #34d399 - Borda verde
+  doc.setLineWidth(1);
+  doc.roundedRect(20, yPos, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFontSize(8);
+  doc.setTextColor(52, 211, 153); // #34d399 - Label verde
+  doc.text('TOTAL ENTRADAS', 22, yPos + 5);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(52, 211, 153); // #34d399 - Valor verde
+  doc.text(formatCurrency(totalEntradas), 22, yPos + 12);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184); // #94a3b8 - Texto secundário
+  doc.text(`${transacoesExportar.filter(t => t.tipo === 'entrada').length} lançamento(s)`, 22, yPos + 18);
+    
+  // Card 2 - Saídas
+  doc.setFillColor(21, 26, 46); // #151a2e - Fundo do card
+  doc.setDrawColor(248, 113, 113); // #f87171 - Borda vermelha
+  doc.roundedRect(20 + cardWidth + cardSpacing, yPos, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFontSize(8);
+  doc.setTextColor(248, 113, 113); // #f87171 - Label vermelha
+  doc.text('TOTAL SAÍDAS', 22 + cardWidth + cardSpacing, yPos + 5);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(248, 113, 113); // #f87171 - Valor vermelho
+  doc.text(formatCurrency(totalSaidas), 22 + cardWidth + cardSpacing, yPos + 12);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184); // #94a3b8 - Texto secundário
+  doc.text(`${transacoesExportar.filter(t => t.tipo === 'saida').length} lançamento(s)`, 22 + cardWidth + cardSpacing, yPos + 18);
+    
+  // Card 3 - Saldo Final
+  const saldoColor = saldoFinal >= 0 ? [52, 211, 153] : [248, 113, 113]; // Verde ou vermelho
+  doc.setFillColor(21, 26, 46); // #151a2e - Fundo do card
+  doc.setDrawColor(saldoColor[0], saldoColor[1], saldoColor[2]); // Borda colorida
+  doc.roundedRect(20 + (cardWidth + cardSpacing) * 2, yPos, cardWidth, cardHeight, 2, 2, 'FD');
+  doc.setFontSize(8);
+  doc.setTextColor(saldoColor[0], saldoColor[1], saldoColor[2]); // Label colorida
+  doc.text('SALDO FINAL', 22 + (cardWidth + cardSpacing) * 2, yPos + 5);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(saldoColor[0], saldoColor[1], saldoColor[2]); // Valor colorido
+  doc.text(formatCurrency(saldoFinal), 22 + (cardWidth + cardSpacing) * 2, yPos + 12);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184); // #94a3b8 - Texto secundário
+  doc.text(saldoFinal >= 0 ? 'Saldo positivo' : 'Saldo negativo', 22 + (cardWidth + cardSpacing) * 2, yPos + 18);
+
+    // ===== TABELA DE TRANSAÇÕES =====
+    yPos += 35;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(96, 165, 250); // Azul #60a5fa
+    doc.text('DETALHAMENTO DAS TRANSAÇÕES', 20, yPos);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184);
+  doc.text(`Total de ${transacoesExportar.length} transação(ões)`, 120, yPos);
+
+    yPos += 7;
+    
+    // Cabeçalho da tabela
+    doc.setFillColor(96, 165, 250); // #60a5fa
+    doc.rect(15, yPos, 180, 10, 'F');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text('DATA', 18, yPos + 6);
+    doc.text('ORIGEM', 38, yPos + 6);
+    doc.text('CATEGORIA', 70, yPos + 6);
+    doc.text('TIPO', 110, yPos + 6);
+    doc.text('VALOR', 170, yPos + 6);
+    
+    yPos += 10;
+
+    // Linhas da tabela
+  (transacoesExportar || []).forEach((transacao, idx) => {
+      // Verifica se precisa adicionar nova página
+      if (yPos > 260) {
         doc.addPage();
+        // Reaplica background na nova página
+        doc.setFillColor(15, 23, 42);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
         yPos = 20;
+        
+        // Reaplica cabeçalho da tabela na nova página
+        doc.setFillColor(96, 165, 250);
+        doc.rect(15, yPos, 180, 10, 'F');
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Total de ${transacoesExportar.length} transação(ões)`, 120, yPos);
+        doc.text('ORIGEM', 38, yPos + 6);
+        doc.text('CATEGORIA', 70, yPos + 6);
+        doc.text('TIPO', 110, yPos + 6);
+        doc.text('VALOR', 170, yPos + 6);
+        yPos += 10;
       }
+
+      // Alterna cor de fundo
+      if (idx % 2 === 0) {
+        doc.setFillColor(26, 31, 58); // #1a1f3a
+      } else {
+        doc.setFillColor(21, 26, 46); // #151a2e
+      }
+      
+      // Altura da linha (10 se não tem obs, 16 se tem)
+      const rowHeight = transacao.observacao ? 16 : 10;
+      doc.rect(15, yPos, 180, rowHeight, 'F');
+      
+      // Borda lateral colorida
+      if (transacao.tipo === 'entrada') {
+        doc.setDrawColor(52, 211, 153); // Verde
+      } else {
+        doc.setDrawColor(248, 113, 113); // Vermelho
+      }
+      doc.setLineWidth(1);
+      doc.line(15, yPos, 15, yPos + rowHeight);
+      
+      // Conteúdo da linha
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(148, 163, 184);
+      doc.text(new Date(transacao.data.replace(/-/g, '/')).toLocaleDateString('pt-BR'), 18, yPos + 6);
+      
+      doc.setTextColor(230, 238, 248);
+      doc.setFont('helvetica', 'normal');
+  const origemStr = transacao.origem || "";
+  const origemTruncada = origemStr.length > 15 ? origemStr.substring(0, 12) + '...' : origemStr;
+      doc.text(origemTruncada, 38, yPos + 6);
+      
+      doc.setTextColor(167, 139, 250); // #a78bfa - roxo para categoria
+      doc.setFont('helvetica', 'bold');
+  const categoriaStr = transacao.categoria || "";
+  const categoriaTruncada = categoriaStr.length > 18 ? categoriaStr.substring(0, 15) + '...' : categoriaStr;
+      doc.text(categoriaTruncada, 70, yPos + 6);
+      
+      // Badge de tipo
+      if (transacao.tipo === 'entrada') {
+        doc.setTextColor(52, 211, 153); // Verde
+        doc.text('Entrada', 110, yPos + 6);
+      } else {
+        doc.setTextColor(248, 113, 113); // Vermelho
+        doc.text('Saída', 110, yPos + 6);
+      }
+      
+      // Valor
+      doc.setFont('helvetica', 'bold');
+      doc.text((transacao.tipo === 'entrada' ? '+' : '-') + formatCurrency(transacao.valor), 190, yPos + 6, { align: 'right' });
+      
+      // Observação se existir
+      if (transacao.observacao) {
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(100, 116, 139); // #64748b
+        const obsTruncada = transacao.observacao.length > 80 ? transacao.observacao.substring(0, 77) + '...' : transacao.observacao;
+        doc.text(`Obs: ${obsTruncada}`, 18, yPos + 12);
+      }
+      
+      yPos += rowHeight;
     });
 
-    doc.save('extrato-caixa.pdf');
-    toast.success('Extrato exportado com sucesso!');
-  };
+    // Linha de resumo final
+    yPos += 2;
+    doc.setFillColor(7, 16, 41); // #071029
+    doc.rect(15, yPos, 180, 18, 'F');
+    doc.setDrawColor(96, 165, 250);
+    doc.setLineWidth(2);
+    doc.line(15, yPos, 195, yPos);
+    
+  // Entradas
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(52, 211, 153);
+  doc.text('ENTRADAS:', 18, yPos + 6);
+  doc.setFontSize(10);
+  doc.text(formatCurrency(totalEntradas), 55, yPos + 6);
+    
+  // Saídas
+  doc.setTextColor(248, 113, 113);
+  doc.setFontSize(9);
+  doc.text('SAÍDAS:', 18, yPos + 12);
+  doc.setFontSize(10);
+  doc.text(formatCurrency(totalSaidas), 55, yPos + 12);
+    
+    // Saldo Final
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(230, 238, 248);
+    doc.text('SALDO FINAL:', 120, yPos + 9);
+    doc.setFontSize(12);
+    doc.setTextColor(saldoColor[0], saldoColor[1], saldoColor[2]);
+    doc.text(formatCurrency(saldoFinal), 190, yPos + 9, { align: 'right' });
+
+    // ===== RODAPÉ =====
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFillColor(7, 16, 41);
+      doc.rect(0, 282, 210, 15, 'F');
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text('PEPERAIO - Comunicação Visual', 105, 290, { align: 'center' });
+      doc.text(`Página ${i} de ${pageCount}`, 190, 290, { align: 'right' });
+    }
+
+    // Usar função de download otimizada para mobile
+    await downloadPDFMobile(doc, 'extrato-caixa.pdf');
+  }
+  
+  function renderTransacoes(lista: Transacao[]) {
+    if (!lista.length) {
+      return (
+        <div className="caixa-empty-state">Nenhuma transação encontrada.</div>
+      );
+    }
+    return (
+      <div className="caixa-transactions-list">
+        {getPaginatedTransacoes(lista).map((transacao: Transacao) => (
+          <div key={transacao.id} className={`caixa-transaction-card ${transacao.tipo}`}>
+            <div className="caixa-transaction-content">
+              <div className="caixa-transaction-info">
+                <span className="caixa-transaction-date">
+                  {new Date(transacao.data.replace(/-/g, '/')).toLocaleDateString('pt-BR')}
+                </span>
+                <div className="caixa-transaction-details">
+                  {transacao.origem} - {transacao.categoria}
+                </div>
+                <div className={`caixa-transaction-value ${transacao.tipo}`}>
+                  {transacao.tipo === 'entrada' ? '+' : '-'}{formatCurrency(transacao.valor)}
+                </div>
+                {transacao.observacao && (
+                  <div className="caixa-transaction-obs">{transacao.observacao}</div>
+                )}
+              </div>
+              {canDelete && (
+                <div className="caixa-transaction-actions">
+                  <button
+                    className="caixa-delete-btn"
+                    title="Excluir lançamento"
+                    onClick={() => handleDeleteTransacao(transacao.id)}
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Função para excluir transação
+  function handleDeleteTransacao(id: string) {
+    if (!canDelete) return;
+    setConfirmDeleteDialog({ isOpen: true, id });
+  }
+
+  async function confirmDelete() {
+    if (!confirmDeleteDialog.id) return;
+    
+    const transacaoParaExcluir = transacoes.find(t => t.id === confirmDeleteDialog.id);
+    if (!transacaoParaExcluir) {
+      toast.error('Transação não encontrada!');
+      return;
+    }
+
+    // Salva no histórico antes de excluir
+    const { error: historicoError } = await supabase.from('transacoes_excluidas').insert({
+      ...transacaoParaExcluir,
+      data_exclusao: new Date().toISOString(),
+    });
+
+    if (historicoError) {
+      console.error('Erro ao salvar no histórico:', historicoError);
+    }
+
+    // Exclui a transação
+    const { error } = await supabase.from('transacoes').delete().eq('id', confirmDeleteDialog.id);
+    if (!error) {
+      loadTransacoes();
+      loadHistorico();
+      toast.success('Transação removida e salva no histórico!');
+    } else {
+      toast.error('Erro ao remover transação!');
+    }
+
+    setConfirmDeleteDialog({ isOpen: false, id: null });
+  }
+
+  function cancelDelete() {
+    setConfirmDeleteDialog({ isOpen: false, id: null });
+  }
+
+  // Função para reverter exclusão do histórico
+  async function handleReverterExclusao(transacaoExcluida: TransacaoExcluida) {
+    if (!canCreate) {
+      toast.error('Você não tem permissão para restaurar transações!');
+      return;
+    }
+
+    try {
+      // Remove campos específicos do histórico antes de reinserir
+      const { data_exclusao, excluido_por, ...transacaoRestaurada } = transacaoExcluida;
+
+      // Reinsere a transação na tabela principal
+      const { error: insertError } = await supabase
+        .from('transacoes')
+        .insert(transacaoRestaurada);
+
+      if (insertError) {
+        console.error('Erro ao restaurar transação:', insertError);
+        toast.error('Erro ao restaurar transação!');
+        return;
+      }
+
+      // Remove do histórico
+      const { error: deleteError } = await supabase
+        .from('transacoes_excluidas')
+        .delete()
+        .eq('id', transacaoExcluida.id);
+
+      if (deleteError) {
+        console.error('Erro ao remover do histórico:', deleteError);
+        toast.error('Transação restaurada, mas erro ao limpar histórico!');
+      }
+
+      // Recarrega ambas as listas
+      loadTransacoes();
+      loadHistorico();
+      toast.success('Transação restaurada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao reverter exclusão:', error);
+      toast.error('Erro ao reverter exclusão!');
+    }
+  }
+
+  // Função para calcular total de páginas
+  function getTotalPages(lista: Transacao[]) {
+    return Math.max(1, Math.ceil(lista.length / ITEMS_PER_PAGE));
+  }
+
+  // Renderização dos controles de paginação
+  function renderPagination(lista: Transacao[]) {
+    const totalPages = getTotalPages(lista);
+    if (totalPages <= 1) return null;
+    return (
+      <div className="caixa-pagination">
+        <button
+          className="caixa-pagination-btn"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <span className="caixa-pagination-info">Página {currentPage} de {totalPages}</span>
+        <button
+          className="caixa-pagination-btn"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+    );
+  }
 
   // Variáveis de escopo para os componentes
   const entradas = filtrarTransacoes('entrada');
@@ -295,34 +800,69 @@ export default function Caixa() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-4">
-        <div>
-          <h1 className="text-gray-900">Caixa</h1>
-          <p className="text-gray-600">Controle de fluxo financeiro</p>
+    <div className="caixa-container">
+      {/* Cards de resumo financeiro */}
+      <div className="caixa-summary-grid">
+        <div className="caixa-summary-card saldo">
+          <div className="caixa-summary-header">
+            <span className="caixa-summary-label">Saldo do Caixa</span>
+            <div className="caixa-summary-icon blue">
+              <Wallet />
+            </div>
+          </div>
+          <div className={`caixa-summary-value ${calcularSaldo() < 0 ? 'red' : ''}`}>
+            {formatCurrency(calcularSaldo())}
+          </div>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" onClick={exportarExtrato}>
-            <FileDown className="mr-2 h-4 w-4" />
+        
+        <div className="caixa-summary-card receber">
+          <div className="caixa-summary-header">
+            <span className="caixa-summary-label">Total a Receber</span>
+            <div className="caixa-summary-icon green">
+              <TrendingUp />
+            </div>
+          </div>
+          <div className="caixa-summary-value green">{formatCurrency(totalReceber)}</div>
+        </div>
+        
+        <div className="caixa-summary-card dividas">
+          <div className="caixa-summary-header">
+            <span className="caixa-summary-label">Dívidas Ativas</span>
+            <div className="caixa-summary-icon red">
+              <Minus />
+            </div>
+          </div>
+          <div className="caixa-summary-value red">{formatCurrency(dividasAtivas)}</div>
+        </div>
+      </div>
+
+      <div className="caixa-header">
+        <div className="caixa-header-content">
+          <h1>Caixa</h1>
+          <p>Controle de fluxo financeiro</p>
+        </div>
+        <div className="caixa-header-actions">
+          <button className="caixa-btn caixa-btn-outline" onClick={exportarExtrato}>
+            <FileDown className="h-4 w-4" />
             Exportar
-          </Button>
+          </button>
           {canCreate && (
             <>
               <Dialog open={isEntradaDialogOpen} onOpenChange={setIsEntradaDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="bg-green-50 text-green-700 hover:bg-green-100">
-                    <Plus className="mr-2 h-4 w-4" />
+                  <button className="caixa-btn caixa-btn-entrada">
+                    <Plus className="h-4 w-4" />
                     Entrada
-                  </Button>
+                  </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="caixa-dialog-content">
                   <DialogHeader>
-                    <DialogTitle>Cadastrar Entrada</DialogTitle>
+                    <DialogTitle className="caixa-dialog-title">Cadastrar Entrada</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleEntradaSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Valor</Label>
-                      <Input
+                  <form onSubmit={handleEntradaSubmit} className="caixa-form">
+                    <div className="caixa-form-field">
+                      <label>Valor</label>
+                      <input
                         type="number"
                         step="0.01"
                         value={entradaFormData.valor}
@@ -330,25 +870,25 @@ export default function Caixa() {
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Origem</Label>
-                      <Input
+                    <div className="caixa-form-field">
+                      <label>Origem</label>
+                      <input
                         value={entradaFormData.origem}
                         onChange={(e) => setEntradaFormData({ ...entradaFormData, origem: e.target.value })}
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Data</Label>
-                      <Input
+                    <div className="caixa-form-field">
+                      <label>Data</label>
+                      <input
                         type="date"
                         value={entradaFormData.data}
                         onChange={(e) => setEntradaFormData({ ...entradaFormData, data: e.target.value })}
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Categoria</Label>
+                    <div className="caixa-form-field">
+                      <label>Categoria</label>
                       <Select
                         value={entradaFormData.categoria}
                         onValueChange={(value: string) =>
@@ -368,9 +908,9 @@ export default function Caixa() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Observação (opcional)</Label>
-                      <Textarea
+                    <div className="caixa-form-field">
+                      <label>Observação (opcional)</label>
+                      <textarea
                         value={entradaFormData.observacao}
                         onChange={(e) =>
                           setEntradaFormData({ ...entradaFormData, observacao: e.target.value })
@@ -378,28 +918,28 @@ export default function Caixa() {
                         rows={3}
                       />
                     </div>
-                    <Button type="submit" className="w-full">
+                    <button type="submit" className="caixa-btn caixa-btn-primary">
                       Registrar Entrada
-                    </Button>
+                    </button>
                   </form>
                 </DialogContent>
               </Dialog>
-
+              
               <Dialog open={isSaidaDialogOpen} onOpenChange={setIsSaidaDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="bg-red-50 text-red-700 hover:bg-red-100">
-                    <Plus className="mr-2 h-4 w-4" />
+                  <button className="caixa-btn caixa-btn-saida">
+                    <Minus className="h-4 w-4" />
                     Saída
-                  </Button>
+                  </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="caixa-dialog-content">
                   <DialogHeader>
-                    <DialogTitle>Cadastrar Saída</DialogTitle>
+                    <DialogTitle className="caixa-dialog-title">Cadastrar Saída</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleSaidaSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Valor</Label>
-                      <Input
+                  <form onSubmit={handleSaidaSubmit} className="caixa-form">
+                    <div className="caixa-form-field">
+                      <label>Valor</label>
+                      <input
                         type="number"
                         step="0.01"
                         value={saidaFormData.valor}
@@ -407,25 +947,25 @@ export default function Caixa() {
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Destino</Label>
-                      <Input
+                    <div className="caixa-form-field">
+                      <label>Destino</label>
+                      <input
                         value={saidaFormData.origem}
                         onChange={(e) => setSaidaFormData({ ...saidaFormData, origem: e.target.value })}
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Data</Label>
-                      <Input
+                    <div className="caixa-form-field">
+                      <label>Data</label>
+                      <input
                         type="date"
                         value={saidaFormData.data}
                         onChange={(e) => setSaidaFormData({ ...saidaFormData, data: e.target.value })}
                         required
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Categoria</Label>
+                    <div className="caixa-form-field">
+                      <label>Categoria</label>
                       <Select
                         value={saidaFormData.categoria}
                         onValueChange={(value: string) =>
@@ -445,9 +985,9 @@ export default function Caixa() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Observação (opcional)</Label>
-                      <Textarea
+                    <div className="caixa-form-field">
+                      <label>Observação (opcional)</label>
+                      <textarea
                         value={saidaFormData.observacao}
                         onChange={(e) =>
                           setSaidaFormData({ ...saidaFormData, observacao: e.target.value })
@@ -455,31 +995,30 @@ export default function Caixa() {
                         rows={3}
                       />
                     </div>
-                    <Button type="submit" className="w-full">
+                    <button type="submit" className="caixa-btn caixa-btn-primary">
                       Registrar Saída
-                    </Button>
+                    </button>
                   </form>
                 </DialogContent>
               </Dialog>
-
               <Dialog open={isCategoriaDialogOpen} onOpenChange={setIsCategoriaDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <Tag className="mr-2 h-4 w-4" />
+                  <button className="caixa-btn caixa-btn-outline">
+                    <Tag className="h-4 w-4" />
                     Categorias
-                  </Button>
+                  </button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="caixa-dialog-content large">
                   <DialogHeader>
-                    <DialogTitle>Gerenciar Categorias</DialogTitle>
+                    <DialogTitle className="caixa-dialog-title">Gerenciar Categorias</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4">
-                    <form onSubmit={handleCategoriaSubmit} className="space-y-4 p-4 bg-gray-50 rounded-lg">
-                      <h3 className="text-gray-900">Nova Categoria</h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>Nome</Label>
-                          <Input
+                  <div>
+                    <form onSubmit={handleCategoriaSubmit} className="caixa-categoria-form">
+                      <h3>Nova Categoria</h3>
+                      <div className="caixa-categoria-grid">
+                        <div className="caixa-form-field">
+                          <label>Nome</label>
+                          <input
                             value={categoriaFormData.nome}
                             onChange={(e) =>
                               setCategoriaFormData({ ...categoriaFormData, nome: e.target.value })
@@ -487,8 +1026,8 @@ export default function Caixa() {
                             required
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label>Tipo</Label>
+                        <div className="caixa-form-field">
+                          <label>Tipo</label>
                           <Select
                             value={categoriaFormData.tipo}
                             onValueChange={(value: 'entrada' | 'saida' | 'ambos') =>
@@ -506,32 +1045,26 @@ export default function Caixa() {
                           </Select>
                         </div>
                       </div>
-                      <Button type="submit" className="w-full">
+                      <button type="submit" className="caixa-btn caixa-btn-primary">
                         Adicionar Categoria
-                      </Button>
+                      </button>
                     </form>
-
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
-                      <h3 className="text-gray-900">Categorias Existentes</h3>
+                    <div className="caixa-categorias-list">
                       {categorias.map((categoria) => (
-                        <div
-                          key={categoria.id}
-                          className="flex items-center justify-between p-3 bg-white border rounded-lg"
-                        >
-                          <div>
-                            <p className="text-gray-900">{categoria.nome}</p>
-                            <p className="text-xs text-gray-500">
+                        <div key={categoria.id} className="caixa-categoria-item">
+                          <div className="caixa-categoria-info">
+                            <h4>{categoria.nome}</h4>
+                            <p>
                               {categoria.tipo === 'ambos' ? 'Entrada e Saída' : categoria.tipo === 'entrada' ? 'Entrada' : 'Saída'}
                             </p>
                           </div>
                           {canDelete && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
+                            <button
+                              className="caixa-delete-btn"
                               onClick={() => handleDeleteCategoria(categoria.id)}
                             >
-                              <Trash2 className="h-4 w-4 text-red-600" />
-                            </Button>
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           )}
                         </div>
                       ))}
@@ -544,145 +1077,161 @@ export default function Caixa() {
         </div>
       </div>
 
-      {/* Resumo Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-blue-900">
-              <Wallet className="h-5 w-5" />
-              Saldo Total
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p
-              className={`text-3xl ${
-                calcularSaldo() >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}
+      {/* Filtro */}
+      <div className="caixa-filter-card">
+        <div className="caixa-filter-buttons">
+          <button
+            className={`caixa-btn ${filtroTipo === 'data' ? 'caixa-btn-primary' : 'caixa-btn-outline'}`}
+            onClick={() => {
+              setFiltroTipo('data');
+              setFiltroMes('');
+              setCurrentPage(1);
+            }}
+          >
+            Filtrar por Data
+          </button>
+          <button
+            className={`caixa-btn ${filtroTipo === 'mes' ? 'caixa-btn-primary' : 'caixa-btn-outline'}`}
+            onClick={() => {
+              setFiltroTipo('mes');
+              setFiltroData('');
+              setCurrentPage(1);
+            }}
+          >
+            Filtrar por Mês
+          </button>
+        </div>
+
+        <div className="caixa-filter-inputs">
+          {filtroTipo === 'data' && (
+            <div className="caixa-filter-field">
+              <label>Filtrar a partir de:</label>
+              <input
+                type="date"
+                value={filtroData}
+                onChange={(e) => {
+                  setFiltroData(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+            </div>
+          )}
+
+          {filtroTipo === 'mes' && (
+            <div className="caixa-filter-field">
+              <label>Selecione o mês:</label>
+              <input
+                type="month"
+                value={filtroMes}
+                onChange={(e) => {
+                  setFiltroMes(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+            </div>
+          )}
+
+          {(filtroData || filtroMes) && (
+            <button
+              className="caixa-btn caixa-btn-outline"
+              onClick={() => {
+                setFiltroData('');
+                setFiltroMes('');
+                setCurrentPage(1);
+              }}
             >
-              {formatCurrency(calcularSaldo())}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-900">
-              <TrendingUp className="h-5 w-5" />
-              Total Entradas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl text-green-600">{formatCurrency(totalEntradas)}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-red-50 to-rose-50 border-red-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-900">
-              <TrendingDown className="h-5 w-5" />
-              Total Saídas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl text-red-600">{formatCurrency(totalSaidas)}</p>
-          </CardContent>
-        </Card>
+              Limpar Filtro
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Filtro */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <Button
-                variant={filtroTipo === 'data' ? 'default' : 'outline'}
-                onClick={() => {
-                  setFiltroTipo('data');
-                  setFiltroMes('');
-                  setCurrentPage(1);
-                }}
-              >
-                Filtrar por Data
-              </Button>
-              <Button
-                variant={filtroTipo === 'mes' ? 'default' : 'outline'}
-                onClick={() => {
-                  setFiltroTipo('mes');
-                  setFiltroData('');
-                  setCurrentPage(1);
-                }}
-              >
-                Filtrar por Mês
-              </Button>
-            </div>
-
-            <div className="flex items-end gap-4">
-              {filtroTipo === 'data' && (
-                <div className="flex-1 space-y-2">
-                  <Label>Filtrar a partir de:</Label>
-                  <Input
-                    type="date"
-                    value={filtroData}
-                    onChange={(e) => {
-                      setFiltroData(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  />
+      {/* Tabs com paginação */}
+      <div className="caixa-tabs">
+        <Tabs defaultValue="todas" className="w-full" onValueChange={() => setCurrentPage(1)}>
+          <TabsList className="caixa-tabs-list">
+            <TabsTrigger value="todas" className="caixa-tab-trigger">Todas</TabsTrigger>
+            <TabsTrigger value="entradas" className="caixa-tab-trigger">
+              Entradas ({entradas.length})
+            </TabsTrigger>
+            <TabsTrigger value="saidas" className="caixa-tab-trigger">
+              Saídas ({saidas.length})
+            </TabsTrigger>
+            <TabsTrigger value="historico" className="caixa-tab-trigger">
+              <History size={16} />
+              <span>Histórico ({historico.length})</span>
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="todas" className="space-y-4">
+            {renderTransacoes(todasTransacoes)}
+            {renderPagination(todasTransacoes)}
+          </TabsContent>
+          <TabsContent value="entradas" className="space-y-4">
+            {renderTransacoes(entradas)}
+            {renderPagination(entradas)}
+          </TabsContent>
+          <TabsContent value="saidas" className="space-y-4">
+            {renderTransacoes(saidas)}
+            {renderPagination(saidas)}
+          </TabsContent>
+          <TabsContent value="historico" className="space-y-4">
+            <div className="caixa-historico">
+              {historico.length === 0 ? (
+                <div className="caixa-empty">
+                  <History size={48} style={{ opacity: 0.3, margin: '0 auto 1rem' }} />
+                  <p>Nenhum item excluído ainda</p>
                 </div>
-              )}
-
-              {filtroTipo === 'mes' && (
-                <div className="flex-1 space-y-2">
-                  <Label>Selecione o mês:</Label>
-                  <Input
-                    type="month"
-                    value={filtroMes}
-                    onChange={(e) => {
-                      setFiltroMes(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  />
-                </div>
-              )}
-
-              {(filtroData || filtroMes) && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setFiltroData('');
-                    setFiltroMes('');
-                    setCurrentPage(1);
-                  }}
-                >
-                  Limpar Filtro
-                </Button>
+              ) : (
+                historico.map((item) => (
+                  <div key={item.id} className="caixa-historico-item">
+                    <div className="caixa-historico-header">
+                      <span className={`caixa-historico-tipo ${item.tipo}`}>
+                        {item.tipo === 'entrada' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                        {item.tipo.toUpperCase()}
+                      </span>
+                      <span className="caixa-historico-data-exclusao">
+                        Excluído em: {new Date(item.data_exclusao).toLocaleDateString('pt-BR')}
+                      </span>
+                    </div>
+                    <div className="caixa-historico-content">
+                      <div>
+                        <strong>{item.origem}</strong>
+                        {item.categoria && <span className="caixa-tag">{item.categoria}</span>}
+                        <p className="caixa-historico-obs">{item.observacao}</p>
+                        <small>Data original: {new Date(item.data).toLocaleDateString('pt-BR')}</small>
+                      </div>
+                      <div className="caixa-historico-valor">
+                        {formatCurrency(item.valor)}
+                      </div>
+                    </div>
+                    <div className="caixa-historico-actions">
+                      <button
+                        className="caixa-btn-reverter"
+                        onClick={() => handleReverterExclusao(item)}
+                        title="Restaurar transação"
+                      >
+                        <RotateCcw size={16} />
+                        Reverter
+                      </button>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="todas" className="w-full" onValueChange={() => setCurrentPage(1)}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="todas">Todas</TabsTrigger>
-          <TabsTrigger value="entradas">
-            Entradas ({entradas.length})
-          </TabsTrigger>
-          <TabsTrigger value="saidas">
-            Saídas ({saidas.length})
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="todas" className="space-y-4">
-          {renderTransacoes(todasTransacoes)}
-        </TabsContent>
-        <TabsContent value="entradas" className="space-y-4">
-          {renderTransacoes(entradas)}
-        </TabsContent>
-        <TabsContent value="saidas" className="space-y-4">
-          {renderTransacoes(saidas)}
-        </TabsContent>
-      </Tabs>
+      {/* Diálogo de Confirmação */}
+      <ConfirmDialog
+        isOpen={confirmDeleteDialog.isOpen}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir esta transação? Ela será movida para o histórico."
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        confirmText="Sim, excluir"
+        cancelText="Cancelar"
+      />
     </div>
   );
 }

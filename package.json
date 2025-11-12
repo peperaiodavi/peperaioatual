@@ -29,6 +29,7 @@
             "@radix-ui/react-toggle": "^1.1.2",
             "@radix-ui/react-toggle-group": "^1.1.2",
             "@radix-ui/react-tooltip": "^1.1.8",
+            "@react-spring/web": "^10.0.3",
             "@supabase/supabase-js": "*",
             "class-variance-authority": "^0.7.1",
             "clsx": "*",
@@ -36,6 +37,7 @@
             "embla-carousel-react": "^8.6.0",
             "input-otp": "^1.4.2",
             "jspdf": "*",
+            "jspdf-autotable": "^5.0.2",
             "lucide-react": "^0.487.0",
             "motion": "*",
             "next-themes": "^0.4.6",
@@ -47,6 +49,7 @@
             "react-router-dom": "*",
             "recharts": "^2.15.2",
             "sonner": "^2.0.3",
+            "swiper": "^12.0.3",
             "tailwind-merge": "*",
             "vaul": "^1.1.2"
       },
@@ -55,7 +58,8 @@
             "@types/react": "^19.2.2",
             "@types/react-dom": "^19.2.2",
             "@vitejs/plugin-react-swc": "^3.10.2",
-            "vite": "6.3.5"
+            "vite": "6.3.5",
+            "vite-plugin-pwa": "^1.1.0"
       },
       "scripts": {
             "dev": "vite",

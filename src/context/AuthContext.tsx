@@ -11,6 +11,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
   login: (email: string, senha: string) => Promise<boolean>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
@@ -40,34 +41,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   };
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verifica se existe sessão ativa no Supabase
-    const getSession = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (data?.user) {
-        // Busca dados do usuário na tabela 'usuarios'
+    let authListener: any;
+    // Função para buscar dados do usuário
+    const fetchUser = async (userObj: any) => {
+      if (userObj) {
         const { data: userData } = await supabase
           .from('usuarios')
           .select('*')
-          .eq('email', data.user.email)
+          .eq('email', userObj.email)
           .single();
         if (userData) setUser(userData);
+        else setUser(null);
+      } else {
+        setUser(null);
       }
     };
-    getSession();
+
+    // Verifica sessão inicial
+    supabase.auth.getUser().then(({ data }) => {
+      fetchUser(data?.user).then(() => setLoading(false));
+    });
+
+    // Listener para mudanças de autenticação
+    authListener = supabase.auth.onAuthStateChange((_event, session) => {
+      fetchUser(session?.user).then(() => setLoading(false));
+    });
+
+    return () => {
+      authListener?.data?.subscription?.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, senha: string): Promise<boolean> => {
     // Autentica com Supabase
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
-    if (error || !data.user) return false;
-    // Busca dados do usuário na tabela 'usuarios'
-    const { data: userData } = await supabase
+    if (error || !data.user) {
+      console.error('Erro Supabase Auth:', error?.message, error);
+      return false;
+    }
+    // Busca dados do usuário na tabela 'usuarios' usando o email do Auth
+    const authEmail = data.user.email;
+    const { data: userData, error: dbError } = await supabase
       .from('usuarios')
       .select('*')
-      .eq('email', email)
-      .single();
+      .eq('email', authEmail)
+      .maybeSingle();
+    if (dbError) {
+      console.error('Erro ao buscar usuário na tabela usuarios:', dbError?.message, dbError);
+    }
     if (userData) {
       setUser(userData);
       return true;
@@ -92,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser, register }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser, register }}>
       {children}
     </AuthContext.Provider>
   );

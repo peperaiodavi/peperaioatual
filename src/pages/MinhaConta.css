@@ -1,0 +1,816 @@
+/* ===== MINHA CONTA PAGE - MODERN STYLING WITH FLOATING PARTICLES ===== */
+
+/* Garantir cores corretas globalmente */
+.minha-conta-container,
+.minha-conta-container * {
+  color: #e6eef8;
+}
+
+.minha-conta-container {
+  padding: 2rem 1.5rem;
+  min-height: calc(100vh - 64px);
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #071029 0%, #0b1220 50%, #0d1528 100%);
+  animation: minha-conta-fade-in 0.6s ease-out;
+}
+
+@keyframes minha-conta-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== FLOATING PARTICLES BACKGROUND ===== */
+.minha-conta-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+.minha-conta-particle {
+  position: absolute;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  will-change: transform, opacity;
+  animation: minha-conta-float linear infinite;
+}
+
+/* Partículas pequenas */
+.minha-conta-particle.small {
+  width: 3px;
+  height: 3px;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+}
+
+/* Partículas médias */
+.minha-conta-particle.medium {
+  width: 5px;
+  height: 5px;
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.8) 0%, transparent 70%);
+}
+
+/* Partículas grandes */
+.minha-conta-particle.large {
+  width: 7px;
+  height: 7px;
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.6) 0%, transparent 70%);
+}
+
+@keyframes minha-conta-float {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(100px) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Otimização de performance das partículas */
+.minha-conta-particle {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* ===== CONTENT WRAPPER ===== */
+.minha-conta-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.minha-conta-header {
+  margin-bottom: 2rem;
+  text-align: center;
+  animation: minha-conta-header-slide 0.6s ease-out;
+}
+
+@keyframes minha-conta-header-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.minha-conta-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 50%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
+  animation: minha-conta-gradient-shift 3s ease infinite;
+}
+
+@keyframes minha-conta-gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.minha-conta-header p {
+  color: #94a3b8;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ===== PROFILE CARD ===== */
+.minha-conta-profile-card {
+  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%);
+  border: 1px solid #232a45;
+  border-radius: 24px;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(96, 165, 250, 0.1);
+  animation: minha-conta-card-enter 0.6s ease-out 0.2s both;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes minha-conta-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.minha-conta-profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #60a5fa 0%, #7c3aed 50%, #a78bfa 100%);
+  background-size: 200% 100%;
+  animation: minha-conta-gradient-flow 3s ease infinite;
+}
+
+@keyframes minha-conta-gradient-flow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.minha-conta-card-header {
+  padding: 2rem 2rem 1.5rem 2rem;
+  border-bottom: 1px solid #232a45;
+}
+
+.minha-conta-card-title {
+  color: #e6eef8;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.minha-conta-card-content {
+  padding: 2rem;
+}
+
+/* ===== AVATAR SECTION ===== */
+.minha-conta-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  animation: minha-conta-avatar-zoom 0.6s ease-out 0.4s both;
+}
+
+@keyframes minha-conta-avatar-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.minha-conta-avatar-wrapper {
+  position: relative;
+}
+
+.minha-conta-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  background: linear-gradient(#1a1f3a, #1a1f3a) padding-box,
+              linear-gradient(135deg, #60a5fa, #7c3aed, #a78bfa) border-box;
+  box-shadow: 0 8px 32px rgba(96, 165, 250, 0.3), 0 0 60px rgba(124, 58, 237, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: minha-conta-avatar-pulse 2s ease-in-out infinite;
+}
+
+@keyframes minha-conta-avatar-pulse {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(96, 165, 250, 0.3), 0 0 60px rgba(124, 58, 237, 0.2);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(96, 165, 250, 0.5), 0 0 80px rgba(124, 58, 237, 0.3);
+  }
+}
+
+.minha-conta-avatar:hover {
+  transform: scale(1.05) rotate(2deg);
+  box-shadow: 0 12px 48px rgba(96, 165, 250, 0.5), 0 0 100px rgba(124, 58, 237, 0.3);
+}
+
+.minha-conta-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.minha-conta-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+  color: #60a5fa;
+  border-radius: 50%;
+}
+
+.minha-conta-avatar-upload-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  border: 3px solid #1a1f3a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4);
+}
+
+.minha-conta-avatar-upload-btn:hover {
+  transform: scale(1.15) rotate(10deg);
+  box-shadow: 0 6px 20px rgba(96, 165, 250, 0.6);
+}
+
+.minha-conta-avatar-upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.minha-conta-avatar-hint {
+  color: #64748b;
+  font-size: 0.8125rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ===== USER INFO SECTION ===== */
+.minha-conta-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.minha-conta-info-item {
+  background: linear-gradient(135deg, #0b1220 0%, #0f1526 100%);
+  border: 1px solid #1a1f35;
+  border-left: 4px solid #60a5fa;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  animation: minha-conta-item-slide 0.4s ease-out both;
+}
+
+.minha-conta-info-item:nth-child(1) {
+  animation-delay: 0.5s;
+  border-left-color: #60a5fa;
+}
+
+.minha-conta-info-item:nth-child(2) {
+  animation-delay: 0.6s;
+  border-left-color: #7c3aed;
+}
+
+.minha-conta-info-item:nth-child(3) {
+  animation-delay: 0.7s;
+  border-left-color: #34d399;
+}
+
+@keyframes minha-conta-item-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.minha-conta-info-item:hover {
+  transform: translateX(8px);
+  background: linear-gradient(135deg, #0f1526 0%, #151a2e 100%);
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.2);
+}
+
+.minha-conta-info-content {
+  flex: 1;
+}
+
+.minha-conta-info-label {
+  color: #64748b;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.minha-conta-info-value {
+  color: #e6eef8;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.minha-conta-edit-btn {
+  background: transparent;
+  border: 1px solid #232a45;
+  color: #94a3b8;
+  padding: 0.625rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.minha-conta-edit-btn:hover {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: #60a5fa;
+  color: #60a5fa;
+  transform: scale(1.1) rotate(10deg);
+}
+
+/* ===== PERMISSION BADGE ===== */
+.minha-conta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: minha-conta-badge-glow 2s ease-in-out infinite;
+}
+
+/* Badge Proprietário - Efeito Dourado Premium */
+.minha-conta-badge.proprietario {
+  background: linear-gradient(135deg, 
+    rgba(234, 179, 8, 0.2) 0%, 
+    rgba(250, 204, 21, 0.25) 25%,
+    rgba(251, 191, 36, 0.3) 50%,
+    rgba(245, 158, 11, 0.25) 75%,
+    rgba(217, 119, 6, 0.2) 100%);
+  border: 2px solid transparent;
+  background-image: 
+    linear-gradient(#1a1f3a, #1a1f3a) padding-box,
+    linear-gradient(135deg, #fbbf24, #f59e0b, #eab308, #fcd34d, #fbbf24) border-box;
+  background-size: 100% 100%, 200% 200%;
+  background-position: 0 0, 0% 50%;
+  color: #fcd34d;
+  box-shadow: 
+    0 4px 20px rgba(251, 191, 36, 0.4),
+    0 0 30px rgba(234, 179, 8, 0.3),
+    inset 0 1px 0 rgba(252, 211, 77, 0.3),
+    inset 0 -1px 0 rgba(180, 83, 9, 0.2);
+  text-shadow: 
+    0 0 10px rgba(250, 204, 21, 0.5),
+    0 0 20px rgba(251, 191, 36, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+  animation: minha-conta-badge-proprietario-glow 2.5s ease-in-out infinite,
+             minha-conta-badge-proprietario-border 4s linear infinite;
+}
+
+/* Brilho interno animado */
+.minha-conta-badge.proprietario::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(252, 211, 77, 0.15) 50%,
+    transparent 70%
+  );
+  animation: minha-conta-badge-proprietario-shine 3s ease-in-out infinite;
+}
+
+/* Partículas douradas */
+.minha-conta-badge.proprietario::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(252, 211, 77, 0.3) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: minha-conta-badge-proprietario-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Ícone com cor dourada */
+.minha-conta-badge.proprietario svg {
+  filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.6));
+  color: #fcd34d;
+}
+
+@keyframes minha-conta-badge-proprietario-glow {
+  0%, 100% {
+    box-shadow: 
+      0 4px 20px rgba(251, 191, 36, 0.4),
+      0 0 30px rgba(234, 179, 8, 0.3),
+      inset 0 1px 0 rgba(252, 211, 77, 0.3),
+      inset 0 -1px 0 rgba(180, 83, 9, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 6px 30px rgba(251, 191, 36, 0.6),
+      0 0 50px rgba(234, 179, 8, 0.5),
+      inset 0 1px 0 rgba(252, 211, 77, 0.5),
+      inset 0 -1px 0 rgba(180, 83, 9, 0.3);
+  }
+}
+
+@keyframes minha-conta-badge-proprietario-border {
+  0%, 100% {
+    background-position: 0 0, 0% 50%;
+  }
+  50% {
+    background-position: 0 0, 100% 50%;
+  }
+}
+
+@keyframes minha-conta-badge-proprietario-shine {
+  0% {
+    transform: translate(-100%, -100%) rotate(45deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(100%, 100%) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes minha-conta-badge-proprietario-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.5;
+  }
+}
+
+.minha-conta-badge.admin {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+  border: 1px solid #60a5fa;
+  color: #60a5fa;
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+}
+
+.minha-conta-badge.viewer {
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.2) 0%, rgba(71, 85, 105, 0.2) 100%);
+  border: 1px solid #64748b;
+  color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+}
+
+@keyframes minha-conta-badge-glow {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(96, 165, 250, 0.5);
+  }
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.minha-conta-logout-btn {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(248, 113, 113, 0.3);
+  animation: minha-conta-logout-enter 0.4s ease-out 0.8s both;
+}
+
+@keyframes minha-conta-logout-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.minha-conta-logout-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(248, 113, 113, 0.5);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+/* ===== INFO CARD ===== */
+.minha-conta-info-card {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.15);
+  animation: minha-conta-info-card-enter 0.4s ease-out 0.9s both;
+}
+
+@keyframes minha-conta-info-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.minha-conta-info-card h3 {
+  color: #60a5fa;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.minha-conta-info-card-content {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.minha-conta-info-card-content p {
+  margin: 0 0 0.625rem 0;
+}
+
+.minha-conta-info-card-content strong {
+  color: #e6eef8;
+  font-weight: 600;
+}
+
+/* ===== DIALOG ===== */
+.minha-conta-dialog-content {
+  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%);
+  border: 1px solid #232a45;
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  animation: minha-conta-dialog-enter 0.3s ease-out;
+}
+
+@keyframes minha-conta-dialog-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.minha-conta-dialog-title {
+  color: #e6eef8;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.minha-conta-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.minha-conta-form-field label {
+  color: #e6eef8;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.minha-conta-form-field input {
+  background: #0b1220;
+  border: 1px solid #232a45;
+  color: #e6eef8;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.minha-conta-form-field input:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15), 0 4px 12px rgba(96, 165, 250, 0.2);
+  background: #0f1526;
+}
+
+.minha-conta-btn-submit {
+  width: 100%;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+}
+
+.minha-conta-btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.5);
+}
+
+/* ===== LOADING SPINNER ===== */
+.minha-conta-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.minha-conta-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #232a45;
+  border-top-color: #60a5fa;
+  border-radius: 50%;
+  animation: minha-conta-spin 1s linear infinite;
+}
+
+@keyframes minha-conta-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .minha-conta-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .minha-conta-header h1 {
+    font-size: 2rem;
+  }
+
+  .minha-conta-avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .minha-conta-avatar-fallback {
+    font-size: 3rem;
+  }
+
+  .minha-conta-card-header,
+  .minha-conta-card-content {
+    padding: 1.5rem;
+  }
+
+  .minha-conta-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .minha-conta-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .minha-conta-avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .minha-conta-avatar-fallback {
+    font-size: 2.5rem;
+  }
+
+  .minha-conta-info-value {
+    font-size: 1rem;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .minha-conta-particle {
+    display: none;
+  }
+}
