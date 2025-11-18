@@ -5,24 +5,37 @@ import IconButton, { LauncherApp } from '../features/launcher/IconButton';
 import AppWindow from '../features/launcher/AppWindow';
 // Dock removido a pedido: usaremos apenas o grid de apps
 import '../features/launcher/launcher.css';
+// MUI icons (desenhos das abas) - escolhidos para cada app
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import DescriptionIcon from '@mui/icons-material/Description';
+import ConstructionIcon from '@mui/icons-material/Construction';
+import AppsIcon from '@mui/icons-material/Apps';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import DownloadIcon from '@mui/icons-material/Download';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+import PersonIcon from '@mui/icons-material/Person';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import ExploreIcon from '@mui/icons-material/Explore';
 
 export default function DashboardLauncher() {
   const navigate = useNavigate();
   const [activeApp, setActiveApp] = useState<LauncherApp | null>(null);
 
-  const apps = useMemo<LauncherApp[]>(() => [
-    { id: 'lancamentos', label: 'Lançamentos', icon: 'cash-outline', gradient: 'linear-gradient(135deg,#00C853,#00E676)' , route: '/caixa' },
-    { id: 'calendario', label: 'Calendário', icon: 'calendar-outline', gradient: 'linear-gradient(135deg,#3F51B5,#00BCD4)' , route: '/calendario' },
-    { id: 'propostas', label: 'Propostas', icon: 'document-text-outline', gradient: 'linear-gradient(135deg,#FF6F00,#FFA000)' , route: '/propostas' },
-    { id: 'obras', label: 'Obras', icon: 'construct-outline', gradient: 'linear-gradient(135deg,#8E24AA,#D81B60)' , route: '/obras-hub' },
-    { id: 'cards', label: 'Cards de Obra', icon: 'apps-outline', gradient: 'linear-gradient(135deg,#7CB342,#C0CA33)', route: '/cards-de-obra' },
-    { id: 'minhas-obras', label: 'Minhas Obras', icon: 'clipboard-outline', gradient: 'linear-gradient(135deg,#0097A7,#26C6DA)', route: '/minhas-obras' },
-    { id: 'receber', label: 'A Receber', icon: 'download-outline', gradient: 'linear-gradient(135deg,#00B8D4,#00E5FF)' , route: '/receber' },
-    { id: 'dividas', label: 'Dívidas', icon: 'alert-circle-outline', gradient: 'linear-gradient(135deg,#D32F2F,#FF5252)' , route: '/dividas' },
-    { id: 'funcionarios', label: 'Funcionários', icon: 'people-outline', gradient: 'linear-gradient(135deg,#5E35B1,#7E57C2)' , route: '/funcionarios' },
-    { id: 'conta', label: 'Minha Conta', icon: 'person-circle-outline', gradient: 'linear-gradient(135deg,#546E7A,#455A64)' , route: '/minha-conta' },
-    { id: 'financeiro', label: 'Financeiro', icon: 'stats-chart-outline', gradient: 'linear-gradient(135deg,#1565C0,#42A5F5)', route: '/financeiro-hub' },
-    { id: 'obras-hub', label: 'Obras Hub', icon: 'compass-outline', gradient: 'linear-gradient(135deg,#6A1B9A,#AB47BC)', route: '/obras-hub' },
+  const apps = useMemo<any[]>(() => [
+    { id: 'lancamentos', label: 'Lançamentos', gradient: 'linear-gradient(135deg,#00C853,#00E676)' , route: '/caixa', glyph: <AttachMoneyIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'calendario', label: 'Calendário', gradient: 'linear-gradient(135deg,#3F51B5,#00BCD4)' , route: '/calendario', glyph: <CalendarMonthIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'propostas', label: 'Propostas', gradient: 'linear-gradient(135deg,#FF6F00,#FFA000)' , route: '/propostas', glyph: <DescriptionIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'obras', label: 'Obras', gradient: 'linear-gradient(135deg,#8E24AA,#D81B60)' , route: '/obras-hub', glyph: <ConstructionIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'cards', label: 'Cards de Obra', gradient: 'linear-gradient(135deg,#7CB342,#C0CA33)', route: '/cards-de-obra', glyph: <AppsIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'minhas-obras', label: 'Minhas Obras', gradient: 'linear-gradient(135deg,#0097A7,#26C6DA)', route: '/minhas-obras', glyph: <ContentPasteIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'receber', label: 'A Receber', gradient: 'linear-gradient(135deg,#00B8D4,#00E5FF)' , route: '/receber', glyph: <DownloadIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'dividas', label: 'Dívidas', gradient: 'linear-gradient(135deg,#D32F2F,#FF5252)' , route: '/dividas', glyph: <WarningAmberIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'funcionarios', label: 'Funcionários', gradient: 'linear-gradient(135deg,#5E35B1,#7E57C2)' , route: '/funcionarios', glyph: <PeopleOutlineIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'conta', label: 'Minha Conta', gradient: 'linear-gradient(135deg,#546E7A,#455A64)' , route: '/minha-conta', glyph: <PersonIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'financeiro', label: 'Financeiro', gradient: 'linear-gradient(135deg,#1565C0,#42A5F5)', route: '/financeiro-hub', glyph: <QueryStatsIcon htmlColor="#fff" fontSize="medium" /> },
+    { id: 'obras-hub', label: 'Obras Hub', gradient: 'linear-gradient(135deg,#6A1B9A,#AB47BC)', route: '/obras-hub', glyph: <ExploreIcon htmlColor="#fff" fontSize="medium" /> },
   ], []);
 
   const openApp = (app: LauncherApp) => setActiveApp(app);

@@ -24,34 +24,35 @@ export default function AppWindow({ app, onClose, children }: Props) {
             onClick={onClose}
           />
 
-          {/* Janela expansível com layoutId */}
-          <motion.div
-            layoutId={`app-${app.id}`}
-            className="launcher-window"
-            style={{ zIndex: 1000 }}
-            drag="y"
-            dragElastic={0.2}
-            dragMomentum={true}
-            onDragEnd={(e, info) => {
-              const threshold = 140; // px
-              const velocityThreshold = 1200; // px/s
-              if (Math.abs(info.offset.y) > threshold || Math.abs(info.velocity.y) > velocityThreshold) {
-                onClose();
-              }
-            }}
-          >
-            <div className="launcher-window-header">
-              <div className="grabber" />
-              <div className="title">
-                {app.emoji && <span className="emoji">{app.emoji}</span>}
-                <span>{app.label}</span>
+          {/* Overlay centralizado evita posicionamento incorreto em diferentes devices */}
+          <div className="launcher-overlay" style={{ zIndex: 1000 }}>
+            <motion.div
+              layoutId={`app-${app.id}`}
+              className="launcher-window"
+              drag="y"
+              dragElastic={0.2}
+              dragMomentum={true}
+              onDragEnd={(e, info) => {
+                const threshold = 140; // px
+                const velocityThreshold = 1200; // px/s
+                if (Math.abs(info.offset.y) > threshold || Math.abs(info.velocity.y) > velocityThreshold) {
+                  onClose();
+                }
+              }}
+            >
+              <div className="launcher-window-header">
+                <div className="grabber" />
+                <div className="title">
+                  {app.emoji && <span className="emoji">{app.emoji}</span>}
+                  <span>{app.label}</span>
+                </div>
+                <button className="close-btn" onClick={onClose} aria-label="Fechar">✕</button>
               </div>
-              <button className="close-btn" onClick={onClose} aria-label="Fechar">✕</button>
-            </div>
-            <div className="launcher-window-content">
-              {children}
-            </div>
-          </motion.div>
+              <div className="launcher-window-content">
+                {children}
+              </div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>,
