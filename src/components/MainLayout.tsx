@@ -2,7 +2,6 @@
 import { ReactNode } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import MacOSDock from './MacOSDock';
 import SwipeNavigation from './SwipeNavigation';
 import { useCompromissosNotification } from '../hooks/useCompromissosNotification';
 
@@ -111,7 +110,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           </motion.div>
         </AnimatePresence>
       </main>
-      <MacOSDock />
+      {/* Dock antigo removido para o novo launcher estilo iOS */}
       <NotificationDialog />
     </div>
   );

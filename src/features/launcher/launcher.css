@@ -122,9 +122,9 @@
   height: min(88vh, 760px);
   background: rgba(20, 20, 28, 0.82);
   border-radius: 22px;
-  box-shadow: 0 18px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.06);
   overflow: hidden;
-  z-index: 11;
+  z-index: 1000;
   backdrop-filter: blur(12px) saturate(120%);
 }
 

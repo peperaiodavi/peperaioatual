@@ -5,6 +5,7 @@ export type LauncherApp = {
   id: string;
   label: string;
   emoji?: string;
+  icon?: string; // Ionicon name, e.g., 'cash-outline'
   color?: string;
   gradient?: string;
   route?: string;
@@ -26,9 +27,13 @@ export default function IconButton({ app, onOpen }: Props) {
         background: app.gradient || app.color || 'linear-gradient(135deg,#2b5876,#4e4376)',
       }}
     >
-      <span className="launcher-icon-emoji" aria-hidden>
-        {app.emoji || '📦'}
-      </span>
+      {app.icon ? (
+        <ion-icon name={app.icon} style={{ fontSize: 28, color: 'white', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.35))' }}></ion-icon>
+      ) : (
+        <span className="launcher-icon-emoji" aria-hidden>
+          {app.emoji || '📦'}
+        </span>
+      )}
       <span className="launcher-icon-label">{app.label}</span>
     </motion.button>
   );
