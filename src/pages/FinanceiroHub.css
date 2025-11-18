@@ -1,0 +1,250 @@
+/* FinanceiroHub.css - Hub de navegação financeira estilo iOS */
+
+.financeiro-hub {
+  position: relative;
+  min-height: 100%;
+  padding: 24px 20px 40px;
+  overflow: hidden;
+}
+
+/* Elementos com z-index para ficarem sobre as partículas */
+.financeiro-hub .hub-header,
+.financeiro-hub .hub-cards-grid {
+  position: relative;
+  z-index: 1;
+}
+
+/* Badge específico para financeiro com glassmorphism */
+.hub-icon-badge.financeiro-badge {
+  background: rgba(16, 185, 129, 0.15);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(16, 185, 129, 0.25),
+    0 16px 48px rgba(16, 185, 129, 0.15),
+    0 0 0 1px rgba(16, 185, 129, 0.1) inset;
+  color: #10b981;
+}
+
+/* Trending icon animation */
+.hub-trending {
+  color: #10b981;
+  animation: trending-bounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+}
+
+@keyframes trending-bounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(5deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(-5deg);
+  }
+}
+
+/* Cores específicas para cada card financeiro */
+.financeiro-hub .hub-card:nth-child(1) .hub-card-icon {
+  color: #10b981;
+}
+
+.financeiro-hub .hub-card:nth-child(2) .hub-card-icon {
+  color: #3b82f6;
+}
+
+.financeiro-hub .hub-card:nth-child(3) .hub-card-icon {
+  color: #ef4444;
+}
+
+/* Decorações específicas do financeiro */
+.financeiro-hub .hub-decoration-1 {
+  background: radial-gradient(
+    circle,
+    rgba(16, 185, 129, 0.1) 0%,
+    transparent 70%
+  );
+}
+
+.financeiro-hub .hub-decoration-2 {
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.1) 0%,
+    transparent 70%
+  );
+}
+
+.financeiro-hub .hub-decoration-3 {
+  background: radial-gradient(
+    circle,
+    rgba(239, 68, 68, 0.1) 0%,
+    transparent 70%
+  );
+}
+
+/* Cards Grid */
+.hub-cards-grid {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Hub Card com Glassmorphism Premium */
+.hub-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  animation: card-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+@keyframes card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hub-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+}
+
+.hub-card:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* Background gradiente do card */
+.hub-card-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  transition: opacity 0.3s ease;
+}
+
+.hub-card:hover .hub-card-bg {
+  opacity: 0.15;
+}
+
+/* Glow effect */
+.hub-card-glow {
+  position: absolute;
+  inset: -20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.hub-card:hover .hub-card-glow {
+  opacity: 0.6;
+}
+
+/* Conteúdo do card */
+.hub-card-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  z-index: 1;
+}
+
+.hub-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.hub-card:hover .hub-card-icon {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1) rotate(5deg);
+}
+
+.hub-card-info {
+  flex: 1;
+  text-align: left;
+}
+
+.hub-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.hub-card-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Chevron */
+.hub-card-chevron {
+  position: relative;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.hub-card:hover .hub-card-chevron {
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateX(4px);
+}
+
+/* Shimmer effect ao passar mouse */
+.hub-card-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  transition: left 0.5s ease;
+}
+
+.hub-card:hover .hub-card-shimmer {
+  left: 100%;
+}

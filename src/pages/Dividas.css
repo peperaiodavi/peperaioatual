@@ -1,19 +1,76 @@
-/* ===== DIVIDAS PAGE - MODERN STYLING ===== */
+/* ===== DÍVIDAS - TECH ULTRA PREMIUM STYLE ===== */
 
-/* Garantir cores corretas globalmente */
+/* Reset de Box Sizing e Cores Globais */
+.dividas-container *,
+.dividas-container *::before,
+.dividas-container *::after {
+  box-sizing: border-box;
+}
+
 .dividas-container,
-.dividas-container * {
+.dividas-container *,
+.dividas-dialog-content,
+.dividas-dialog-content * {
   color: #e6eef8;
 }
 
-.dividas-container {
-  padding: 2rem 1.5rem;
-  min-height: calc(100vh - 64px);
-  background: linear-gradient(135deg, #071029 0%, #0b1220 100%);
-  animation: dividas-fade-in 0.5s ease-out;
+.dividas-container button,
+.dividas-dialog-content button {
+  color: inherit;
 }
 
-@keyframes dividas-fade-in {
+.dividas-container input,
+.dividas-container select,
+.dividas-container textarea,
+.dividas-dialog-content input,
+.dividas-dialog-content select,
+.dividas-dialog-content textarea {
+  color: #e2e8f0 !important;
+}
+
+.dividas-container input::placeholder,
+.dividas-dialog-content input::placeholder {
+  color: #64748b !important;
+}
+
+.dividas-container option {
+  background: #1a1f3a;
+  color: #e2e8f0;
+}
+
+/* Container Principal */
+.dividas-container {
+  min-height: calc(100vh - 64px);
+  padding: 2rem 1.5rem;
+  max-width: 100%;
+  margin: 0 auto;
+  background: 
+    radial-gradient(ellipse at top right, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(17, 24, 39, 0.98) 50%, rgba(30, 41, 59, 0.98) 100%);
+  background-attachment: fixed;
+  position: relative;
+  overflow-x: hidden;
+  animation: container-fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Grid de pontos tecnológicos */
+.dividas-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.12) 1px, transparent 0);
+  background-size: 40px 40px;
+  animation: grid-move 25s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes container-fade-in {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -21,6 +78,15 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes grid-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 40px;
   }
 }
 
@@ -32,10 +98,23 @@
   flex-wrap: wrap;
   gap: 1.5rem;
   margin-bottom: 2rem;
-  animation: dividas-header-slide 0.6s ease-out;
+  padding: 2rem;
+  background: 
+    linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.1) inset;
+  animation: header-slide 0.6s ease-out;
 }
 
-@keyframes dividas-header-slide {
+@keyframes header-slide {
   from {
     opacity: 0;
     transform: translateX(-30px);
@@ -46,30 +125,119 @@
   }
 }
 
+/* Scanner tecnológico no header */
+.dividas-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.15) 50%,
+    transparent 100%
+  );
+  animation: header-scan 4s ease-in-out infinite;
+}
+
+@keyframes header-scan {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.dividas-header-content {
+  position: relative;
+  z-index: 2;
+}
+
 .dividas-header-content h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #e6eef8;
-  margin: 0 0 0.25rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 
+    0 2px 8px rgba(139, 92, 246, 0.4),
+    0 0 20px rgba(139, 92, 246, 0.2);
+  letter-spacing: -0.02em;
 }
 
 .dividas-header-content p {
   color: #94a3b8;
-  font-size: 0.95rem;
+  font-size: 1rem;
   margin: 0;
+  font-weight: 500;
+}
+
+/* Botão adicionar */
+.dividas-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 16px rgba(139, 92, 246, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.5) inset;
+}
+
+.dividas-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dividas-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(139, 92, 246, 0.5),
+    0 0 0 1px rgba(139, 92, 246, 0.8) inset;
+}
+
+.dividas-btn:hover::before {
+  opacity: 1;
+}
+
+.dividas-btn svg {
+  position: relative;
+  z-index: 1;
+}
+
+.dividas-btn span {
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== SUMMARY CARDS ===== */
 .dividas-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
-  animation: dividas-summary-slide 0.6s ease-out 0.1s both;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
+  animation: summary-slide 0.6s ease-out 0.1s both;
 }
 
-@keyframes dividas-summary-slide {
+@keyframes summary-slide {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -81,14 +249,19 @@
 }
 
 .dividas-summary-card {
-  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%);
-  border: 1px solid #232a45;
-  border-radius: 12px;
-  padding: 1.5rem;
   position: relative;
+  padding: 1.75rem;
+  background: 
+    linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 20px;
   overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.1) inset;
 }
 
 .dividas-summary-card::before {
@@ -98,145 +271,158 @@
   left: 0;
   width: 4px;
   height: 100%;
+  background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
   transition: width 0.3s ease;
-}
-
-.dividas-summary-card.total::before {
-  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
-}
-
-.dividas-summary-card.emdia::before {
-  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
-}
-
-.dividas-summary-card.atrasadas::before {
-  background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
-}
-
-.dividas-summary-card.quitadas::before {
-  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
 }
 
 .dividas-summary-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-  border-color: #2d3548;
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 
+    0 8px 40px rgba(139, 92, 246, 0.2),
+    0 0 0 1px rgba(139, 92, 246, 0.2) inset;
 }
 
 .dividas-summary-card:hover::before {
-  width: 8px;
+  width: 100%;
+  opacity: 0.1;
+}
+
+/* Cores específicas por tipo */
+.dividas-summary-card.total::before {
+  background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.dividas-summary-card.emdia::before {
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+}
+
+.dividas-summary-card.atrasadas::before {
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+}
+
+.dividas-summary-card.quitadas::before {
+  background: linear-gradient(180deg, #06b6d4 0%, #0891b2 100%);
 }
 
 .dividas-summary-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 1rem;
-}
-
-.dividas-summary-label {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  font-weight: 500;
+  position: relative;
+  z-index: 2;
 }
 
 .dividas-summary-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
-.dividas-summary-card:hover .dividas-summary-icon {
-  transform: scale(1.1) rotate(5deg);
+.dividas-summary-icon::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(139, 92, 246, 0.3) 180deg,
+    transparent 360deg
+  );
+  animation: icon-rotate 3s linear infinite;
 }
 
-.dividas-summary-icon.red {
-  background: linear-gradient(135deg, rgba(248, 113, 113, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
-}
-
-.dividas-summary-icon.blue {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
-}
-
-.dividas-summary-icon.orange {
-  background: linear-gradient(135deg, rgba(251, 146, 60, 0.2) 0%, rgba(249, 115, 22, 0.2) 100%);
-}
-
-.dividas-summary-icon.green {
-  background: linear-gradient(135deg, rgba(52, 211, 153, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
+@keyframes icon-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .dividas-summary-icon svg {
-  width: 20px;
-  height: 20px;
+  position: relative;
+  z-index: 1;
+  color: #a78bfa;
 }
 
-.dividas-summary-icon.red svg {
-  color: #f87171;
+.dividas-summary-card.total .dividas-summary-icon {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
 }
 
-.dividas-summary-icon.blue svg {
-  color: #60a5fa;
+.dividas-summary-card.total .dividas-summary-icon svg {
+  color: #a78bfa;
 }
 
-.dividas-summary-icon.orange svg {
-  color: #fb923c;
+.dividas-summary-card.emdia .dividas-summary-icon {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
-.dividas-summary-icon.green svg {
+.dividas-summary-card.emdia .dividas-summary-icon svg {
   color: #34d399;
 }
 
-.dividas-summary-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #e6eef8;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.dividas-summary-card.atrasadas .dividas-summary-icon {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
-.dividas-summary-count {
-  color: #64748b;
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
+.dividas-summary-card.atrasadas .dividas-summary-icon svg {
+  color: #f87171;
 }
 
-/* ===== DIVIDAS GRID ===== */
-.dividas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
-  animation: dividas-grid-enter 0.6s ease-out 0.2s both;
+.dividas-summary-card.quitadas .dividas-summary-icon {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.3);
 }
 
-@keyframes dividas-grid-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.dividas-summary-card.quitadas .dividas-summary-icon svg {
+  color: #22d3ee;
 }
 
-/* ===== DIVIDA CARD ===== */
-.divida-card {
-  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%);
-  border: 1px solid #232a45;
-  border-radius: 16px;
-  padding: 1.5rem;
+.dividas-summary-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   position: relative;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  animation: divida-card-enter 0.4s ease-out both;
+  z-index: 2;
 }
 
-@keyframes divida-card-enter {
+.dividas-summary-value {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
+}
+
+/* ===== LISTA DE DÍVIDAS ===== */
+.dividas-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 350px), 1fr));
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+  animation: list-slide 0.6s ease-out 0.2s both;
+}
+
+@keyframes list-slide {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -247,6 +433,23 @@
   }
 }
 
+/* ===== CARD DA DÍVIDA ===== */
+.divida-card {
+  position: relative;
+  padding: 1.75rem;
+  background: 
+    linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.1) inset;
+}
+
 .divida-card::before {
   content: '';
   position: absolute;
@@ -254,100 +457,203 @@
   left: 0;
   width: 100%;
   height: 4px;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s ease;
-}
-
-.divida-card.emdia::before {
-  background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
-}
-
-.divida-card.atrasado::before {
-  background: linear-gradient(90deg, #fb923c 0%, #f97316 100%);
-}
-
-.divida-card.quitado::before {
-  background: linear-gradient(90deg, #34d399 0%, #10b981 100%);
-}
-
-.divida-card:hover::before {
-  transform: scaleX(1);
+  background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%);
+  transition: height 0.3s ease;
 }
 
 .divida-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(96, 165, 250, 0.2), 0 0 40px rgba(96, 165, 250, 0.1);
-  border-color: #2d3548;
+  transform: translateY(-4px);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 
+    0 8px 40px rgba(139, 92, 246, 0.2),
+    0 0 0 1px rgba(139, 92, 246, 0.2) inset;
 }
 
-.divida-card.quitado {
-  opacity: 0.75;
+/* Status colors */
+.divida-card.em_dia::before {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
 }
 
-/* ===== CARD HEADER ===== */
+.divida-card.atrasado::before {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+.divida-card.quitado::before {
+  background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%);
+}
+
+/* Badge de Instituição Financeira */
+.divida-instituicao-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 2;
+  animation: badge-fade-in 0.4s ease-out;
+}
+
+@keyframes badge-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.divida-instituicao-logo {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.divida-instituicao-nome {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Header do Card */
 .divida-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1.25rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #232a45;
-}
-
-.divida-card-title-section {
-  flex: 1;
+  gap: 1rem;
+  position: relative;
+  z-index: 2;
 }
 
 .divida-card-title {
-  color: #e6eef8;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.divida-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
-.divida-badge.emdia {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  color: #60a5fa;
+.divida-card-title svg {
+  flex-shrink: 0;
+  color: #a78bfa;
 }
 
-.divida-badge.atrasado {
-  background: linear-gradient(135deg, rgba(251, 146, 60, 0.15) 0%, rgba(249, 115, 22, 0.15) 100%);
-  border: 1px solid rgba(251, 146, 60, 0.3);
-  color: #fb923c;
-}
-
-.divida-badge.quitado {
-  background: linear-gradient(135deg, rgba(52, 211, 153, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
-  border: 1px solid rgba(52, 211, 153, 0.3);
+.divida-card.em_dia .divida-card-title svg {
   color: #34d399;
 }
 
-.divida-badge svg {
-  width: 14px;
-  height: 14px;
+.divida-card.atrasado .divida-card-title svg {
+  color: #f87171;
+}
+
+.divida-card.quitado .divida-card-title svg {
+  color: #22d3ee;
+}
+
+.divida-card-title h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .divida-card-actions {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
-/* ===== CARD INFO ===== */
+/* Botões de ação */
+.dividas-btn-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 10px;
+  color: #a78bfa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dividas-btn-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(139, 92, 246, 0.2);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dividas-btn-icon:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.dividas-btn-icon:hover::before {
+  opacity: 1;
+}
+
+.dividas-btn-icon svg {
+  position: relative;
+  z-index: 1;
+}
+
+.dividas-btn-icon.delete {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.dividas-btn-icon.delete::before {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.dividas-btn-icon.delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Info do card */
 .divida-info {
-  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  position: relative;
+  z-index: 2;
+}
+
+.divida-categoria {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.875rem;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  color: #a78bfa;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  align-self: flex-start;
 }
 
 .divida-info-row {
@@ -355,7 +661,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #1a1f35;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .divida-info-row:last-child {
@@ -363,331 +669,438 @@
 }
 
 .divida-info-label {
-  color: #64748b;
   font-size: 0.875rem;
+  color: #94a3b8;
   font-weight: 500;
 }
 
 .divida-info-value {
-  color: #e6eef8;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #e2e8f0;
 }
 
-.divida-info-value.highlight {
-  font-size: 1.35rem;
-  color: #f87171;
+.divida-valor-total {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
-.divida-info-value.success {
+.divida-card.em_dia .divida-valor-total {
   color: #34d399;
+  text-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
-/* ===== PARCELAS SECTION ===== */
-.divida-parcelas-section {
-  background: linear-gradient(135deg, #0b1220 0%, #0f1526 100%);
-  border: 1px solid #1a1f35;
-  border-radius: 10px;
-  padding: 1rem;
-  margin-top: 1rem;
+.divida-card.atrasado .divida-valor-total {
+  color: #f87171;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
-.divida-parcelas-header {
+.divida-card.quitado .divida-valor-total {
+  color: #22d3ee;
+  text-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+}
+
+/* Parcela do Mês em Destaque */
+.divida-parcela-destaque {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.08) 100%);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  animation: pulse-destaque 3s ease-in-out infinite;
+}
+
+.divida-parcela-destaque.vencida {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(220, 38, 38, 0.08) 100%);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+@keyframes pulse-destaque {
+  0%, 100% {
+    box-shadow: 
+      0 4px 16px rgba(16, 185, 129, 0.2),
+      0 0 0 1px rgba(16, 185, 129, 0.2) inset;
+  }
+  50% {
+    box-shadow: 
+      0 4px 24px rgba(16, 185, 129, 0.35),
+      0 0 0 2px rgba(16, 185, 129, 0.3) inset;
+  }
+}
+
+.divida-parcela-destaque.vencida {
+  animation: pulse-destaque-vencida 2s ease-in-out infinite;
+}
+
+@keyframes pulse-destaque-vencida {
+  0%, 100% {
+    box-shadow: 
+      0 4px 16px rgba(239, 68, 68, 0.25),
+      0 0 0 1px rgba(239, 68, 68, 0.3) inset;
+  }
+  50% {
+    box-shadow: 
+      0 4px 24px rgba(239, 68, 68, 0.4),
+      0 0 0 2px rgba(239, 68, 68, 0.5) inset;
+  }
+}
+
+.divida-parcela-destaque-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.875rem;
 }
 
-.divida-parcelas-title {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  font-weight: 600;
+.divida-parcela-destaque-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10b981;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
-.divida-parcelas-progresso {
-  color: #60a5fa;
+.divida-parcela-destaque.vencida .divida-parcela-destaque-label {
+  color: #ef4444;
+}
+
+.divida-parcela-destaque-numero {
+  padding: 0.25rem 0.625rem;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 6px;
+  color: #10b981;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.divida-parcela-destaque.vencida .divida-parcela-destaque-numero {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.divida-parcela-destaque-info {
+  margin-bottom: 1rem;
+}
+
+.divida-parcela-destaque-valor {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #10b981;
+  margin-bottom: 0.375rem;
+  text-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.divida-parcela-destaque.vencida .divida-parcela-destaque-valor {
+  color: #ef4444;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.divida-parcela-destaque-data {
   font-size: 0.875rem;
-  font-weight: 600;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.divida-parcela-destaque .dividas-btn-pagar {
+  width: 100%;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+/* Parcelas */
+.divida-parcelas-section {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 2;
+}
+
+.divida-parcelas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.divida-parcelas-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.divida-parcelas-contador {
+  padding: 0.375rem 0.75rem;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  color: #a78bfa;
+  font-size: 0.8125rem;
+  font-weight: 700;
 }
 
 .divida-parcelas-list {
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
-  max-height: 250px;
+  max-height: 300px;
   overflow-y: auto;
-  padding-right: 0.25rem;
+  padding-right: 0.5rem;
 }
 
+/* Scrollbar personalizada */
 .divida-parcelas-list::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 .divida-parcelas-list::-webkit-scrollbar-track {
-  background: #0b1220;
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 3px;
 }
 
 .divida-parcelas-list::-webkit-scrollbar-thumb {
-  background: #232a45;
+  background: rgba(139, 92, 246, 0.3);
   border-radius: 3px;
 }
 
 .divida-parcelas-list::-webkit-scrollbar-thumb:hover {
-  background: #2d3548;
+  background: rgba(139, 92, 246, 0.5);
 }
 
 .divida-parcela-item {
-  display: grid;
-  grid-template-columns: 2fr 140px 120px 130px;
-  gap: 1.5rem;
+  display: flex;
   align-items: center;
-  background: linear-gradient(135deg, #0b1220 0%, #151a2e 100%);
-  border: 1px solid #1a1f35;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  transition: all 0.3s ease;
-}
-
-.divida-parcela-item.paga {
-  opacity: 0.6;
-  border-left: 3px solid #34d399;
-}
-
-.divida-parcela-item.pendente {
-  border-left: 3px solid #60a5fa;
-}
-
-.divida-parcela-item.atrasada {
-  border-left: 3px solid #fb923c;
-}
-
-.divida-parcela-item.mesatual {
-  border-left: 3px solid #7c3aed;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .divida-parcela-item:hover {
-  transform: translateX(4px);
-  background: linear-gradient(135deg, #0f1526 0%, #151a2e 100%);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.divida-parcela-item.paga {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  opacity: 0.7;
 }
 
 .divida-parcela-info {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-width: 0;
-}
-
-.divida-parcela-numero {
-  color: #e6eef8;
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.3;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  letter-spacing: 0.3px;
-}
-
-.divida-parcela-data {
-  color: #94a3b8;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-.divida-parcela-valor {
-  color: #e6eef8;
-  font-size: 1.1rem;
-  font-weight: 700;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  text-align: right;
-  white-space: nowrap;
-}
-
-.divida-parcela-status {
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0.4rem 0.875rem;
-  border-radius: 14px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-left: 0.75rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  gap: 0.75rem;
+  flex: 1;
 }
 
-.divida-parcela-status.paga {
-  background: linear-gradient(135deg, rgba(52, 211, 153, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  color: #34d399;
-}
-
-.divida-parcela-status.paga:hover {
-  background: linear-gradient(135deg, rgba(52, 211, 153, 0.3) 0%, rgba(16, 185, 129, 0.3) 100%);
-  transform: scale(1.05);
-}
-
-.divida-parcela-status.pendente {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.4);
-  color: #60a5fa;
-}
-
-.divida-parcela-status.pendente:hover {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
-  transform: scale(1.05);
-}
-
-.divida-parcela-status.atrasada {
-  background: linear-gradient(135deg, rgba(251, 146, 60, 0.2) 0%, rgba(249, 115, 22, 0.2) 100%);
-  border: 1px solid rgba(251, 146, 60, 0.4);
-  color: #fb923c;
-  animation: pulse-atrasada 2s ease-in-out infinite;
-}
-
-@keyframes pulse-atrasada {
-  0%, 100% {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-  50% {
-    box-shadow: 0 2px 8px rgba(251, 146, 60, 0.4), 0 0 12px rgba(251, 146, 60, 0.2);
-  }
-}
-
-.divida-parcela-status.atrasada:hover {
-  background: linear-gradient(135deg, rgba(251, 146, 60, 0.3) 0%, rgba(249, 115, 22, 0.3) 100%);
-  transform: scale(1.05);
-}
-
-/* ===== BUTTONS ===== */
-.dividas-btn {
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.dividas-btn-icon {
-  background: transparent;
-  border: 1px solid #232a45;
-  color: #94a3b8;
-  padding: 0.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.divida-parcela-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid rgba(139, 92, 246, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-.dividas-btn-icon:hover {
-  background: rgba(96, 165, 250, 0.1);
-  border-color: #60a5fa;
-  color: #60a5fa;
-  transform: scale(1.1);
+.divida-parcela-item.paga .divida-parcela-checkbox {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
 }
 
-.dividas-btn-icon.edit:hover {
-  background: rgba(96, 165, 250, 0.1);
-  border-color: #60a5fa;
-  color: #60a5fa;
+.divida-parcela-checkbox svg {
+  color: #ffffff;
 }
 
-.dividas-btn-icon.delete:hover {
-  background: rgba(248, 113, 113, 0.1);
-  border-color: #f87171;
+.divida-parcela-numero {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.divida-parcela-data {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+}
+
+.divida-parcela-valor {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+/* Footer do card */
+.divida-card-footer {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.divida-status-badge {
+  padding: 0.5rem 0.875rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.divida-status-badge.em_dia {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.divida-status-badge.atrasado {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   color: #f87171;
 }
 
-.dividas-btn-primary {
-  background: linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%);
-  color: #fff;
-  border: none;
-  width: 100%;
-  justify-content: center;
+.divida-status-badge.quitado {
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  color: #22d3ee;
 }
 
-.dividas-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(96, 165, 250, 0.4);
-}
-
-.dividas-btn-pagar {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-  border: 2px solid #34d399;
-  color: #fff;
-  justify-content: center;
-  font-weight: 600;
+.divida-vencimento {
   font-size: 0.875rem;
-  padding: 0.625rem 1rem;
-  min-width: 110px;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3), 0 0 20px rgba(52, 211, 153, 0.1);
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Botão de Pagar */
+.dividas-btn-pagar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  min-width: 100px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff !important;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  white-space: nowrap;
+  box-shadow: 
+    0 4px 12px rgba(16, 185, 129, 0.3),
+    0 0 0 1px rgba(16, 185, 129, 0.5) inset;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .dividas-btn-pagar::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.dividas-btn-pagar:hover::before {
-  left: 100%;
+  inset: 0;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
 }
 
 .dividas-btn-pagar:hover {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-color: #10b981;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(52, 211, 153, 0.4), 0 0 30px rgba(52, 211, 153, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(16, 185, 129, 0.5),
+    0 0 0 1px rgba(16, 185, 129, 0.8) inset;
 }
 
-.dividas-btn-pagar:active {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
+.dividas-btn-pagar:hover::before {
+  opacity: 1;
 }
 
-.dividas-btn-pagar:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.dividas-btn-pagar svg {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
 }
 
-.dividas-btn-pagar:disabled:hover {
-  transform: none;
+.dividas-btn-pagar span,
+.dividas-btn-pagar > *:not(svg) {
+  position: relative;
+  z-index: 1;
 }
 
-/* ===== DIALOGS ===== */
+/* Botão de Pagar Urgente (vencido) */
+.dividas-btn-pagar.urgent {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 
+    0 4px 12px rgba(239, 68, 68, 0.3),
+    0 0 0 1px rgba(239, 68, 68, 0.5) inset;
+  animation: pulse-urgent 2s ease-in-out infinite;
+}
+
+.dividas-btn-pagar.urgent::before {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.dividas-btn-pagar.urgent:hover {
+  box-shadow: 
+    0 6px 20px rgba(239, 68, 68, 0.5),
+    0 0 0 1px rgba(239, 68, 68, 0.8) inset;
+}
+
+@keyframes pulse-urgent {
+  0%, 100% {
+    box-shadow: 
+      0 4px 12px rgba(239, 68, 68, 0.3),
+      0 0 0 1px rgba(239, 68, 68, 0.5) inset;
+  }
+  50% {
+    box-shadow: 
+      0 4px 20px rgba(239, 68, 68, 0.6),
+      0 0 0 2px rgba(239, 68, 68, 0.8) inset;
+  }
+}
+
+/* ===== DIALOG ===== */
 .dividas-dialog-content {
   background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%);
-  border: 1px solid #232a45;
-  border-radius: 16px;
-  padding: 1.5rem;
-  max-width: 480px;
-  width: 90vw;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  animation: dividas-dialog-enter 0.3s ease-out;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 20px;
+  padding: 0;
+  max-width: 600px;
+  width: 95vw;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(139, 92, 246, 0.2) inset;
+  animation: dialog-enter 0.3s ease-out;
 }
 
-@keyframes dividas-dialog-enter {
+@keyframes dialog-enter {
   from {
     opacity: 0;
     transform: scale(0.95) translateY(-20px);
@@ -698,206 +1111,310 @@
   }
 }
 
+.dividas-dialog-header {
+  padding: 2rem;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  background: rgba(139, 92, 246, 0.05);
+}
+
 .dividas-dialog-title {
-  color: #e6eef8;
-  font-size: 1.35rem;
-  font-weight: 700;
-  margin-bottom: 1.25rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #232a45;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
 .dividas-form {
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
+  max-height: calc(90vh - 180px);
+  overflow-y: auto;
+}
+
+.dividas-form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dividas-form::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.dividas-form::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
+}
+
+.dividas-form::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
 }
 
 .dividas-form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .dividas-form-field label {
-  color: #94a3b8;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 700;
+  color: #cbd5e1 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .dividas-form-field input,
 .dividas-form-field select {
-  background: #0b1220;
-  border: 1px solid #232a45;
-  color: #e6eef8;
-  padding: 0.625rem 0.875rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+  color: #e2e8f0 !important;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .dividas-form-field input:focus,
 .dividas-form-field select:focus {
   outline: none;
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 
-.dividas-form-field input::placeholder {
-  color: #475569;
+/* Inputs de data e número */
+.dividas-form-field input[type="date"],
+.dividas-form-field input[type="number"],
+.dividas-form-field input[type="text"] {
+  color-scheme: dark;
 }
 
-.dividas-form-field input:read-only {
-  background: #0f1526;
-  cursor: not-allowed;
-  opacity: 0.7;
+.dividas-form-field input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }
 
-/* Radio buttons para tipo de dívida */
+.dividas-select-instituicao {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  padding-right: 2.5rem;
+}
+
+.dividas-select-instituicao option,
+.dividas-form-field select option {
+  background: #1a1f3a !important;
+  color: #e2e8f0 !important;
+  padding: 0.5rem;
+}
+
+/* Tipo options */
 .dividas-tipo-options {
   display: flex;
-  gap: 1rem;
-  padding: 0.5rem 0;
+  gap: 0.75rem;
 }
 
-.dividas-tipo-option {
+.dividas-tipo-options button {
   flex: 1;
+  padding: 0.875rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+  color: #94a3b8;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dividas-tipo-options button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.dividas-tipo-options button.active {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border-color: #8b5cf6;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Botão submit do formulário */
+.dividas-btn-primary {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #ffffff !important;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 16px rgba(139, 92, 246, 0.3),
+    0 0 0 1px rgba(139, 92, 246, 0.5) inset;
+  margin-top: 1rem;
+}
+
+.dividas-btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dividas-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 24px rgba(139, 92, 246, 0.5),
+    0 0 0 1px rgba(139, 92, 246, 0.8) inset;
+}
+
+.dividas-btn-primary:hover::before {
+  opacity: 1;
+}
+
+.dividas-btn-primary span,
+.dividas-btn-primary svg {
+  position: relative;
+  z-index: 1;
+}
+
+.w-full {
+  width: 100%;
+}
+
+/* Botões do form */
+.dividas-form-actions {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: #0b1220;
-  border: 1px solid #232a45;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(139, 92, 246, 0.2);
+  background: rgba(139, 92, 246, 0.05);
 }
 
-.dividas-tipo-option:hover {
-  border-color: #60a5fa;
-  background: rgba(96, 165, 250, 0.05);
-}
-
-.dividas-tipo-option input[type="radio"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-.dividas-tipo-option label {
-  cursor: pointer;
+.dividas-form-actions button {
   flex: 1;
-  margin: 0;
-  color: #e6eef8;
-  font-weight: 500;
+  padding: 0.875rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Select do shadcn/ui */
-.dividas-form-field [role="combobox"] {
-  background: #0b1220 !important;
-  border: 1px solid #232a45 !important;
-  color: #e6eef8 !important;
-  padding: 0.625rem 0.875rem !important;
-  border-radius: 8px !important;
-  font-size: 0.9rem !important;
-  height: auto !important;
-  min-height: 38px !important;
+.dividas-form-actions button[type="submit"] {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
-.dividas-form-field [role="combobox"]:hover {
-  border-color: #2d3548 !important;
+.dividas-form-actions button[type="submit"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
 }
 
-.dividas-form-field [role="combobox"]:focus {
-  outline: none !important;
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+.dividas-form-actions button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
-/* ===== EMPTY STATE ===== */
-.dividas-empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #64748b;
-  font-size: 0.95rem;
-  background: linear-gradient(135deg, #151a2e 0%, #1a1f3a 100%);
-  border: 1px dashed #232a45;
-  border-radius: 16px;
-  animation: dividas-fade-in 0.6s ease-out 0.3s both;
+.dividas-form-actions button[type="submit"]:hover::before {
+  opacity: 1;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1024px) {
-  .dividas-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }
+.dividas-form-actions button[type="submit"] span,
+.dividas-form-actions button[type="submit"] svg {
+  position: relative;
+  z-index: 1;
 }
 
+.dividas-form-actions button[type="button"] {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8 !important;
+}
+
+.dividas-form-actions button[type="button"]:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #cbd5e1 !important;
+}
+
+/* ===== RESPONSIVIDADE ===== */
 @media (max-width: 768px) {
   .dividas-container {
     padding: 1.5rem 1rem;
   }
 
   .dividas-header {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 1.5rem;
   }
 
   .dividas-header-content h1 {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
 
   .dividas-summary {
     grid-template-columns: 1fr;
   }
 
-  .dividas-grid {
+  .dividas-list {
     grid-template-columns: 1fr;
   }
 
-  .divida-card-header {
-    flex-direction: column;
-    gap: 1rem;
+  .divida-card {
+    padding: 1.5rem;
   }
 
-  .divida-card-actions {
-    width: 100%;
-    justify-content: flex-end;
+  .dividas-form {
+    padding: 1.5rem;
   }
 
-  .dividas-dialog-content {
-    padding: 1.25rem;
-    max-width: 95vw;
-  }
-
-  .dividas-dialog-title {
-    font-size: 1.2rem;
-  }
-
-  .dividas-tipo-options {
+  .dividas-form-actions {
+    padding: 1rem 1.5rem;
     flex-direction: column;
   }
+}
 
-  .divida-parcela-item {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-    padding: 1rem;
+@media (max-width: 480px) {
+  .dividas-header-content h1 {
+    font-size: 1.5rem;
   }
 
-  .divida-parcela-info,
-  .divida-parcela-valor,
-  .divida-parcela-status,
-  .dividas-btn-pagar {
+  .dividas-btn {
     width: 100%;
-    text-align: left;
+    justify-content: center;
   }
 
-  .divida-parcela-valor {
-    text-align: left;
+  .dividas-summary-value {
+    font-size: 1.5rem;
   }
 
-  .dividas-btn-pagar {
-    margin-top: 0.5rem;
+  .divida-card-title h3 {
+    font-size: 1rem;
+  }
+
+  .divida-valor-total {
+    font-size: 1.25rem;
   }
 }

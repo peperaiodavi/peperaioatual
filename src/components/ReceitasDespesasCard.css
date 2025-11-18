@@ -1,0 +1,388 @@
+/* ReceitasDespesasCard - Estilo iOS Premium */
+
+.receitas-despesas-card {
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  border-radius: 24px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.receitas-despesas-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.receitas-despesas-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(96, 165, 250, 0.3) inset;
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+.receitas-despesas-card:hover::before {
+  opacity: 1;
+}
+
+/* Loading State */
+.receitas-despesas-card.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(96, 165, 250, 0.2);
+  border-top-color: #60a5fa;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Header */
+.rd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.rd-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rd-header-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(96, 165, 250, 0.15);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #60a5fa;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.2);
+  transition: all 0.3s ease;
+}
+
+.receitas-despesas-card:hover .rd-header-icon {
+  transform: scale(1.1) rotate(-5deg);
+  background: rgba(96, 165, 250, 0.25);
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.4);
+}
+
+.rd-header h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.rd-mes {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0.25rem 0 0 0;
+  text-transform: capitalize;
+}
+
+/* Saldo do Mês */
+.rd-saldo-section {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 16px;
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.rd-saldo-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(148, 163, 184, 0.9);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rd-saldo-valor {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.rd-saldo-valor.positivo {
+  color: #34d399;
+  text-shadow: 0 2px 20px rgba(52, 211, 153, 0.4);
+}
+
+.rd-saldo-valor.negativo {
+  color: #f87171;
+  text-shadow: 0 2px 20px rgba(248, 113, 113, 0.4);
+}
+
+/* Grid de Valores */
+.rd-valores-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.rd-valor-card {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 16px;
+  padding: 1.25rem;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.rd-valor-card.receita {
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+.rd-valor-card.receita:hover {
+  background: rgba(52, 211, 153, 0.05);
+  border-color: rgba(52, 211, 153, 0.4);
+  box-shadow: 0 8px 24px rgba(52, 211, 153, 0.15);
+}
+
+.rd-valor-card.despesa {
+  border-color: rgba(248, 113, 113, 0.2);
+}
+
+.rd-valor-card.despesa:hover {
+  background: rgba(248, 113, 113, 0.05);
+  border-color: rgba(248, 113, 113, 0.4);
+  box-shadow: 0 8px 24px rgba(248, 113, 113, 0.15);
+}
+
+.rd-valor-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.875rem;
+}
+
+.rd-valor-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid;
+}
+
+.rd-valor-icon.receita {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #34d399;
+}
+
+.rd-valor-icon.despesa {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #f87171;
+}
+
+.rd-valor-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(226, 232, 240, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rd-valor-principal {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.rd-valor-info {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.rd-quantidade {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: rgba(148, 163, 184, 0.9);
+}
+
+.rd-texto {
+  font-size: 0.8125rem;
+  color: rgba(148, 163, 184, 0.7);
+}
+
+/* Barra de Progresso */
+.rd-barra-progresso {
+  width: 100%;
+  height: 4px;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rd-barra-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.rd-barra-fill.receita {
+  background: linear-gradient(90deg, #34d399, #10b981);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+}
+
+.rd-barra-fill.despesa {
+  background: linear-gradient(90deg, #f87171, #ef4444);
+  box-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
+
+/* Footer */
+.rd-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(139, 92, 246, 0.15);
+  position: relative;
+  z-index: 1;
+}
+
+.rd-indicador {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rd-indicador-icon {
+  flex-shrink: 0;
+}
+
+.rd-indicador-icon.positivo {
+  color: #34d399;
+}
+
+.rd-indicador-icon.negativo {
+  color: #f87171;
+}
+
+.rd-indicador-texto {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.rd-indicador-texto.positivo {
+  color: #34d399;
+}
+
+.rd-indicador-texto.negativo {
+  color: #f87171;
+}
+
+.rd-percentual {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.rd-percentual-label {
+  font-size: 0.8125rem;
+  color: rgba(148, 163, 184, 0.8);
+}
+
+.rd-percentual-valor {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.rd-percentual-valor.positivo {
+  color: #34d399;
+}
+
+.rd-percentual-valor.negativo {
+  color: #f87171;
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .receitas-despesas-card {
+    padding: 1.25rem;
+  }
+
+  .rd-saldo-valor {
+    font-size: 1.875rem;
+  }
+
+  .rd-valores-grid {
+    gap: 0.75rem;
+  }
+
+  .rd-valor-card {
+    padding: 1rem;
+  }
+
+  .rd-valor-principal {
+    font-size: 1.25rem;
+  }
+
+  .rd-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .rd-valores-grid {
+    grid-template-columns: 1fr;
+  }
+}

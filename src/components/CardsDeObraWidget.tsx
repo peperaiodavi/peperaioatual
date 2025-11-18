@@ -185,12 +185,14 @@ const CardsDeObraWidget: React.FC<Props> = ({ userRole }) => {
                     <span className="financeiro-valor">{formatarMoeda(card.valor_venda_orcamento)}</span>
                   </div>
                   <div className="financeiro-item">
-                    <span className="financeiro-label">Saldo</span>
-                    <span className="financeiro-valor saldo">{formatarMoeda(card.saldo_atual)}</span>
-                  </div>
-                  <div className="financeiro-item">
                     <span className="financeiro-label">Gasto</span>
                     <span className="financeiro-valor gasto">{formatarMoeda(card.total_gasto)}</span>
+                  </div>
+                  <div className="financeiro-item">
+                    <span className="financeiro-label">Lucro</span>
+                    <span className={`financeiro-valor ${(card.valor_venda_orcamento - card.total_gasto) >= 0 ? 'lucro-positivo' : 'lucro-negativo'}`}>
+                      {formatarMoeda(card.valor_venda_orcamento - card.total_gasto)}
+                    </span>
                   </div>
                 </div>
 

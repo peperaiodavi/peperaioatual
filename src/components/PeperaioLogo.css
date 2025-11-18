@@ -1,0 +1,235 @@
+/* Peperaio Logo - Estilo com animações */
+
+.peperaio-logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Tamanhos */
+.peperaio-logo-small {
+  --logo-main-size: 20px;
+  --logo-subtitle-size: 10px;
+  --logo-stripe-height: 2px;
+  --logo-gap: 0px;
+  --logo-stripe-gap: 2px;
+}
+
+.peperaio-logo-medium {
+  --logo-main-size: 28px;
+  --logo-subtitle-size: 13px;
+  --logo-stripe-height: 3px;
+  --logo-gap: -2px;
+  --logo-stripe-gap: 0px;
+}
+
+.peperaio-logo-large {
+  --logo-main-size: 36px;
+  --logo-subtitle-size: 16px;
+  --logo-stripe-height: 4px;
+  --logo-gap: -2px;
+  --logo-stripe-gap: 1px;
+}
+
+/* Texto Principal - PEPERAIO */
+.peperaio-logo-main {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.peperaio-text {
+  font-size: var(--logo-main-size);
+  font-weight: 900;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  
+  /* Gradiente sutil */
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  /* Sombra de texto para destaque */
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  
+  /* Transição suave */
+  transition: all 0.3s ease;
+}
+
+.peperaio-logo:hover .peperaio-text {
+  filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+  letter-spacing: 0.04em;
+}
+
+/* Subtítulo - Comunicação Visual */
+.peperaio-logo-subtitle {
+  margin-bottom: var(--logo-stripe-gap);
+}
+
+.peperaio-subtitle-text {
+  font-size: var(--logo-subtitle-size);
+  font-weight: 400;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.08em;
+  font-style: italic;
+  text-transform: none;
+  
+  /* Transição suave */
+  transition: color 0.3s ease;
+}
+
+.peperaio-logo:hover .peperaio-subtitle-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Container das listras */
+.peperaio-logo-stripes {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  position: relative;
+}
+
+/* Listras individuais (bandeira italiana) */
+.peperaio-stripe {
+  height: var(--logo-stripe-height);
+  width: 100%;
+  border-radius: 2px;
+  transform-origin: left;
+  
+  /* Sombra para dar profundidade */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  
+  /* Transição para hover */
+  transition: all 0.3s ease;
+}
+
+/* Verde */
+.peperaio-stripe-green {
+  background: linear-gradient(90deg, #009246 0%, #00b359 100%);
+}
+
+/* Branco */
+.peperaio-stripe-white {
+  background: linear-gradient(90deg, #f1f5f9 0%, #ffffff 100%);
+}
+
+/* Vermelho */
+.peperaio-stripe-red {
+  background: linear-gradient(90deg, #ce2b37 0%, #ef4444 100%);
+}
+
+/* Efeito hover nas listras */
+.peperaio-logo:hover .peperaio-stripe {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: scaleX(1.02);
+}
+
+.peperaio-logo:hover .peperaio-stripe-green {
+  background: linear-gradient(90deg, #00b359 0%, #00d46a 100%);
+}
+
+.peperaio-logo:hover .peperaio-stripe-white {
+  background: linear-gradient(90deg, #ffffff 0%, #ffffff 100%);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
+}
+
+.peperaio-logo:hover .peperaio-stripe-red {
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+}
+
+/* Efeito de brilho animado */
+.peperaio-logo-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Animação de pulso suave */
+@keyframes logo-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.02);
+  }
+}
+
+.peperaio-logo-medium:hover {
+  animation: logo-pulse 2s ease-in-out infinite;
+}
+
+/* Animação de brilho nas listras */
+@keyframes stripe-glow {
+  0%, 100% {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  }
+}
+
+.peperaio-stripe {
+  animation: stripe-glow 3s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.peperaio-logo:hover .peperaio-stripe {
+  animation-play-state: running;
+}
+
+/* Variação para usar em fundo claro */
+.peperaio-logo.light-theme .peperaio-text {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.peperaio-logo.light-theme .peperaio-subtitle-text {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .peperaio-logo-large {
+    --logo-main-size: 28px;
+    --logo-subtitle-size: 13px;
+    --logo-stripe-height: 3px;
+  }
+}
+
+/* Acessibilidade - Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .peperaio-logo,
+  .peperaio-text,
+  .peperaio-stripe {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .peperaio-logo-shine {
+    display: none;
+  }
+}

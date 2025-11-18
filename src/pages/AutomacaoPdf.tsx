@@ -1,19 +1,35 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
-import { FileDown, FileText, DollarSign, Calendar, User, Trash2, Plus } from 'lucide-react';
+import { FileDown, FileText, DollarSign, Calendar, User, Trash2, Plus, Bold, Italic, List } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable'; // ⚠️ GARANTA QUE ISSO ESTÁ INSTALADO (npm install jspdf-autotable)
 import { supabase } from '../utils/supabaseClient';
+import extenso from 'extenso';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import './AutomacaoPdf.css';
 
 // Função auxiliar para detectar mobile
 const isMobileDevice = () => {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
+// Função para converter valor numérico para extenso
+const converterValorParaExtenso = (valor: number): string => {
+  try {
+    if (valor === 0) return 'zero reais';
+    // Usa a biblioteca extenso para converter o valor
+    const valorExtenso = extenso(valor, { mode: 'currency' });
+    return valorExtenso;
+  } catch (error) {
+    console.error('Erro ao converter valor para extenso:', error);
+    return `${valor.toFixed(2)} reais`;
+  }
 };
 
 // Função auxiliar para download de PDF em mobile
@@ -254,11 +270,12 @@ visto.
 
 
 // Configurações de Posição
-const MARGIN_LEFT = 20;
+const MARGIN_LEFT = 25; // Margem esquerda aumentada para 25mm
+const MARGIN_RIGHT = 25; // Margem direita igual
 const MARGIN_TOP = 20;
 const PAGE_WIDTH = 210; // A4
 const PAGE_HEIGHT = 297; // A4
-const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT * 2;
+const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT; // Largura centralizada
 const FOOTER_Y = PAGE_HEIGHT - MARGIN_TOP;
 
 // --- FUNÇÕES AUXILIARES DO PDF ---
@@ -285,10 +302,10 @@ const addHeader = (doc: jsPDF) => {
   // Linhas coloridas (verde e vermelho)
   doc.setLineWidth(2);
   doc.setDrawColor(0, 128, 0); // Verde
-  doc.line(MARGIN_LEFT, MARGIN_TOP + 15, PAGE_WIDTH - MARGIN_LEFT, MARGIN_TOP + 15);
+  doc.line(MARGIN_LEFT, MARGIN_TOP + 15, PAGE_WIDTH - MARGIN_RIGHT, MARGIN_TOP + 15);
   
   doc.setDrawColor(255, 0, 0); // Vermelho
-  doc.line(MARGIN_LEFT, MARGIN_TOP + 18, PAGE_WIDTH - MARGIN_LEFT, MARGIN_TOP + 18);
+  doc.line(MARGIN_LEFT, MARGIN_TOP + 18, PAGE_WIDTH - MARGIN_RIGHT, MARGIN_TOP + 18);
 };
 
 const addTextWithPageBreaks = (
@@ -325,6 +342,210 @@ const addTextWithPageBreaks = (
   });
 
   return y; // Retorna a nova posição Y
+};
+
+/**
+ * Converte HTML do ReactQuill para texto simples mantendo formatação básica
+ * SOLUÇÃO DEFINITIVA E COMPLETA - Versão 2.0
+ */
+const htmlToPlainText = (html: string): string => {
+  if (!html) return '';
+  
+  // Remove quebras de linha do código HTML primeiro
+  let cleanHtml = html.trim();
+  
+  // ESTRATÉGIA: Usar textContent do DOM para extrair texto puro, mas processar tags manualmente primeiro
+  try {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Processa recursivamente cada nó
+    const processNode = (node: Node): string => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent || '';
+      }
+      
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
+        const tag = element.tagName.toLowerCase();
+        let content = '';
+        
+        // Processa os filhos
+        Array.from(element.childNodes).forEach(child => {
+          content += processNode(child);
+        });
+        
+        // Aplica formatação baseada na tag
+        switch (tag) {
+          case 'strong':
+          case 'b':
+            return `**${content}**`;
+          case 'em':
+          case 'i':
+            return `*${content}*`;
+          case 'u':
+            return `_${content}_`;
+          case 'br':
+            return '\n';
+          case 'p':
+            return content + '\n';
+          case 'div':
+            return content + '\n';
+          case 'li':
+            return `• ${content}\n`;
+          case 'ul':
+          case 'ol':
+            return content;
+          case 'h1':
+          case 'h2':
+          case 'h3':
+          case 'h4':
+          case 'h5':
+          case 'h6':
+            return `**${content}**\n`;
+          default:
+            return content;
+        }
+      }
+      
+      return '';
+    };
+    
+    let result = '';
+    Array.from(tempDiv.childNodes).forEach(node => {
+      result += processNode(node);
+    });
+    
+    // Limpeza final
+    result = result
+      .replace(/\n{2,}/g, '\n') // Máximo de 1 quebra de linha (sem linhas vazias extras)
+      .replace(/\n +/g, '\n')
+      .replace(/ +\n/g, '\n')
+      .trim();
+    
+    return result;
+    
+  } catch (error) {
+    console.error('❌ ERRO NA CONVERSÃO HTML:', error);
+    
+    // Fallback ultra-seguro: remove TUDO que é tag
+    let fallback = html
+      .replace(/<strong[^>]*>/gi, '**')
+      .replace(/<\/strong>/gi, '**')
+      .replace(/<b[^>]*>/gi, '**')
+      .replace(/<\/b>/gi, '**')
+      .replace(/<em[^>]*>/gi, '*')
+      .replace(/<\/em>/gi, '*')
+      .replace(/<i[^>]*>/gi, '*')
+      .replace(/<\/i>/gi, '*')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<p[^>]*>/gi, '')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<li[^>]*>/gi, '• ')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .trim();
+    
+    return fallback;
+  }
+};
+
+/**
+ * Renderiza texto com formatação inline usando marcadores **texto** para negrito
+ * Exemplo: "Este é um **texto em negrito** e este é normal"
+ */
+const addFormattedTextWithPageBreaks = (
+  doc: jsPDF,
+  text: string,
+  startY: number,
+  fontSize = 10
+): number => {
+  let y = startY;
+  doc.setFontSize(fontSize);
+  const lineHeight = fontSize * 0.7;
+  
+  // Divide o texto em linhas primeiro
+  const paragraphs = text.split('\n');
+  
+  paragraphs.forEach((paragraph) => {
+    if (paragraph.trim() === '') {
+      y += lineHeight * 0.3; // Espaçamento reduzido para linhas vazias
+      return;
+    }
+
+    // Processa formatação inline com **texto**
+    const segments: Array<{ text: string; bold: boolean }> = [];
+    let currentText = '';
+    let isBold = false;
+    let i = 0;
+    
+    while (i < paragraph.length) {
+      if (paragraph[i] === '*' && paragraph[i + 1] === '*') {
+        // Encontrou marcador de negrito
+        if (currentText) {
+          segments.push({ text: currentText, bold: isBold });
+          currentText = '';
+        }
+        isBold = !isBold;
+        i += 2; // Pula os dois asteriscos
+      } else {
+        currentText += paragraph[i];
+        i++;
+      }
+    }
+    
+    // Adiciona o último segmento
+    if (currentText) {
+      segments.push({ text: currentText, bold: isBold });
+    }
+
+    // Renderiza os segmentos
+    let currentX = MARGIN_LEFT;
+    
+    // Verifica se há espaço suficiente antes de iniciar a linha
+    if (y > FOOTER_Y - 15) {
+      doc.addPage();
+      addHeader(doc);
+      y = MARGIN_TOP + 35;
+    }
+    
+    segments.forEach((segment) => {
+      // Quebra o segmento em linhas se necessário
+      doc.setFont('helvetica', segment.bold ? 'bold' : 'normal');
+      const words = segment.text.split(' ');
+      
+      words.forEach((word, index) => {
+        const wordWithSpace = index < words.length - 1 ? word + ' ' : word;
+        const wordWidth = doc.getTextWidth(wordWithSpace);
+        
+        // Verifica se precisa quebrar linha
+        if (currentX + wordWidth > PAGE_WIDTH - MARGIN_RIGHT) {
+          y += lineHeight;
+          currentX = MARGIN_LEFT;
+          
+          // Verifica se precisa de nova página
+          if (y > FOOTER_Y - 15) {
+            doc.addPage();
+            addHeader(doc);
+            y = MARGIN_TOP + 35;
+          }
+        }
+        
+        doc.text(wordWithSpace, currentX, y);
+        currentX += wordWidth;
+      });
+    });
+    
+    y += lineHeight; // Próxima linha
+  });
+
+  return y;
 };
 
 /**
@@ -384,6 +605,9 @@ Prazo de Execução:
     // Campos 5.1 e 5.4
     dataBaseProposta: new Date().toLocaleDateString('pt-BR'), // 5.1
     prazoEntrega: '10 dias úteis', // 5.4
+    
+    // Campo editável para Notas Técnicas (Item 3)
+    notasTecnicas: '', // Se vazio, usa texto padrão
   };
 };
 
@@ -429,10 +653,17 @@ export default function AutomacaoPdf() {
     if (proximoNumeroPreview !== null) {
       const anoAtual = new Date().getFullYear();
       const numeroCompleto = `${anoAtual} ${proximoNumeroPreview}-R01`;
-      setPdfData(prev => ({
-        ...prev,
-        propostaNumero: numeroCompleto
-      }));
+      
+      // Só atualiza se o número for diferente (evita loop infinito)
+      setPdfData(prev => {
+        if (prev.propostaNumero !== numeroCompleto) {
+          return {
+            ...prev,
+            propostaNumero: numeroCompleto
+          };
+        }
+        return prev;
+      });
     }
   }, [proximoNumeroPreview]);
 
@@ -470,6 +701,20 @@ export default function AutomacaoPdf() {
     }));
   };
 
+  // Calcula o valor total automaticamente sempre que os itens mudarem
+  const valorTotalCalculado = useMemo(() => {
+    return pdfData.priceItems.reduce((acc, item) => {
+      const valorItem = parseFloat(item.valor || '0');
+      const qtdeItem = parseInt(item.qtde || '1', 10);
+      return acc + (valorItem * qtdeItem);
+    }, 0);
+  }, [pdfData.priceItems]);
+
+  // Calcula o valor por extenso (sem causar re-render)
+  const valorTotalExtenso = useMemo(() => {
+    return converterValorParaExtenso(valorTotalCalculado);
+  }, [valorTotalCalculado]);
+
   // --- FIM DAS FUNÇÕES DE GERENCIAMENTO ---
 
   // Função para converter número em extenso (simplificada para meses)
@@ -501,7 +746,7 @@ export default function AutomacaoPdf() {
     const valorFormatado = totalSum.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
     // 1. Validação dos campos
-    if (!pdfData.clienteNome || !pdfData.clienteContato || !pdfData.propostaNumero || !pdfData.escopoFornecimento || pdfData.priceItems.length === 0 || !pdfData.valorTotalExtenso || !pdfData.dataBaseProposta || !pdfData.prazoEntrega) {
+    if (!pdfData.clienteNome || !pdfData.clienteContato || !pdfData.propostaNumero || !pdfData.escopoFornecimento || pdfData.priceItems.length === 0 || !pdfData.dataBaseProposta || !pdfData.prazoEntrega) {
       toast.error('Erro: Preencha todos os campos obrigatórios (*)');
       return; // Para a execução aqui
     }
@@ -549,8 +794,9 @@ export default function AutomacaoPdf() {
           data_emissao: pdfData.dataEmissao,
           escopo_fornecimento: pdfData.escopoFornecimento,
           condicoes_pagamento: pdfData.condicoesPagamento,
+          notas_tecnicas: pdfData.notasTecnicas || null,
           price_items: pdfData.priceItems,
-          valor_total_extenso: pdfData.valorTotalExtenso,
+          valor_total_extenso: valorTotalExtenso,
           prazo_garantia_meses: pdfData.prazoGarantiaMeses,
           data_base_proposta: pdfData.dataBaseProposta,
           prazo_entrega: pdfData.prazoEntrega,
@@ -638,7 +884,7 @@ export default function AutomacaoPdf() {
       // --- PÁGINA 2: ÍNDICE ---
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 50; // Início mais próximo do cabeçalho
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(16);
       
@@ -670,29 +916,31 @@ export default function AutomacaoPdf() {
       // --- PÁGINA 3: ESCOPO DE FORNECIMENTO (DINÂMICO) ---
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 50; // Início mais próximo do cabeçalho
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('1-ESCOPO DE FORNECIMENTO', MARGIN_LEFT, yPos);
-      yPos += 10;
+      yPos += 12; // Espaçamento maior após título da seção
       
-  // 1. Renderiza o Escopo (agora sem as condições)
-  yPos = addTextWithPageBreaks(doc, pdfData.escopoFornecimento || '---', yPos, 11, 'normal');
-  yPos += 10; 
+  // 1. Renderiza o Escopo (converte HTML do ReactQuill para texto formatado)
+  const escopoTexto = pdfData.escopoFornecimento ? htmlToPlainText(pdfData.escopoFornecimento) : '---';
+  yPos = addFormattedTextWithPageBreaks(doc, escopoTexto, yPos, 11);
+  yPos += 15; // Espaçamento maior antes do valor total
   // 2. Renderiza o Valor Total (usando o total calculado)
   doc.setFont('helvetica', 'bold');
   doc.text('Valor Total do Serviço:', MARGIN_LEFT, yPos);
   yPos += 7;
   doc.setFont('helvetica', 'normal');
   doc.text(valorFormatado, MARGIN_LEFT, yPos); // <-- USA A SOMA CALCULADA
-  yPos += 10; // Espaçamento
-  // 3. Renderiza as Condições de Pagamento
-  yPos = addTextWithPageBreaks(doc, pdfData.condicoesPagamento || '---', yPos, 11, 'normal');
+  yPos += 15; // Espaçamento maior
+  // 3. Renderiza as Condições de Pagamento (converte HTML do ReactQuill para texto formatado)
+  const condicoesPagamentoTexto = pdfData.condicoesPagamento ? htmlToPlainText(pdfData.condicoesPagamento) : '---';
+  yPos = addFormattedTextWithPageBreaks(doc, condicoesPagamentoTexto, yPos, 11);
 
       // --- PÁGINA 4: EXCLUSÕES E NOTAS TÉCNICAS (ESTÁTICO) ---
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 50; // Início mais próximo do cabeçalho
       
       // Renderiza título do item 2 com a mesma formatação do item 1
       doc.setFont('helvetica', 'bold');
@@ -717,8 +965,9 @@ export default function AutomacaoPdf() {
   doc.setFontSize(14);
   doc.text('3-NOTAS TÉCNICAS', MARGIN_LEFT, yPos);
   yPos += 10;
-  // Conteúdo do item 3
-  const conteudoItem3 = `3.1 para elaboração da presente proposta consideramos as documentações técnicas e lista de materiais encaminhada nesta proposta
+  
+  // Usa o campo editável notasTecnicas se existir, caso contrário usa o padrão
+  const conteudoItem3Padrao = `3.1 para elaboração da presente proposta consideramos as documentações técnicas e lista de materiais encaminhada nesta proposta
 
 3.2 o material relacionado, possui garantia de 5 anos;
 
@@ -727,13 +976,19 @@ export default function AutomacaoPdf() {
 3.4 A garantia do serviço se dará na mesma quantidade da garantia do material.
 
 3.5 Quaisquer divergências entre o ofertado e suas reais necessidades, poderão ser ajustadas mediante novo contrato, para tal, reservamo-nos o direito de rever os preços e prazos de entrega.`;
-  yPos = addTextWithPageBreaks(doc, conteudoItem3, yPos, 10, 'normal');
+  
+  // Converte HTML do ReactQuill para texto formatado
+  const notasTecnicasTexto = pdfData.notasTecnicas ? htmlToPlainText(pdfData.notasTecnicas) : '';
+  const conteudoItem3 = notasTecnicasTexto || conteudoItem3Padrao;
+  
+  // Usa a função de formatação para suportar **negrito**
+  yPos = addFormattedTextWithPageBreaks(doc, conteudoItem3, yPos, 10);
   yPos += 10;
 
       // --- PÁGINA 5: PREÇOS (DINÂMICO) ---
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 50; // Início mais próximo do cabeçalho
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('4-PREÇOS', MARGIN_LEFT, yPos);
@@ -791,21 +1046,38 @@ export default function AutomacaoPdf() {
       });
       
       yPos = yPos + 10;
+      
+      // Verifica se há espaço suficiente
+      if (yPos > FOOTER_Y - 30) {
+        doc.addPage();
+        addHeader(doc);
+        yPos = MARGIN_TOP + 35;
+      }
+      
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       
-      // --- LINHA MODIFICADA: VALOR EM VERMELHO ---
-      // Texto antes do valor
+      // --- LINHA MODIFICADA: VALOR EM VERMELHO (COM QUEBRA DE LINHA INTELIGENTE) ---
+      const margemTextoPreco = 15; // Margem reduzida para 15mm
+      const larguraDisponivel = PAGE_WIDTH - margemTextoPreco - MARGIN_RIGHT;
+      
       doc.setTextColor(0, 0, 0); // Preto
-      doc.text('Importa a presente proposta o valor final total de ', MARGIN_LEFT, yPos);
+      doc.text('Importa a presente proposta o valor final total de', margemTextoPreco, yPos);
+      yPos += 6;
       
-      // Calcula posição do valor
-      const textoAntes = 'Importa a presente proposta o valor final total de ';
-      const larguraTextoAntes = doc.getTextWidth(textoAntes);
-      
-      // Valor numérico e por extenso em VERMELHO
+      // Valor numérico e por extenso em VERMELHO na linha seguinte
       doc.setTextColor(255, 0, 0); // Vermelho
-      doc.text(`${valorFormatado} (${pdfData.valorTotalExtenso})`, MARGIN_LEFT + larguraTextoAntes, yPos);
+      const textoValor = `${valorFormatado} (${valorTotalExtenso})`;
+      const linhasValor = doc.splitTextToSize(textoValor, larguraDisponivel);
+      linhasValor.forEach((linha: string) => {
+        if (yPos > FOOTER_Y - 10) {
+          doc.addPage();
+          addHeader(doc);
+          yPos = MARGIN_TOP + 35;
+        }
+        doc.text(linha, margemTextoPreco, yPos);
+        yPos += 6;
+      });
       
       // Volta para cor preta
       doc.setTextColor(0, 0, 0);
@@ -815,7 +1087,7 @@ export default function AutomacaoPdf() {
   // --- PÁGINA 5: CONDIÇÕES GERAIS DE VENDA (sempre exporta) ---
   doc.addPage();
   addHeader(doc);
-  yPos = 90;
+  yPos = 50; // Início mais próximo do cabeçalho
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.text('5-CONDIÇÕES GERAIS DE VENDA', MARGIN_LEFT, yPos);
@@ -867,7 +1139,7 @@ prazo que perdurar o atraso.`;
   // --- PÁGINA 6: TERMO DE GARANTIA DE PRODUTOS ENGENHEIRADOS (sempre exporta) ---
   doc.addPage();
   addHeader(doc);
-  yPos = 90;
+  yPos = 50; // Início mais próximo do cabeçalho
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.text('6-TERMO DE GARANTIA DE PRODUTOS ENGENHEIRADOS', MARGIN_LEFT, yPos);
@@ -972,7 +1244,7 @@ visto.`;
   if (yPos > FOOTER_Y - 50) {
     doc.addPage();
     addHeader(doc);
-    yPos = 90;
+    yPos = 50;
   } else {
     yPos += 15;
   }
@@ -1086,38 +1358,84 @@ visto.`;
             </div>
           </div>
 
-          {/* SEÇÃO 2: Escopo de Fornecimento */}
+          {/* SEÇÃO 2: Escopo de Fornecimento (COM EDITOR RICH TEXT) */}
           <div className="automacao-section">
             <h3 className="automacao-section-title">
               <FileText />
               1. Escopo de Fornecimento
             </h3>
             <p className="automacao-section-description">
-              Digite ou cole o escopo completo aqui. Apenas quebras de linha serão mantidas (sem negrito ou cores).
+              💡 Use os botões do editor para formatar o texto com <strong>negrito</strong>, <em>itálico</em> e listas.
             </p>
             <div className="automacao-form-field">
-              <Textarea
+              <ReactQuill
                 value={pdfData.escopoFornecimento}
-                onChange={(e) => setPdfData({ ...pdfData, escopoFornecimento: e.target.value })}
-                placeholder="Descreva o serviço..."
-                rows={20}
-                style={{ minHeight: '200px' }}
+                onChange={(value) => setPdfData({ ...pdfData, escopoFornecimento: value })}
+                modules={{
+                  toolbar: [
+                    ['bold', 'italic'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['clean']
+                  ]
+                }}
+                formats={['bold', 'italic', 'list', 'bullet']}
+                placeholder="Descreva o serviço com formatação..."
+                className="editor-escopo"
               />
             </div>
           </div>
 
-          {/* SEÇÃO 3: Condições de Pagamento */}
+          {/* SEÇÃO 2: Condições de Pagamento (COM EDITOR RICH TEXT) */}
           <div className="automacao-section">
             <h3 className="automacao-section-title">
               <DollarSign />
-              Condições de Pagamento
+              2. Condições de Pagamento
             </h3>
+            <p className="automacao-section-description">
+              💡 Use os botões do editor para formatar o texto com <strong>negrito</strong>, <em>itálico</em> e listas.
+            </p>
             <div className="automacao-form-field">
-              <Textarea
+              <ReactQuill
                 value={pdfData.condicoesPagamento}
-                onChange={(e) => setPdfData({ ...pdfData, condicoesPagamento: e.target.value })}
-                placeholder="Descreva as condições de pagamento..."
-                rows={5}
+                onChange={(value) => setPdfData({ ...pdfData, condicoesPagamento: value })}
+                modules={{
+                  toolbar: [
+                    ['bold', 'italic'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['clean']
+                  ]
+                }}
+                formats={['bold', 'italic', 'list', 'bullet']}
+                placeholder="Descreva as condições de pagamento com formatação..."
+                className="editor-condicoes"
+              />
+            </div>
+          </div>
+
+          {/* SEÇÃO 3: Notas Técnicas (COM EDITOR RICH TEXT) */}
+          <div className="automacao-section">
+            <h3 className="automacao-section-title">
+              <FileText />
+              3. Notas Técnicas (Opcional - Item 3 do PDF)
+            </h3>
+            <p className="automacao-section-description">
+              💡 Use os botões do editor para formatar o texto com <strong>negrito</strong>, <em>itálico</em> e listas.<br />
+              Deixe vazio para usar o texto padrão ou customize completamente o conteúdo da seção "3-NOTAS TÉCNICAS".
+            </p>
+            <div className="automacao-form-field">
+              <ReactQuill
+                value={pdfData.notasTecnicas}
+                onChange={(value) => setPdfData({ ...pdfData, notasTecnicas: value })}
+                modules={{
+                  toolbar: [
+                    ['bold', 'italic'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['clean']
+                  ]
+                }}
+                formats={['bold', 'italic', 'list', 'bullet']}
+                placeholder="3.1 para elaboração consideramos as documentações técnicas..."
+                className="editor-notas"
               />
             </div>
           </div>
@@ -1185,16 +1503,26 @@ visto.`;
 
             <div className="automacao-divider"></div>
 
-            <div className="automacao-grid-2">
-              <div className="automacao-form-field">
-                <label>Valor Total por Extenso *</label>
-                <Input
-                  value={pdfData.valorTotalExtenso}
-                  onChange={(e) => setPdfData({ ...pdfData, valorTotalExtenso: e.target.value })}
-                  placeholder="Quinze mil e trezentos reais"
-                />
+            {/* Exibição do Valor Total Calculado */}
+            <div style={{ 
+              background: 'rgba(139, 92, 246, 0.1)', 
+              padding: '1.5rem', 
+              borderRadius: '12px', 
+              border: '2px solid rgba(139, 92, 246, 0.3)',
+              marginBottom: '1.5rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.875rem', color: '#94a3b8', fontWeight: 600 }}>VALOR TOTAL CALCULADO:</span>
+                <span style={{ fontSize: '1.5rem', color: '#a78bfa', fontWeight: 700 }}>
+                  {valorTotalCalculado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </span>
               </div>
+              <div style={{ fontSize: '0.875rem', color: '#cbd5e1', fontStyle: 'italic' }}>
+                Por extenso: <strong style={{ color: '#e0e7ff' }}>{valorTotalExtenso || 'Zero reais'}</strong>
+              </div>
+            </div>
 
+            <div className="automacao-grid-2">
               <div className="automacao-form-field">
                 <label>Prazo de Garantia (meses) *</label>
                 <Input

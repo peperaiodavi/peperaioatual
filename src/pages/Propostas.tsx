@@ -13,6 +13,7 @@ import { Edit2, Trash2, FileDown, CheckCircle, Plus, Minus, Building2, FileText,
 import { formatCurrency } from '../utils/formatCurrency';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import PropostaWizard from '../components/PropostaWizard';
 import './Propostas.css';
 
 // Função auxiliar para detectar mobile
@@ -72,12 +73,15 @@ interface Proposta {
   id: string;
   cliente_nome: string;
   cliente_contato: string;
+  cliente_cnpj?: string;
+  cliente_endereco?: string;
   proposta_numero: string;
   numero_sequencial: number;
   numero_revisao: number;
   data_emissao: string;
   escopo_fornecimento: string;
   condicoes_pagamento: string;
+  notas_tecnicas?: string; // Campo editável para Notas Técnicas
   price_items: PriceItem[];
   valor_total_extenso: string;
   prazo_garantia_meses: string;
@@ -88,11 +92,12 @@ interface Proposta {
 }
 
 // Funções auxiliares do PDF (copiadas do AutomacaoPdf)
-const MARGIN_LEFT = 20;
+const MARGIN_LEFT = 25; // Margem esquerda aumentada para 25mm
+const MARGIN_RIGHT = 25; // Margem direita igual
 const MARGIN_TOP = 20;
 const PAGE_WIDTH = 210;
 const PAGE_HEIGHT = 297;
-const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT * 2;
+const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT; // Largura centralizada
 const FOOTER_Y = PAGE_HEIGHT - MARGIN_TOP;
 
 const addHeader = (doc: jsPDF) => {
@@ -113,10 +118,10 @@ const addHeader = (doc: jsPDF) => {
 
   doc.setLineWidth(2);
   doc.setDrawColor(0, 128, 0);
-  doc.line(MARGIN_LEFT, MARGIN_TOP + 15, PAGE_WIDTH - MARGIN_LEFT, MARGIN_TOP + 15);
+  doc.line(MARGIN_LEFT, MARGIN_TOP + 15, PAGE_WIDTH - MARGIN_RIGHT, MARGIN_TOP + 15);
   
   doc.setDrawColor(255, 0, 0);
-  doc.line(MARGIN_LEFT, MARGIN_TOP + 18, PAGE_WIDTH - MARGIN_LEFT, MARGIN_TOP + 18);
+  doc.line(MARGIN_LEFT, MARGIN_TOP + 18, PAGE_WIDTH - MARGIN_RIGHT, MARGIN_TOP + 18);
 };
 
 const addTextWithPageBreaks = (
@@ -154,14 +159,212 @@ const addTextWithPageBreaks = (
   return y;
 };
 
+/**
+ * Converte HTML do ReactQuill para texto simples mantendo formatação básica
+ * SOLUÇÃO DEFINITIVA E COMPLETA - Versão 2.0
+ */
+const htmlToPlainText = (html: string): string => {
+  if (!html) return '';
+  
+  // Remove quebras de linha do código HTML primeiro
+  let cleanHtml = html.trim();
+  
+  // ESTRATÉGIA: Usar textContent do DOM para extrair texto puro, mas processar tags manualmente primeiro
+  try {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Processa recursivamente cada nó
+    const processNode = (node: Node): string => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent || '';
+      }
+      
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
+        const tag = element.tagName.toLowerCase();
+        let content = '';
+        
+        // Processa os filhos
+        Array.from(element.childNodes).forEach(child => {
+          content += processNode(child);
+        });
+        
+        // Aplica formatação baseada na tag
+        switch (tag) {
+          case 'strong':
+          case 'b':
+            return `**${content}**`;
+          case 'em':
+          case 'i':
+            return `*${content}*`;
+          case 'u':
+            return `_${content}_`;
+          case 'br':
+            return '\n';
+          case 'p':
+            return content + '\n';
+          case 'div':
+            return content + '\n';
+          case 'li':
+            return `• ${content}\n`;
+          case 'ul':
+          case 'ol':
+            return content;
+          case 'h1':
+          case 'h2':
+          case 'h3':
+          case 'h4':
+          case 'h5':
+          case 'h6':
+            return `**${content}**\n`;
+          default:
+            return content;
+        }
+      }
+      
+      return '';
+    };
+    
+    let result = '';
+    Array.from(tempDiv.childNodes).forEach(node => {
+      result += processNode(node);
+    });
+    
+    // Limpeza final
+    result = result
+      .replace(/\n{2,}/g, '\n') // Máximo de 1 quebra de linha (sem linhas vazias extras)
+      .replace(/\n +/g, '\n')
+      .replace(/ +\n/g, '\n')
+      .trim();
+    
+    return result;
+    
+  } catch (error) {
+    console.error('❌ ERRO NA CONVERSÃO HTML:', error);
+    
+    // Fallback ultra-seguro: remove TUDO que é tag
+    let fallback = html
+      .replace(/<strong[^>]*>/gi, '**')
+      .replace(/<\/strong>/gi, '**')
+      .replace(/<b[^>]*>/gi, '**')
+      .replace(/<\/b>/gi, '**')
+      .replace(/<em[^>]*>/gi, '*')
+      .replace(/<\/em>/gi, '*')
+      .replace(/<i[^>]*>/gi, '*')
+      .replace(/<\/i>/gi, '*')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<p[^>]*>/gi, '')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<li[^>]*>/gi, '• ')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .trim();
+    
+    return fallback;
+  }
+};
+
+/**
+ * Renderiza texto com formatação inline usando marcadores **texto** para negrito
+ * Exemplo: "Este é um **texto em negrito** e este é normal"
+ */
+const addFormattedTextWithPageBreaks = (
+  doc: jsPDF,
+  text: string,
+  startY: number,
+  fontSize = 10
+): number => {
+  let y = startY;
+  doc.setFontSize(fontSize);
+  const lineHeight = fontSize * 0.7;
+  
+  const paragraphs = text.split('\n');
+  
+  paragraphs.forEach((paragraph) => {
+    if (paragraph.trim() === '') {
+      y += lineHeight * 0.3; // Espaçamento reduzido para linhas vazias
+      return;
+    }
+
+    const segments: Array<{ text: string; bold: boolean }> = [];
+    let currentText = '';
+    let isBold = false;
+    let i = 0;
+    
+    while (i < paragraph.length) {
+      if (paragraph[i] === '*' && paragraph[i + 1] === '*') {
+        if (currentText) {
+          segments.push({ text: currentText, bold: isBold });
+          currentText = '';
+        }
+        isBold = !isBold;
+        i += 2;
+      } else {
+        currentText += paragraph[i];
+        i++;
+      }
+    }
+    
+    if (currentText) {
+      segments.push({ text: currentText, bold: isBold });
+    }
+
+    let currentX = MARGIN_LEFT;
+    
+    // Verifica se há espaço suficiente antes de iniciar a linha
+    if (y > FOOTER_Y - 15) {
+      doc.addPage();
+      addHeader(doc);
+      y = MARGIN_TOP + 35;
+    }
+    
+    segments.forEach((segment) => {
+      doc.setFont('helvetica', segment.bold ? 'bold' : 'normal');
+      const words = segment.text.split(' ');
+      
+      words.forEach((word, index) => {
+        const wordWithSpace = index < words.length - 1 ? word + ' ' : word;
+        const wordWidth = doc.getTextWidth(wordWithSpace);
+        
+        if (currentX + wordWidth > PAGE_WIDTH - MARGIN_RIGHT) {
+          y += lineHeight;
+          currentX = MARGIN_LEFT;
+          
+          if (y > FOOTER_Y - 15) {
+            doc.addPage();
+            addHeader(doc);
+            y = MARGIN_TOP + 35;
+          }
+        }
+        
+        doc.text(wordWithSpace, currentX, y);
+        currentX += wordWidth;
+      });
+    });
+    
+    y += lineHeight;
+  });
+
+  return y;
+};
+
 export default function Propostas() {
-  const { canEdit, canDelete, canCreate } = usePermissao();
+  const { canEditProposta, canDeleteProposta, canCreateProposta } = usePermissao();
   const [propostas, setPropostas] = useState<Proposta[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isFinalizarDialogOpen, setIsFinalizarDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingProposta, setEditingProposta] = useState<Proposta | null>(null);
   const [nomeObra, setNomeObra] = useState('');
+  const [abaAtiva, setAbaAtiva] = useState<'ativas' | 'finalizadas'>('ativas');
 
   useEffect(() => {
     loadPropostas();
@@ -183,16 +386,18 @@ export default function Propostas() {
     setLoading(false);
   };
 
-  const handleDeleteProposta = async (id: string) => {
-    if (!canDelete) {
+  const handleDeleteProposta = async () => {
+    if (!canDeleteProposta || !editingProposta) {
       toast.error('Você não tem permissão para deletar!');
       return;
     }
 
-    const { error } = await supabase.from('propostas').delete().eq('id', id);
+    const { error } = await supabase.from('propostas').delete().eq('id', editingProposta.id);
     if (!error) {
-      setPropostas(prev => prev.filter(p => p.id !== id));
+      setPropostas(prev => prev.filter(p => p.id !== editingProposta.id));
       toast.success('Proposta deletada com sucesso!');
+      setIsDeleteDialogOpen(false);
+      setEditingProposta(null);
     } else {
       toast.error('Erro ao deletar proposta!');
     }
@@ -203,30 +408,35 @@ export default function Propostas() {
     setIsEditDialogOpen(true);
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingProposta || !canEdit) return;
+  const handleSaveEdit = async (propostaAtualizada: Proposta) => {
+    if (!canEditProposta) return;
 
     // Incrementar o número de revisão
-    const novaRevisao = editingProposta.numero_revisao + 1;
+    const novaRevisao = propostaAtualizada.numero_revisao + 1;
     const anoAtual = new Date().getFullYear();
     
     // Formatar o novo número da proposta com a revisão incrementada
-    const novoNumero = `${anoAtual} ${editingProposta.numero_sequencial}-R${novaRevisao.toString().padStart(2, '0')}`;
+    const novoNumero = `${anoAtual} ${propostaAtualizada.numero_sequencial}-R${novaRevisao.toString().padStart(2, '0')}`;
 
     const { error } = await supabase
       .from('propostas')
       .update({
-        cliente_nome: editingProposta.cliente_nome,
-        cliente_contato: editingProposta.cliente_contato,
+        cliente_nome: propostaAtualizada.cliente_nome,
+        cliente_contato: propostaAtualizada.cliente_contato,
+        cliente_cnpj: propostaAtualizada.cliente_cnpj || null,
+        cliente_endereco: propostaAtualizada.cliente_endereco || null,
         proposta_numero: novoNumero, // Atualiza com novo número de revisão
         numero_revisao: novaRevisao, // Incrementa a revisão
-        escopo_fornecimento: editingProposta.escopo_fornecimento,
-        condicoes_pagamento: editingProposta.condicoes_pagamento,
-        price_items: editingProposta.price_items,
-        valor_total_extenso: editingProposta.valor_total_extenso,
-        prazo_garantia_meses: editingProposta.prazo_garantia_meses,
+        escopo_fornecimento: propostaAtualizada.escopo_fornecimento,
+        condicoes_pagamento: propostaAtualizada.condicoes_pagamento,
+        notas_tecnicas: propostaAtualizada.notas_tecnicas || null,
+        price_items: propostaAtualizada.price_items,
+        valor_total_extenso: propostaAtualizada.valor_total_extenso,
+        prazo_garantia_meses: propostaAtualizada.prazo_garantia_meses,
+        data_base_proposta: propostaAtualizada.data_base_proposta || null,
+        prazo_entrega: propostaAtualizada.prazo_entrega || null,
       })
-      .eq('id', editingProposta.id);
+      .eq('id', propostaAtualizada.id);
 
     if (!error) {
       loadPropostas();
@@ -336,7 +546,7 @@ export default function Propostas() {
       // PÁGINA 2: ÍNDICE
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 55;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(16);
       
@@ -366,15 +576,17 @@ export default function Propostas() {
       // PÁGINA 3: ESCOPO DE FORNECIMENTO
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 55;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('1-ESCOPO DE FORNECIMENTO', MARGIN_LEFT, yPos);
-      yPos += 10;
+      yPos += 12; // Espaçamento maior após título da seção
       
-      yPos = addTextWithPageBreaks(doc, proposta.escopo_fornecimento, yPos, 11, 'normal');
+      // Converte HTML para texto formatado
+      const escopoTexto = htmlToPlainText(proposta.escopo_fornecimento);
+      yPos = addFormattedTextWithPageBreaks(doc, escopoTexto, yPos, 11);
       
-      yPos += 10;
+      yPos += 15; // Espaçamento maior antes do valor total
       
       doc.setFont('helvetica', 'bold');
       doc.text('Valor Total do Serviço:', MARGIN_LEFT, yPos);
@@ -382,19 +594,21 @@ export default function Propostas() {
       doc.setFont('helvetica', 'normal');
       doc.text(valorFormatado, MARGIN_LEFT, yPos);
       
-      yPos += 10;
+      yPos += 15; // Espaçamento maior
 
-      yPos = addTextWithPageBreaks(doc, proposta.condicoes_pagamento, yPos, 11, 'normal');
+      // Converte HTML para texto formatado
+      const condicoesPagamentoTexto = htmlToPlainText(proposta.condicoes_pagamento);
+      yPos = addFormattedTextWithPageBreaks(doc, condicoesPagamentoTexto, yPos, 11);
 
       // PÁGINA 4: EXCLUSÕES E NOTAS TÉCNICAS
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 55;
       
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('2-EXCLUSÕES / LISTA DE DESVIOS', MARGIN_LEFT, yPos);
-      yPos += 10;
+      yPos += 12; // Espaçamento maior após título
       
       const conteudoItem2 = `2.1 não estão inclusos os services e materiais de instalação elétrica (externo aos paineis presentes nesta oferta), assim como a montagem e instalação dos mesmos;
 
@@ -413,9 +627,10 @@ export default function Propostas() {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('3-NOTAS TÉCNICAS', MARGIN_LEFT, yPos);
-      yPos += 10;
+      yPos += 12; // Espaçamento maior após título
       
-      const conteudoItem3 = `3.1 para elaboração da presente proposta consideramos as documentações técnicas e lista de materiais encaminhada nesta proposta
+      // Usa o campo editável notas_tecnicas se existir, caso contrário usa o padrão
+      const conteudoItem3Padrao = `3.1 para elaboração da presente proposta consideramos as documentações técnicas e lista de materiais encaminhada nesta proposta
 
 3.2 o material relacionado, possui garantia de 5 anos;
 
@@ -425,12 +640,16 @@ export default function Propostas() {
 
 3.5 Quaisquer divergências entre o ofertado e suas reais necessidades, poderão ser ajustadas mediante novo contrato, para tal, reservamo-nos o direito de rever os preços e prazos de entrega.`;
       
-      yPos = addTextWithPageBreaks(doc, conteudoItem3, yPos, 10, 'normal');
+      const conteudoItem3 = proposta.notas_tecnicas || conteudoItem3Padrao;
+      
+      // Converte HTML para texto formatado (se vier do banco com HTML)
+      const notasTecnicasTexto = htmlToPlainText(conteudoItem3);
+      yPos = addFormattedTextWithPageBreaks(doc, notasTecnicasTexto, yPos, 10);
 
       // PÁGINA 5: PREÇOS
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 55;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('4-PREÇOS', MARGIN_LEFT, yPos);
@@ -473,25 +692,46 @@ export default function Propostas() {
       });
 
       yPos = yPos + 10;
+      
+      // Verifica se há espaço suficiente
+      if (yPos > FOOTER_Y - 30) {
+        doc.addPage();
+        addHeader(doc);
+        yPos = MARGIN_TOP + 35;
+      }
+      
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       
-      // Valor total em vermelho
+      // Valor total em vermelho - com quebra automática
+      const margemTextoPreco = 15;
+      const larguraDisponivel = PAGE_WIDTH - margemTextoPreco - MARGIN_RIGHT;
+      
       doc.setTextColor(0, 0, 0);
-      doc.text('Importa a presente proposta o valor final total de ', MARGIN_LEFT, yPos);
+      doc.text('Importa a presente proposta o valor final total de', margemTextoPreco, yPos);
+      yPos += 6;
       
-      const textoAntes = 'Importa a presente proposta o valor final total de ';
-      const larguraTextoAntes = doc.getTextWidth(textoAntes);
-      
+      // Valor em vermelho na linha seguinte
       doc.setTextColor(255, 0, 0);
-      doc.text(`${valorFormatado} (${proposta.valor_total_extenso})`, MARGIN_LEFT + larguraTextoAntes, yPos);
+      const textoValor = `${valorFormatado} (${proposta.valor_total_extenso})`;
+      const linhasValor = doc.splitTextToSize(textoValor, larguraDisponivel);
+      
+      linhasValor.forEach((linha: string) => {
+        if (yPos > FOOTER_Y - 10) {
+          doc.addPage();
+          addHeader(doc);
+          yPos = MARGIN_TOP + 35;
+        }
+        doc.text(linha, margemTextoPreco, yPos);
+        yPos += 6;
+      });
       
       doc.setTextColor(0, 0, 0);
 
       // PÁGINA 6: CONDIÇÕES GERAIS DE VENDA
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 50;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('5-CONDIÇÕES GERAIS DE VENDA', MARGIN_LEFT, yPos);
@@ -547,7 +787,7 @@ prazo que perdurar o atraso.`;
       // PÁGINA 7: TERMO DE GARANTIA
       doc.addPage();
       addHeader(doc);
-      yPos = 90;
+      yPos = 50;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.text('6-TERMO DE GARANTIA DE PRODUTOS ENGENHEIRADOS', MARGIN_LEFT, yPos);
@@ -653,7 +893,7 @@ visto.`;
       if (yPos > FOOTER_Y - 50) {
         doc.addPage();
         addHeader(doc);
-        yPos = 90;
+        yPos = 50;
       } else {
         yPos += 15;
       }
@@ -680,7 +920,7 @@ visto.`;
   };
 
   const handleFinalizarProposta = async () => {
-    if (!canDelete) {
+    if (!canDeleteProposta) {
       toast.error('Você não tem permissão para finalizar propostas!');
       return;
     }
@@ -790,6 +1030,26 @@ visto.`;
         </div>
       </div>
 
+      {/* Abas de Filtro */}
+      <div className="propostas-tabs">
+        <button
+          className={`propostas-tab ${abaAtiva === 'ativas' ? 'active' : ''}`}
+          onClick={() => setAbaAtiva('ativas')}
+        >
+          <FileDown size={18} />
+          Propostas Ativas
+          <span className="propostas-tab-badge">{propostasAtivas.length}</span>
+        </button>
+        <button
+          className={`propostas-tab ${abaAtiva === 'finalizadas' ? 'active' : ''}`}
+          onClick={() => setAbaAtiva('finalizadas')}
+        >
+          <CheckCircle size={18} />
+          Propostas Finalizadas
+          <span className="propostas-tab-badge">{propostasFinalizadas.length}</span>
+        </button>
+      </div>
+
       {/* Propostas Grid */}
       {propostas.length === 0 ? (
         <div className="propostas-empty">
@@ -801,7 +1061,7 @@ visto.`;
         </div>
       ) : (
         <div className="propostas-grid">
-          {propostas.map((proposta) => (
+          {(abaAtiva === 'ativas' ? propostasAtivas : propostasFinalizadas).map((proposta) => (
             <div 
               key={proposta.id} 
               className={`proposta-card ${proposta.finalizada ? 'finalizada' : 'ativa'}`}
@@ -875,7 +1135,7 @@ visto.`;
                   <FileDown size={16} />
                   Exportar PDF
                 </button>
-                {!proposta.finalizada && canDelete && (
+                {!proposta.finalizada && canDeleteProposta && (
                   <button
                     onClick={() => {
                       setEditingProposta(proposta);
@@ -887,9 +1147,12 @@ visto.`;
                     Finalizar
                   </button>
                 )}
-                {canDelete && (
+                {canDeleteProposta && (
                   <button
-                    onClick={() => handleDeleteProposta(proposta.id)}
+                    onClick={() => {
+                      setEditingProposta(proposta);
+                      setIsDeleteDialogOpen(true);
+                    }}
                     className="propostas-btn-icon delete"
                     title="Excluir Proposta"
                   >
@@ -902,190 +1165,15 @@ visto.`;
         </div>
       )}
 
-      {/* Dialog de Edição */}
+      {/* Dialog de Edição com Wizard */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="propostas-dialog-content">
-          <div className="propostas-dialog-header">
-            <h2 className="propostas-dialog-title">
-              <Edit2 />
-              Editar Proposta
-            </h2>
-          </div>
-
+        <DialogContent className="propostas-dialog-content wizard-dialog">
           {editingProposta && (
-            <>
-              <div className="propostas-dialog-body">
-                {/* Seção de Informações Básicas */}
-                <div className="propostas-form-section">
-                  <h3 className="propostas-form-section-title">
-                    <User />
-                    Informações do Cliente
-                  </h3>
-                  <div className="propostas-form-grid">
-                    <div className="propostas-form-field">
-                      <label>Nome do Cliente</label>
-                      <Input
-                        value={editingProposta.cliente_nome}
-                        onChange={(e) =>
-                          setEditingProposta({ ...editingProposta, cliente_nome: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="propostas-form-field">
-                      <label>Contato</label>
-                      <Input
-                        value={editingProposta.cliente_contato}
-                        onChange={(e) =>
-                          setEditingProposta({ ...editingProposta, cliente_contato: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="propostas-form-field">
-                    <label>Número da Proposta</label>
-                    <Input
-                      value={editingProposta.proposta_numero}
-                      readOnly
-                      disabled
-                      style={{ background: '#0f1526', cursor: 'not-allowed', opacity: 0.7 }}
-                      title="Ao salvar, a revisão será incrementada automaticamente"
-                    />
-                    <p style={{ color: '#94a3b8', fontSize: '0.8125rem', marginTop: '0.25rem' }}>
-                      Revisão atual: R{editingProposta.numero_revisao.toString().padStart(2, '0')} →
-                      Próxima revisão: R{(editingProposta.numero_revisao + 1).toString().padStart(2, '0')}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Seção de Escopo e Pagamento */}
-                <div className="propostas-form-section">
-                  <h3 className="propostas-form-section-title">
-                    <FileText />
-                    Escopo e Condições
-                  </h3>
-                  <div className="propostas-form-field full">
-                    <label>Escopo de Fornecimento</label>
-                    <Textarea
-                      value={editingProposta.escopo_fornecimento}
-                      onChange={(e) =>
-                        setEditingProposta({ ...editingProposta, escopo_fornecimento: e.target.value })
-                      }
-                      rows={6}
-                    />
-                  </div>
-
-                  <div className="propostas-form-field full">
-                    <label>Condições de Pagamento</label>
-                    <Textarea
-                      value={editingProposta.condicoes_pagamento}
-                      onChange={(e) =>
-                        setEditingProposta({ ...editingProposta, condicoes_pagamento: e.target.value })
-                      }
-                      rows={4}
-                    />
-                  </div>
-                </div>
-
-                {/* Seção de Itens de Preço */}
-                <div className="propostas-form-section">
-                  <h3 className="propostas-form-section-title">
-                    <DollarSign />
-                    Itens de Preço
-                  </h3>
-                  
-                  <div className="propostas-price-items">
-                    {editingProposta.price_items.map((item, index) => (
-                      <div key={item.id} className="propostas-price-item">
-                        <div className="propostas-price-item-header">
-                          <span className="propostas-price-item-label">Item {index + 1}</span>
-                          <button
-                            onClick={() => handleRemoveItem(item.id)}
-                            className="propostas-price-item-remove"
-                          >
-                            <Trash2 size={14} />
-                            Remover
-                          </button>
-                        </div>
-                        <div className="propostas-price-item-fields">
-                          <div className="propostas-form-field">
-                            <label>Descrição</label>
-                            <Input
-                              placeholder="Descrição do item"
-                              value={item.descricao}
-                              onChange={(e) => handleItemChange(item.id, 'descricao', e.target.value)}
-                            />
-                          </div>
-                          <div className="propostas-form-field">
-                            <label>Qtde</label>
-                            <Input
-                              type="number"
-                              placeholder="1"
-                              value={item.qtde}
-                              onChange={(e) => handleItemChange(item.id, 'qtde', e.target.value)}
-                            />
-                          </div>
-                          <div className="propostas-form-field">
-                            <label>Valor (R$)</label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              placeholder="0.00"
-                              value={item.valor}
-                              onChange={(e) => handleItemChange(item.id, 'valor', e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <button onClick={handleAddItem} className="propostas-btn-add-item">
-                    <Plus size={18} />
-                    Adicionar Novo Item
-                  </button>
-
-                  <p style={{ color: '#34d399', fontSize: '1.1rem', fontWeight: '700', marginTop: '1rem' }}>
-                    Valor Total: {formatCurrency(calcularValorTotal(editingProposta.price_items))}
-                  </p>
-                </div>
-
-                {/* Seção de Garantia */}
-                {/* Seção de Garantia */}
-                <div className="propostas-form-section">
-                  <div className="propostas-form-grid">
-                    <div className="propostas-form-field">
-                      <label>Valor Total por Extenso</label>
-                      <Input
-                        value={editingProposta.valor_total_extenso}
-                        onChange={(e) =>
-                          setEditingProposta({ ...editingProposta, valor_total_extenso: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="propostas-form-field">
-                      <label>Prazo Garantia (meses)</label>
-                      <Input
-                        type="number"
-                        value={editingProposta.prazo_garantia_meses}
-                        onChange={(e) =>
-                          setEditingProposta({ ...editingProposta, prazo_garantia_meses: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="propostas-dialog-footer">
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="propostas-btn">
-                  Cancelar
-                </Button>
-                <Button onClick={handleSaveEdit} className="propostas-btn propostas-btn-primary">
-                  Salvar Alterações
-                </Button>
-              </div>
-            </>
+            <PropostaWizard
+              proposta={editingProposta}
+              onSave={handleSaveEdit}
+              onCancel={() => setIsEditDialogOpen(false)}
+            />
           )}
         </DialogContent>
       </Dialog>
@@ -1173,6 +1261,100 @@ visto.`;
                 >
                   <CheckCircle size={16} />
                   Criar Obra
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de Confirmação de Exclusão */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="propostas-dialog-content" style={{ maxWidth: '500px' }}>
+          {editingProposta && (
+            <>
+              <div className="propostas-dialog-header">
+                <h2 className="propostas-dialog-title">
+                  <Trash2 style={{ color: '#f87171' }} />
+                  Excluir Proposta
+                </h2>
+              </div>
+
+              <div className="propostas-dialog-body">
+                <div className="propostas-delete-warning">
+                  <div className="propostas-delete-icon">
+                    <Trash2 size={32} />
+                  </div>
+                  <h3 style={{ color: '#f87171', fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.75rem' }}>
+                    ⚠️ Atenção: Esta ação não pode ser desfeita!
+                  </h3>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.9375rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
+                    Você está prestes a excluir permanentemente a seguinte proposta:
+                  </p>
+                </div>
+
+                {/* Card com informações da proposta */}
+                <div className="propostas-delete-info">
+                  <div className="propostas-delete-badge">
+                    <FileText size={14} />
+                    PROPOSTA
+                  </div>
+                  <h3 style={{ color: '#e6eef8', fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+                    {editingProposta.proposta_numero}
+                  </h3>
+                  
+                  <div className="propostas-delete-details">
+                    <p><strong>Cliente:</strong> {editingProposta.cliente_nome}</p>
+                    <p><strong>Contato:</strong> {editingProposta.cliente_contato}</p>
+                    <p><strong>Emissão:</strong> {new Date(editingProposta.data_emissao).toLocaleDateString('pt-BR')}</p>
+                  </div>
+                  
+                  <div className="propostas-delete-total">
+                    <span className="propostas-delete-total-label">Valor Total:</span>
+                    <span className="propostas-delete-total-value">
+                      {formatCurrency(calcularValorTotal(editingProposta.price_items))}
+                    </span>
+                  </div>
+                </div>
+
+                <p style={{ 
+                  color: '#94a3b8', 
+                  fontSize: '0.8125rem', 
+                  marginTop: '1rem',
+                  padding: '0.75rem',
+                  background: 'rgba(248, 113, 113, 0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(248, 113, 113, 0.2)'
+                }}>
+                  💡 Dica: Se preferir manter o histórico, considere <strong>finalizar a proposta</strong> ao invés de excluí-la.
+                </p>
+              </div>
+
+              <div className="propostas-dialog-footer">
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setIsDeleteDialogOpen(false);
+                    setEditingProposta(null);
+                  }}
+                  className="propostas-btn"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="button"
+                  onClick={handleDeleteProposta}
+                  className="propostas-btn propostas-btn-delete"
+                  style={{
+                    background: 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)',
+                    color: '#fff',
+                    border: '1px solid rgba(248, 113, 113, 0.5)',
+                    boxShadow: '0 8px 24px rgba(248, 113, 113, 0.3)'
+                  }}
+                >
+                  <Trash2 size={16} />
+                  Sim, Excluir Proposta
                 </Button>
               </div>
             </>

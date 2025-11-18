@@ -610,3 +610,146 @@
     font-size: 1rem;
   }
 }
+
+/* ===== REACT QUILL EDITOR CUSTOMIZATION ===== */
+.quill {
+  background: #0a0f1e;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.ql-toolbar {
+  background: #151a2e;
+  border: none;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px 8px 0 0;
+  padding: 0.75rem;
+}
+
+.ql-container {
+  border: none;
+  font-size: 0.95rem;
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.ql-editor {
+  color: #e6eef8;
+  min-height: 200px;
+  max-height: 500px;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+/* Scrollbar personalizada para o editor */
+.ql-editor::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ql-editor::-webkit-scrollbar-track {
+  background: #0a0f1e;
+  border-radius: 4px;
+}
+
+.ql-editor::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.4);
+  border-radius: 4px;
+}
+
+.ql-editor::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+.ql-editor.ql-blank::before {
+  color: #64748b;
+  font-style: italic;
+}
+
+.ql-toolbar button {
+  color: #94a3b8 !important;
+}
+
+.ql-toolbar button:hover {
+  color: #a78bfa !important;
+}
+
+.ql-toolbar button.ql-active {
+  color: #8b5cf6 !important;
+}
+
+.ql-stroke {
+  stroke: #94a3b8 !important;
+}
+
+.ql-fill {
+  fill: #94a3b8 !important;
+}
+
+.ql-toolbar button:hover .ql-stroke {
+  stroke: #a78bfa !important;
+}
+
+.ql-toolbar button:hover .ql-fill {
+  fill: #a78bfa !important;
+}
+
+.ql-toolbar button.ql-active .ql-stroke {
+  stroke: #8b5cf6 !important;
+}
+
+.ql-toolbar button.ql-active .ql-fill {
+  fill: #8b5cf6 !important;
+}
+
+/* Classes específicas para editores */
+.editor-escopo .ql-editor {
+  min-height: 300px;
+  max-height: 600px;
+}
+
+.editor-condicoes .ql-editor {
+  min-height: 150px;
+  max-height: 350px;
+}
+
+.editor-notas .ql-editor {
+  min-height: 200px;
+  max-height: 400px;
+}
+
+/* Responsividade do editor Quill */
+@media (max-width: 768px) {
+  .quill {
+    font-size: 0.9rem;
+  }
+  
+  .ql-toolbar {
+    padding: 0.5rem;
+  }
+  
+  .ql-toolbar button {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .ql-editor {
+    min-height: 150px;
+    padding: 0.75rem;
+  }
+  
+  .editor-escopo .ql-editor {
+    min-height: 250px;
+    max-height: 500px;
+  }
+  
+  .editor-condicoes .ql-editor {
+    min-height: 130px;
+    max-height: 300px;
+  }
+  
+  .editor-notas .ql-editor {
+    min-height: 180px;
+    max-height: 350px;
+  }
+}

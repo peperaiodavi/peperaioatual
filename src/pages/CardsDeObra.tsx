@@ -851,12 +851,14 @@ const CardsDeObra: React.FC = () => {
                     <span className="valor">{formatarMoeda(card.valor_venda_orcamento)}</span>
                   </div>
                   <div className="financeiro-item">
-                    <span className="label">Saldo</span>
-                    <span className="valor saldo">{formatarMoeda(card.saldo_atual)}</span>
-                  </div>
-                  <div className="financeiro-item">
                     <span className="label">Gasto</span>
                     <span className="valor gasto">{formatarMoeda(card.total_gasto)}</span>
+                  </div>
+                  <div className="financeiro-item">
+                    <span className="label">Lucro</span>
+                    <span className={`valor ${(card.valor_venda_orcamento - card.total_gasto) >= 0 ? 'lucro-positivo' : 'lucro-negativo'}`}>
+                      {formatarMoeda(card.valor_venda_orcamento - card.total_gasto)}
+                    </span>
                   </div>
                 </div>
 

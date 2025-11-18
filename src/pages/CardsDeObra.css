@@ -329,6 +329,16 @@
   color: #ef4444;
 }
 
+.financeiro-item .valor.lucro-positivo {
+  color: #34d399;
+  font-weight: 800;
+}
+
+.financeiro-item .valor.lucro-negativo {
+  color: #f87171;
+  font-weight: 800;
+}
+
 .card-progresso-section {
   margin-top: 16px;
   padding-top: 16px;

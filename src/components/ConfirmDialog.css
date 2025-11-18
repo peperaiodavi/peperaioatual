@@ -1,167 +1,415 @@
-/* Confirm Dialog - Animado e Estilizado */
-.confirm-dialog-overlay {
+/* iOS Dialog - Estilo moderno e harmonioso */
+
+/* Portal Container - sempre no topo */
+.ios-dialog-portal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  animation: fadeIn 0.2s ease-out;
+  pointer-events: auto;
+  
+  /* Garante que apareça acima de tudo */
+  isolation: isolate;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Backdrop com ultra blur estilo iOS */
+.ios-dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  cursor: pointer;
+  z-index: 1;
 }
 
-.confirm-dialog-content {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid rgba(96, 165, 250, 0.2);
-  border-radius: 1.25rem;
-  padding: 2rem;
-  max-width: 420px;
-  width: 90%;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
-              0 0 0 1px rgba(96, 165, 250, 0.1);
-  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* Container - centralizado na viewport visível */
+.ios-dialog-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 90vh;
+  overflow: auto;
+  z-index: 2;
+  pointer-events: none;
+  
+  /* Garante que fique visível mesmo com scroll */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dialog Content - estilo iOS 17 */
+.ios-dialog-content {
+  background: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-radius: 20px;
+  padding: 28px 24px 20px;
+  max-width: 320px;
+  width: 90vw;
+  min-width: 280px;
+  pointer-events: auto;
+  
+  /* Sombra suave e elegante */
+  box-shadow: 
+    0 24px 48px rgba(0, 0, 0, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  
+  /* Borda sutil */
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  
+  /* Efeito de vidro */
   position: relative;
+  overflow: hidden;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+/* Glassmorphism overlay */
+.ios-dialog-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    transparent
+  );
 }
 
-.confirm-dialog-icon {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, rgba(248, 113, 113, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+/* Ícone estilo iOS com variantes de cor */
+.ios-dialog-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f87171;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  position: relative;
+  
+  /* Animação suave de pulso */
+  animation: gentle-pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.confirm-dialog-icon svg {
-  width: 32px;
-  height: 32px;
+.dialog-icon-svg {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-@keyframes pulse {
+/* Variantes de cor do ícone */
+.ios-dialog-icon-warning {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.25) 100%);
+  color: #fbbf24;
+  box-shadow: 
+    0 0 0 1px rgba(251, 191, 36, 0.3),
+    0 4px 12px rgba(251, 191, 36, 0.2);
+}
+
+.ios-dialog-icon-danger {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(220, 38, 38, 0.25) 100%);
+  color: #ef4444;
+  box-shadow: 
+    0 0 0 1px rgba(239, 68, 68, 0.3),
+    0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.ios-dialog-icon-info {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.25) 0%, rgba(59, 130, 246, 0.25) 100%);
+  color: #60a5fa;
+  box-shadow: 
+    0 0 0 1px rgba(96, 165, 250, 0.3),
+    0 4px 12px rgba(96, 165, 250, 0.2);
+}
+
+.ios-dialog-icon-success {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(22, 163, 74, 0.25) 100%);
+  color: #22c55e;
+  box-shadow: 
+    0 0 0 1px rgba(34, 197, 94, 0.3),
+    0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+@keyframes gentle-pulse {
   0%, 100% {
     opacity: 1;
     transform: scale(1);
   }
   50% {
-    opacity: 0.8;
-    transform: scale(1.05);
+    opacity: 0.9;
+    transform: scale(1.03);
   }
 }
 
-.confirm-dialog-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  text-align: center;
-  margin: 0 0 0.75rem 0;
-}
-
-.confirm-dialog-message {
-  font-size: 1rem;
-  color: #94a3b8;
-  text-align: center;
-  margin: 0 0 2rem 0;
-  line-height: 1.6;
-}
-
-.confirm-dialog-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-}
-
-.confirm-dialog-btn {
-  flex: 1;
-  padding: 0.875rem 1.5rem;
-  border-radius: 0.75rem;
+/* Título estilo iOS - SF Pro */
+.ios-dialog-title {
+  font-size: 20px;
   font-weight: 600;
-  font-size: 0.9375rem;
+  color: #ffffff;
+  text-align: center;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  
+  /* San Francisco Display font style */
+  font-feature-settings: 'ss01' on, 'ss02' on;
+}
+
+/* Mensagem estilo iOS */
+.ios-dialog-message {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+/* Botões estilo iOS 17 */
+.ios-dialog-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.ios-dialog-btn {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.3s ease;
   border: none;
   outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+  
+  /* Haptic feedback visual */
+  position: relative;
+  overflow: hidden;
 }
 
-.confirm-dialog-btn-cancel {
-  background: rgba(100, 116, 139, 0.15);
-  color: #cbd5e1;
-  border: 1px solid rgba(100, 116, 139, 0.3);
+/* Botão Cancelar - estilo iOS secundário */
+.ios-dialog-btn-cancel {
+  background: rgba(120, 120, 128, 0.24);
+  color: #ffffff;
+  font-weight: 500;
 }
 
-.confirm-dialog-btn-cancel:hover {
-  background: rgba(100, 116, 139, 0.25);
-  border-color: rgba(100, 116, 139, 0.5);
-  transform: translateY(-2px);
+.ios-dialog-btn-cancel:hover {
+  background: rgba(120, 120, 128, 0.32);
 }
 
-.confirm-dialog-btn-confirm {
+.ios-dialog-btn-cancel:active {
+  background: rgba(120, 120, 128, 0.18);
+  transform: scale(0.98);
+}
+
+/* Botão Confirmar - variantes por tipo */
+.ios-dialog-btn-confirm {
+  font-weight: 600;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Warning - Amarelo */
+.ios-dialog-btn-warning {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 
+    0 4px 12px rgba(251, 191, 36, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ios-dialog-btn-warning:hover {
+  background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+  box-shadow: 0 6px 16px rgba(251, 191, 36, 0.4);
+}
+
+.ios-dialog-btn-warning:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+}
+
+/* Danger - Vermelho */
+.ios-dialog-btn-danger {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-  border: 1px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 
+    0 4px 12px rgba(239, 68, 68, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.confirm-dialog-btn-confirm:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+.ios-dialog-btn-danger:hover {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
 }
 
-.confirm-dialog-btn:active {
-  transform: translateY(0);
+.ios-dialog-btn-danger:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
-/* Responsivo */
+/* Info - Azul */
+.ios-dialog-btn-info {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  box-shadow: 
+    0 4px 12px rgba(96, 165, 250, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ios-dialog-btn-info:hover {
+  background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+  box-shadow: 0 6px 16px rgba(96, 165, 250, 0.4);
+}
+
+.ios-dialog-btn-info:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
+}
+
+/* Success - Verde */
+.ios-dialog-btn-success {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  box-shadow: 
+    0 4px 12px rgba(34, 197, 94, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ios-dialog-btn-success:hover {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+}
+
+.ios-dialog-btn-success:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+/* Ripple effect ao clicar */
+.ios-dialog-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ios-dialog-btn:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Responsivo - Mobile First */
 @media (max-width: 480px) {
-  .confirm-dialog-content {
-    padding: 1.5rem;
-    max-width: 95%;
+  .ios-dialog-content {
+    max-width: 92vw;
+    padding: 24px 20px 18px;
   }
-
-  .confirm-dialog-title {
-    font-size: 1.25rem;
+  
+  .ios-dialog-title {
+    font-size: 18px;
   }
-
-  .confirm-dialog-message {
-    font-size: 0.9375rem;
+  
+  .ios-dialog-message {
+    font-size: 14px;
+    margin-bottom: 20px;
   }
-
-  .confirm-dialog-actions {
-    flex-direction: column;
+  
+  .ios-dialog-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 16px;
   }
+  
+  .dialog-icon-svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .ios-dialog-btn {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+}
 
-  .confirm-dialog-btn {
-    width: 100%;
+/* Landscape em dispositivos pequenos */
+@media (max-height: 600px) and (orientation: landscape) {
+  .ios-dialog-content {
+    padding: 20px 24px 16px;
+    max-width: 400px;
+  }
+  
+  .ios-dialog-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 12px;
+  }
+  
+  .dialog-icon-svg {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .ios-dialog-title {
+    font-size: 17px;
+    margin-bottom: 8px;
+  }
+  
+  .ios-dialog-message {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .ios-dialog-btn {
+    padding: 10px 16px;
+  }
+}
+
+/* Safe areas para iOS */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .ios-dialog-container {
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
+  }
+}
+
+/* Dark mode extra */
+@media (prefers-color-scheme: dark) {
+  .ios-dialog-content {
+    background: rgba(28, 28, 30, 0.98);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+}
+
+/* Animação de entrada mais suave */
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

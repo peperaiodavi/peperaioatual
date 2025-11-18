@@ -1,0 +1,218 @@
+/* PageHeader.css - Header minimalista iOS-style */
+
+.page-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: linear-gradient(
+    180deg,
+    rgba(11, 18, 32, 0.98) 0%,
+    rgba(7, 16, 41, 0.95) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.15);
+  animation: slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  margin-top: calc(-1 * max(env(safe-area-inset-top, 0px), 0px));
+  padding-top: max(env(safe-area-inset-top, 0px), 0px);
+}
+
+/* Efeito de brilho animado no header */
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.08) 25%,
+    rgba(96, 165, 250, 0.12) 50%,
+    rgba(139, 92, 246, 0.08) 75%,
+    transparent 100%
+  );
+  animation: headerShine 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes headerShine {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(50%);
+  }
+}
+
+/* Partículas decorativas */
+.page-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(96, 165, 250, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(52, 211, 153, 0.03) 0%, transparent 50%);
+  animation: particleFloat 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(-10px) scale(1.1);
+  }
+}
+
+.page-header.transparent {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 10px 16px;
+  max-width: 100%;
+  min-height: 50px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Botões do header */
+.header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 12px;
+  color: #60a5fa;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-btn:hover {
+  background: rgba(96, 165, 250, 0.2);
+  border-color: #60a5fa;
+  transform: scale(1.05);
+}
+
+.header-btn:active {
+  transform: scale(0.95);
+}
+
+/* Botão voltar */
+.back-btn {
+  padding: 0 8px;
+}
+
+.back-btn:hover {
+  transform: translateX(-2px) scale(1.05);
+}
+
+/* Botão trocar dashboard */
+.dashboard-switch-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  color: #ffffff;
+}
+
+.dashboard-switch-btn:hover {
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  transform: scale(1.05) rotate(180deg);
+}
+
+/* Seção de título */
+.header-title-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  min-width: 0; /* Permite truncate */
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #e6eef8 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.01em;
+  margin: 0;
+  overflow: visible;
+  
+  /* Suporte para logo como componente */
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.header-subtitle {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(230, 238, 248, 0.5);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+/* Espaçador */
+.header-spacer {
+  flex: 1;
+}
+
+/* Responsivo */
+@media (min-width: 768px) {
+  .page-header-content {
+    padding: 12px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .header-title {
+    font-size: 24px;
+  }
+  
+  .header-subtitle {
+    font-size: 14px;
+  }
+}
+
+/* Acessibilidade */
+.header-btn:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}

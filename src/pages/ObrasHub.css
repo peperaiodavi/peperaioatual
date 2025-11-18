@@ -1,0 +1,374 @@
+/* ObrasHub.css - Hub de navegação estilo iOS */
+
+.obras-hub {
+  position: relative;
+  min-height: 100%;
+  padding: 24px 20px 40px;
+  overflow: hidden;
+}
+
+/* Header */
+.hub-header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 32px;
+  animation: fade-in-down 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hub-header-content {
+  text-align: center;
+}
+
+.hub-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(59, 130, 246, 0.15);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 24px;
+  color: #3b82f6;
+  margin-bottom: 20px;
+  box-shadow: 
+    0 8px 32px rgba(59, 130, 246, 0.25),
+    0 16px 48px rgba(59, 130, 246, 0.15),
+    0 0 0 1px rgba(59, 130, 246, 0.1) inset;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 8px 32px rgba(59, 130, 246, 0.25),
+      0 16px 48px rgba(59, 130, 246, 0.15),
+      0 0 0 1px rgba(59, 130, 246, 0.1) inset;
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 
+      0 12px 40px rgba(59, 130, 246, 0.35),
+      0 20px 60px rgba(59, 130, 246, 0.25),
+      0 0 0 1px rgba(59, 130, 246, 0.15) inset;
+  }
+}
+
+.hub-title {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 36px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #e6eef8 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+
+.hub-sparkle {
+  color: #fbbf24;
+  animation: sparkle-rotate 4s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+}
+
+@keyframes sparkle-rotate {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: rotate(90deg) scale(1.2);
+    opacity: 0.8;
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: rotate(270deg) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+.hub-subtitle {
+  font-size: 16px;
+  color: rgba(230, 238, 248, 0.6);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Cards Grid */
+.hub-cards-grid {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Hub Card */
+.hub-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  animation: card-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.hub-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+}
+
+@keyframes card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Background gradiente do card */
+.hub-card-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  transition: opacity 0.3s ease;
+}
+
+.hub-card:hover .hub-card-bg {
+  opacity: 0.15;
+}
+
+/* Glow effect */
+.hub-card-glow {
+  position: absolute;
+  inset: -20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.hub-card:hover .hub-card-glow {
+  opacity: 0.6;
+}
+
+/* Conteúdo do card */
+.hub-card-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  z-index: 1;
+}
+
+.hub-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: #60a5fa;
+  transition: all 0.3s ease;
+}
+
+.hub-card:hover .hub-card-icon {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1) rotate(5deg);
+}
+
+.hub-card-info {
+  flex: 1;
+  text-align: left;
+}
+
+.hub-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.hub-card-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Chevron */
+.hub-card-chevron {
+  position: relative;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.hub-card:hover .hub-card-chevron {
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateX(4px);
+}
+
+/* Shimmer effect ao passar mouse */
+.hub-card-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  transition: left 0.5s ease;
+}
+
+.hub-card:hover .hub-card-shimmer {
+  left: 100%;
+}
+
+/* Efeitos ao clicar */
+.hub-card:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* Elementos decorativos */
+.hub-decoration {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(96, 165, 250, 0.1) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: float 10s ease-in-out infinite;
+}
+
+.hub-decoration-1 {
+  width: 200px;
+  height: 200px;
+  top: 10%;
+  right: -50px;
+  animation-delay: 0s;
+}
+
+.hub-decoration-2 {
+  width: 150px;
+  height: 150px;
+  bottom: 20%;
+  left: -30px;
+  animation-delay: 2s;
+}
+
+.hub-decoration-3 {
+  width: 100px;
+  height: 100px;
+  top: 50%;
+  left: 50%;
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  33% {
+    transform: translate(20px, -20px) scale(1.1);
+    opacity: 0.5;
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+    opacity: 0.4;
+  }
+}
+
+/* Responsivo para telas maiores */
+@media (min-width: 768px) {
+  .obras-hub {
+    padding: 40px 32px 60px;
+  }
+
+  .hub-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .hub-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 32px 24px;
+  }
+
+  .hub-card-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hub-card-info {
+    text-align: center;
+  }
+
+  .hub-card-chevron {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+}
+
+/* Acessibilidade */
+.hub-card:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}

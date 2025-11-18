@@ -3,18 +3,38 @@
   <html lang="pt-BR">
     <head>
       <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no, interactive-widget=resizes-content" />
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta name="apple-mobile-web-app-title" content="PeperaioV" />
       <meta name="theme-color" content="#071029" />
+      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#071029" />
       <meta name="msapplication-TileColor" content="#071029" />
       <meta name="format-detection" content="telephone=no" />
+      <meta name="apple-touch-fullscreen" content="yes" />
+      <meta name="HandheldFriendly" content="true" />
+      <meta name="MobileOptimized" content="width" />
       <title>Peperaio Comunicação Visual</title>
     <link rel="icon" type="image/png" href="/assets/favicon-D_MNVYsB.png" />
-      <script type="module" crossorigin src="/assets/index-D70h3m_U.js"></script>
-      <link rel="stylesheet" crossorigin href="/assets/index-DD9uFI5K.css">
+    <style>
+      /* Previne scroll no body durante carregamento */
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: fixed;
+        overscroll-behavior: none;
+      }
+      #root {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+      <script type="module" crossorigin src="/assets/index-bGOnYz_z.js"></script>
+      <link rel="stylesheet" crossorigin href="/assets/index-DWd1egbl.css">
     <link rel="manifest" href="/manifest.webmanifest"></head>
 
     <body>

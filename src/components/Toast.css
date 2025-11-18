@@ -1,0 +1,226 @@
+/* Toast - Notificações estilo iOS */
+
+/* Container posicionado */
+.ios-toast-container {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  pointer-events: none;
+  
+  /* Safe areas */
+  padding-left: env(safe-area-inset-left, 16px);
+  padding-right: env(safe-area-inset-right, 16px);
+}
+
+.ios-toast-top {
+  top: env(safe-area-inset-top, 16px);
+  top: max(env(safe-area-inset-top, 0px), 16px);
+}
+
+.ios-toast-bottom {
+  bottom: calc(100px + env(safe-area-inset-bottom, 16px));
+  bottom: max(calc(100px + env(safe-area-inset-bottom, 0px)), 116px);
+}
+
+/* Toast Card estilo iOS */
+.ios-toast {
+  background: rgba(28, 28, 30, 0.95);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-radius: 16px;
+  padding: 14px 16px;
+  min-width: 320px;
+  max-width: 420px;
+  pointer-events: auto;
+  
+  /* Sombra suave */
+  box-shadow: 
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  
+  /* Layout */
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glassmorphism overlay */
+.ios-toast::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.15) 50%, 
+    transparent
+  );
+}
+
+/* Ícone wrapper */
+.ios-toast-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ios-toast-icon-svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Variantes de cor do ícone */
+.ios-toast-icon-success {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.ios-toast-icon-error {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.ios-toast-icon-warning {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.ios-toast-icon-info {
+  background: rgba(96, 165, 250, 0.2);
+  color: #60a5fa;
+}
+
+/* Conteúdo */
+.ios-toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ios-toast-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 2px 0;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.ios-toast-message {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+/* Botão fechar */
+.ios-toast-close {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(120, 120, 128, 0.24);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-toast-close:hover {
+  background: rgba(120, 120, 128, 0.36);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.ios-toast-close:active {
+  background: rgba(120, 120, 128, 0.18);
+  transform: scale(0.95);
+}
+
+/* Barra de progresso */
+.ios-toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    rgba(96, 165, 250, 0.8) 0%, 
+    rgba(59, 130, 246, 0.8) 100%
+  );
+  transform-origin: left;
+}
+
+.ios-toast-success .ios-toast-progress {
+  background: linear-gradient(90deg, 
+    rgba(34, 197, 94, 0.8) 0%, 
+    rgba(22, 163, 74, 0.8) 100%
+  );
+}
+
+.ios-toast-error .ios-toast-progress {
+  background: linear-gradient(90deg, 
+    rgba(239, 68, 68, 0.8) 0%, 
+    rgba(220, 38, 38, 0.8) 100%
+  );
+}
+
+.ios-toast-warning .ios-toast-progress {
+  background: linear-gradient(90deg, 
+    rgba(251, 191, 36, 0.8) 0%, 
+    rgba(245, 158, 11, 0.8) 100%
+  );
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .ios-toast {
+    min-width: 280px;
+    max-width: calc(100vw - 32px);
+    padding: 12px 14px;
+  }
+  
+  .ios-toast-icon-wrapper {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .ios-toast-icon-svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .ios-toast-title {
+    font-size: 14px;
+  }
+  
+  .ios-toast-message {
+    font-size: 12px;
+  }
+}
+
+/* Landscape */
+@media (max-height: 600px) and (orientation: landscape) {
+  .ios-toast-top {
+    top: 12px;
+  }
+  
+  .ios-toast {
+    padding: 10px 12px;
+  }
+}

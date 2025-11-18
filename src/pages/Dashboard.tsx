@@ -1,30 +1,22 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabaseClient';
+import { useState, useMemo } from 'react';
 import { usePermissao } from '../context/PermissaoContext';
 import { useAuth } from '../context/AuthContext';
-import CaixaAdiantamentoWidget from '../components/CaixaAdiantamentoWidget';
-import CardsDeObraWidget from '../components/CardsDeObraWidget';
-import {
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  LineChart,
-  Line,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-} from 'recharts';
+import { useDashboardData } from '../hooks/queries/useDashboard';
+import DashboardCharts from '../components/DashboardCharts';
+import QuickTransactionCard from '../components/QuickTransactionCard';
+import ReceitasDespesasCard from '../components/ReceitasDespesasCard';
+import CompromissosWidget from '../components/CompromissosWidget';
+import PageHeader from '../components/PageHeader';
 import { formatCurrency } from '../utils/formatCurrency';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon, BarChart3, Activity, Wallet } from 'lucide-react';
+import PeperaioLogo from '../components/PeperaioLogo';
 import './DashboardNew.css';
 import './Dashboard-fab.css';
+
+// Força reload do CSS
+if (typeof window !== 'undefined') {
+  const timestamp = Date.now();
+  console.log('Dashboard CSS carregado:', timestamp);
+}
 
 interface Transacao {
   id: string;
@@ -45,75 +37,125 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 export default function Dashboard() {
   const { isAdmin } = usePermissao();
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    saldoCaixa: 0,
-    totalReceber: 0,
-    dividasAtivas: 0,
-    lucroTotal: 0,
-  });
-  const [gastosPorCategoria, setGastosPorCategoria] = useState<GastosPorCategoria[]>([]);
-  const [fluxoMensal, setFluxoMensal] = useState<any[]>([]);
-  const [comparativoEntradaSaida, setComparativoEntradaSaida] = useState<any[]>([]);
   
+  // Usando TanStack Query para buscar dados
+  const { data, isLoading, error } = useDashboardData();
+
   // Determinar role do usuário
   const userRole = isAdmin ? 'admin' : 'visualizador';
 
-  useEffect(() => {
-    loadDashboardData();
-    // Realtime could be added later (supabase subscription)
-  }, []);
+  // Calcular estatísticas com useMemo para otimização
+  const stats = useMemo(() => {
+    if (!data) return { saldoCaixa: 0, totalReceber: 0, dividasAtivas: 0, lucroTotal: 0 };
 
-  const loadDashboardData = async () => {
-    try {
-      const [{ data: caixa }, { data: receber }, { data: dividas }, { data: obras }] = await Promise.all([
-        supabase.from('transacoes').select('*'),
-        supabase.from('recebiveis').select('*'),
-        supabase.from('dividas').select('*'),
-        supabase.from('obras').select('*'),
-      ]);
-      const caixaData: Transacao[] = (caixa as any[]) || [];
-      const receberData: any[] = (receber as any[]) || [];
-      const dividasData: any[] = (dividas as any[]) || [];
-      const obrasData: any[] = (obras as any[]) || [];
+    const caixaData: Transacao[] = data.transacoes || [];
+    const receberData: any[] = data.recebiveis || [];
+    const dividasData: any[] = data.dividas || [];
+    const obrasData: any[] = data.obras || [];
 
-      const saldoCaixa = caixaData.reduce((acc, t) => (t.tipo === 'entrada' ? acc + t.valor : acc - t.valor), 0);
-      const totalReceber = receberData.reduce((acc: number, r: any) => acc + ((Number(r.valor_total) || 0) - (Number(r.valor_pago) || 0)), 0);
-      const dividasAtivas = dividasData.filter((d: any) => d.status !== 'quitado').reduce((acc: number, d: any) => acc + (d.valorRestante ?? d.valor ?? 0), 0);
-      const lucroTotal = obrasData.filter((o: any) => o.finalizada).reduce((acc: number, o: any) => acc + (o.lucro || 0), 0);
-      setStats({ saldoCaixa, totalReceber, dividasAtivas, lucroTotal });
+    const saldoCaixa = caixaData.reduce((acc, t) => (t.tipo === 'entrada' ? acc + t.valor : acc - t.valor), 0);
+    const totalReceber = receberData.reduce((acc: number, r: any) => acc + ((Number(r.valor_total) || 0) - (Number(r.valor_pago) || 0)), 0);
+    const dividasAtivas = dividasData.filter((d: any) => d.status !== 'quitado').reduce((acc: number, d: any) => acc + (d.valorRestante ?? d.valor ?? 0), 0);
+    
+    // LUCRO TOTAL: Soma dos lucros de obras finalizadas (valor_recebido - gastos)
+    const obrasFinalizadas = obrasData.filter((o: any) => o.finalizada);
+    const lucroTotal = obrasFinalizadas.reduce((acc: number, o: any) => {
+      const totalGastosObra = (o.gastos_obra || []).reduce((sum: number, g: any) => sum + (g.valor || 0), 0);
+      const valorRecebido = o.valor_recebido || 0;
+      const lucroObra = valorRecebido - totalGastosObra;
+      return acc + lucroObra;
+    }, 0);
+    
+    return { saldoCaixa, totalReceber, dividasAtivas, lucroTotal };
+  }, [data]);
 
-      // Gastos por categoria
-      const gastos = caixaData.filter((t) => t.tipo === 'saida');
-      const totalGastos = gastos.reduce((acc, t) => acc + t.valor, 0);
-      const categoriaMap = new Map<string, number>();
-      gastos.forEach((g) => categoriaMap.set(g.categoria, (categoriaMap.get(g.categoria) || 0) + g.valor));
-      const gastosPorCategoriaArr: GastosPorCategoria[] = Array.from(categoriaMap.entries()).map(([categoria, valor]) => ({
+  const gastosPorCategoria = useMemo(() => {
+    if (!data) return [];
+
+    const dataAtual = new Date();
+    const mesAtual = dataAtual.getMonth();
+    const anoAtual = dataAtual.getFullYear();
+
+    const caixaData: Transacao[] = data.transacoes || [];
+    const gastosObraData: any[] = data.gastosObra || [];
+    const despesasCardsData: any[] = data.despesasObra || [];
+
+    // GASTOS POR CATEGORIA - Mês atual apenas, incluindo caixa, obras e cards
+    const categoriaMap = new Map<string, number>();
+    
+    // Gastos do caixa do mês atual
+    caixaData
+      .filter((t) => {
+        if (t.tipo !== 'saida') return false;
+        const dataTransacao = new Date(t.data);
+        return dataTransacao.getMonth() === mesAtual && dataTransacao.getFullYear() === anoAtual;
+      })
+      .forEach((g) => {
+        const categoria = g.categoria || 'Outros';
+        categoriaMap.set(categoria, (categoriaMap.get(categoria) || 0) + g.valor);
+      });
+
+    // Gastos de obras do mês atual
+    gastosObraData
+      .filter((g) => {
+        const dataGasto = new Date(g.data);
+        return dataGasto.getMonth() === mesAtual && dataGasto.getFullYear() === anoAtual;
+      })
+      .forEach((g) => {
+        const categoria = g.categoria || 'Outros';
+        categoriaMap.set(categoria, (categoriaMap.get(categoria) || 0) + g.valor);
+      });
+
+    // Despesas de cards do mês atual
+    despesasCardsData
+      .filter((d) => {
+        const dataDespesa = new Date(d.data);
+        return dataDespesa.getMonth() === mesAtual && dataDespesa.getFullYear() === anoAtual;
+      })
+      .forEach((d) => {
+        const categoria = d.categorias_de_gasto?.nome || 'Outros';
+        categoriaMap.set(categoria, (categoriaMap.get(categoria) || 0) + d.valor);
+      });
+
+    const totalGastos = Array.from(categoriaMap.values()).reduce((acc, v) => acc + v, 0);
+    const gastosPorCategoriaArr: GastosPorCategoria[] = Array.from(categoriaMap.entries())
+      .map(([categoria, valor]) => ({
         categoria,
         valor,
         percentual: totalGastos > 0 ? (valor / totalGastos) * 100 : 0,
-      }));
-      setGastosPorCategoria(gastosPorCategoriaArr);
+      }))
+      .sort((a, b) => b.valor - a.valor);
+    
+    return gastosPorCategoriaArr;
+  }, [data]);
 
-      // Fluxo mensal (últimos 6 meses)
-      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-      const fluxoMap = new Map<string, { entradas: number; saidas: number }>();
-      caixaData.forEach((t) => {
-        const date = new Date(t.data);
-        const mesAno = `${meses[date.getMonth()]}/${date.getFullYear().toString().slice(-2)}`;
-        if (!fluxoMap.has(mesAno)) fluxoMap.set(mesAno, { entradas: 0, saidas: 0 });
-        const atual = fluxoMap.get(mesAno)!;
-        if (t.tipo === 'entrada') atual.entradas += t.valor; else atual.saidas += t.valor;
-      });
-      const fluxoData = Array.from(fluxoMap.entries()).map(([mes, valores]) => ({ mes, entradas: valores.entradas, saidas: valores.saidas, saldo: valores.entradas - valores.saidas })).slice(-6);
-      setFluxoMensal(fluxoData);
+  const fluxoMensal = useMemo(() => {
+    if (!data) return [];
 
-      const totalEntradas = caixaData.filter((t) => t.tipo === 'entrada').reduce((acc, t) => acc + t.valor, 0);
-      const totalSaidas = caixaData.filter((t) => t.tipo === 'saida').reduce((acc, t) => acc + t.valor, 0);
-      setComparativoEntradaSaida([{ name: 'Entradas', valor: totalEntradas }, { name: 'Saídas', valor: totalSaidas }]);
-    } catch (err) {
-      console.error('Erro ao carregar dados do dashboard', err);
-    }
-  };
+    const obrasData: any[] = data.obras || [];
+    const obrasFinalizadas = obrasData.filter((o: any) => o.finalizada);
+
+    // TOP 5 OBRAS MAIS LUCRATIVAS - Por porcentagem de ganho
+    const obrasComLucro = obrasFinalizadas.map((o: any) => {
+      const totalGastosObra = (o.gastos_obra || []).reduce((sum: number, g: any) => sum + (g.valor || 0), 0);
+      const valorRecebido = o.valor_recebido || 0;
+      const lucroObra = valorRecebido - totalGastosObra;
+      const percentualLucro = valorRecebido > 0 ? (lucroObra / valorRecebido) * 100 : 0;
+      return {
+        nome: o.nome,
+        lucro: lucroObra,
+        percentualLucro,
+        valorRecebido,
+        gastos: totalGastosObra
+      };
+    });
+
+    const top5Obras = obrasComLucro
+      .sort((a, b) => b.percentualLucro - a.percentualLucro)
+      .slice(0, 5);
+
+    return top5Obras;
+  }, [data]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -145,24 +187,66 @@ export default function Dashboard() {
     return null;
   };
 
+  // Preparar dados para os gráficos
+  const chartData = useMemo(() => ({
+    totalReceitas: stats.saldoCaixa + stats.totalReceber,
+    totalDespesas: stats.dividasAtivas,
+    lucroTotal: stats.lucroTotal,
+    obrasMaisLucrativas: fluxoMensal.map((item: any) => ({
+      nome: item.nome || `Obra ${item.mes}`,
+      lucro: item.lucro || item.saldo || 0,
+      percentualLucro: item.percentualLucro || 0
+    })),
+    gastosPorCategoria: gastosPorCategoria.map((item, index) => ({
+      categoria: item.categoria,
+      valor: item.valor,
+      cor: COLORS[index % COLORS.length]
+    })),
+    tendenciaMensal: []
+  }), [stats, fluxoMensal, gastosPorCategoria]);
+
+  if (isLoading) {
+    return (
+      <div className="dashboard-container">
+        <PageHeader 
+          title={<PeperaioLogo size="small" animate={true} />}
+          subtitle="Carregando..."
+          showDashboardSwitch={true}
+        />
+        <div className="dashboard-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <p>Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-container">
+        <PageHeader 
+          title={<PeperaioLogo size="small" animate={true} />}
+          subtitle="Erro ao carregar dados"
+          showDashboardSwitch={true}
+        />
+        <div className="dashboard-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <p style={{ color: 'red' }}>Erro ao carregar dados do dashboard</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="dashboard-container">
-      <div className="dashboard-page">
-        <header className="dashboard-hero">
-          <div>
-            <h2 className="dashboard-hero-title"><Activity /> Dashboard</h2>
-            <p className="dashboard-hero-sub">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-          </div>
-        </header>
-
-        <main className="dashboard-main">
-          {/* Card harmonizado: Meus Cards de Obras */}
-          <section className="dashboard-cards-harmonic">
-            <div className="widget-container">
-              <CardsDeObraWidget userRole={userRole} />
-            </div>
-          </section>
-        </main>
+      <PageHeader 
+        title={<PeperaioLogo size="small" animate={true} />}
+        subtitle={new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+        showDashboardSwitch={true}
+      />
+      <div className="dashboard-content">
+        <QuickTransactionCard />
+        <CompromissosWidget />
+        <ReceitasDespesasCard />
+        <DashboardCharts data={chartData} />
       </div>
     </div>
   );

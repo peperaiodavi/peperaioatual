@@ -9,6 +9,7 @@ import { supabase } from '../utils/supabaseClient';
 import { Plus, Edit2, Trash2, DollarSign, TrendingDown, Users, ChevronDown, Calendar as CalendarIcon } from 'lucide-react';
 import { FuncionarioCard } from '../components/FuncionarioCard';
 import { formatCurrency } from '../utils/formatCurrency';
+import { motion, AnimatePresence } from 'framer-motion';
 import './Funcionarios.css';
 
 interface Vale {
@@ -1163,11 +1164,17 @@ export default function Funcionarios() {
 
       {/* Conteúdo das Abas */}
       {activeTab === 'funcionarios' && (
-        <div className="funcionarios-grid">
-          {funcionariosDetalhados.map((funcionario) => {
+        <div className="funcionarios-grid-tech">
+          {funcionariosDetalhados.map((funcionario, index) => {
           const isExpanded = expandedId === funcionario.id;
           return (
-            <div key={funcionario.id} className="funcionario-card">
+            <motion.div 
+              key={funcionario.id} 
+              className="funcionario-card-wrapper"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+            >
               <FuncionarioCard
                 nome={funcionario.nome}
                 cargo={funcionario.cargo}
@@ -1184,107 +1191,112 @@ export default function Funcionarios() {
                 dataPagamentoCLT={funcionario.dataPagamentoCLT}
               />
 
-              {/* Salário/Diária Info */}
-              {funcionario.categoria === 'clt' && funcionario.salario_mensal && (
-                <div className="funcionario-salary">
-                  <div className="funcionario-salary-label">Salário Mensal</div>
-                  <div className="funcionario-salary-value">
-                    {formatCurrency(funcionario.salario_mensal)}
-                  </div>
-                </div>
-              )}
-
-              {funcionario.categoria === 'contrato' && funcionario.valor_diaria && (
-                <div className="funcionario-salary">
-                  <div className="funcionario-salary-label">Valor da Diária</div>
-                  <div className="funcionario-salary-value">
-                    {formatCurrency(funcionario.valor_diaria)}
-                  </div>
-                </div>
-              )}
-
               {/* Botão para expandir */}
-              <button
-                className={`funcionario-expand-btn ${isExpanded ? 'expanded' : ''}`}
+              <motion.button
+                className={`funcionario-expand-btn-tech ${isExpanded ? 'expanded' : ''}`}
                 onClick={() => setExpandedId(isExpanded ? null : funcionario.id)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <span>{isExpanded ? 'Ocultar Detalhes' : 'Ver Detalhes'}</span>
-                <ChevronDown className="funcionario-expand-icon" />
-              </button>
+                <motion.div
+                  animate={{ rotate: isExpanded ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChevronDown className="funcionario-expand-icon" />
+                </motion.div>
+              </motion.button>
 
               {/* Conteúdo Expandido */}
+              <AnimatePresence>
               {isExpanded && (
-                <div className="funcionario-expanded">
+                <motion.div 
+                  className="funcionario-expanded-tech"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                >
                   {/* Botões de Ação */}
                   {canCreate && (
-                    <div className="funcionario-action-group">
+                    <div className="funcionario-action-group-tech">
                       {funcionario.categoria === 'clt' && (
-                        <button
-                          className="funcionario-primary-btn funcionario-pagamento-btn"
+                        <motion.button
+                          className="funcionario-primary-btn-tech pagamento"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedFuncionario(funcionario.id);
                             setOpenCalendarId(funcionario.id);
                           }}
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
                         >
                           <DollarSign className="funcionario-btn-icon" />
-                          Registrar Pagamento CLT
-                        </button>
+                          <span>Registrar Pagamento CLT</span>
+                        </motion.button>
                       )}
 
                       {funcionario.categoria === 'contrato' && (
-                        <button
-                          className="funcionario-primary-btn funcionario-diaria-btn"
+                        <motion.button
+                          className="funcionario-primary-btn-tech diaria"
                           onClick={(e) => {
                             e.stopPropagation();
                             setFuncionarioDiaria(funcionario);
                             setIsDiariaDialogOpen(true);
                           }}
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
                         >
                           <DollarSign className="funcionario-btn-icon" />
-                          Registrar Diária Paga
-                        </button>
+                          <span>Registrar Diária Paga</span>
+                        </motion.button>
                       )}
 
                       {funcionario.categoria === 'dono' && (
                         <>
-                          <button
-                            className="funcionario-primary-btn funcionario-pagamento-btn"
+                          <motion.button
+                            className="funcionario-primary-btn-tech pagamento"
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedFuncionario(funcionario.id);
                               setIsPagamentoSalarioDonoOpen(true);
                             }}
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
                           >
                             <DollarSign className="funcionario-btn-icon" />
-                            Pagar Salário
-                          </button>
-                          <button
-                            className="funcionario-primary-btn funcionario-saida-btn"
+                            <span>Pagar Salário</span>
+                          </motion.button>
+                          <motion.button
+                            className="funcionario-primary-btn-tech saida"
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedFuncionario(funcionario.id);
                               setIsSaidaDialogOpen(true);
                             }}
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.98 }}
                           >
                             <TrendingDown className="funcionario-btn-icon" />
-                            Registrar Saída
-                          </button>
+                            <span>Registrar Saída</span>
+                          </motion.button>
                         </>
                       )}
 
                       {funcionario.categoria !== 'dono' && (
-                        <button
-                          className="funcionario-primary-btn funcionario-vale-btn"
+                        <motion.button
+                          className="funcionario-primary-btn-tech vale"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedFuncionario(funcionario.id);
                             setIsValeDialogOpen(true);
                           }}
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
                         >
                           <DollarSign className="funcionario-btn-icon" />
-                          Adicionar Vale
-                        </button>
+                          <span>Adicionar Vale</span>
+                        </motion.button>
                       )}
                     </div>
                   )}
@@ -1375,9 +1387,10 @@ export default function Funcionarios() {
                       </div>
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
-            </div>
+              </AnimatePresence>
+            </motion.div>
           );
         })}
         </div>

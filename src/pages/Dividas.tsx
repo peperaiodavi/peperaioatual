@@ -3,7 +3,7 @@ import { supabase } from '../utils/supabaseClient';
 import { usePermissao } from '../context/PermissaoContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Edit2, Trash2, DollarSign, AlertCircle, CheckCircle, TrendingDown } from 'lucide-react';
+import { Plus, Edit2, Trash2, DollarSign, AlertCircle, CheckCircle, TrendingDown, Building2, CreditCard, Banknote } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
 import './Dividas.css';
 
@@ -12,6 +12,7 @@ interface Divida {
   nome: string;
   valor: number;
   categoria?: string;
+  instituicao?: string; // Nova propriedade para instituição financeira
   tipo?: 'normal' | 'parcelada';
   valorParcela?: number;
   numParcelas?: number;
@@ -20,6 +21,70 @@ interface Divida {
   valorRestante?: number;
   vencimento: string;
   status: 'em_dia' | 'atrasado' | 'quitado';
+}
+
+// Mapa de instituições financeiras com cores e ícones
+const INSTITUICOES_FINANCEIRAS: Record<string, { nome: string; cor: string; logo: string }> = {
+  bradesco: {
+    nome: 'Bradesco',
+    cor: '#CC092F',
+    logo: '🏦'
+  },
+  'banco-do-brasil': {
+    nome: 'Banco do Brasil',
+    cor: '#FFF100',
+    logo: '🏦'
+  },
+  itau: {
+    nome: 'Itaú',
+    cor: '#EC7000',
+    logo: '🏦'
+  },
+  caixa: {
+    nome: 'Caixa Econômica',
+    cor: '#0066B3',
+    logo: '🏦'
+  },
+  santander: {
+    nome: 'Santander',
+    cor: '#EC0000',
+    logo: '🏦'
+  },
+  nubank: {
+    nome: 'Nubank',
+    cor: '#820AD1',
+    logo: '💳'
+  },
+  'mercado-pago': {
+    nome: 'Mercado Pago',
+    cor: '#00B1EA',
+    logo: '💰'
+  },
+  picpay: {
+    nome: 'PicPay',
+    cor: '#21C25E',
+    logo: '💳'
+  },
+  'inter': {
+    nome: 'Banco Inter',
+    cor: '#FF7A00',
+    logo: '🏦'
+  },
+  'c6-bank': {
+    nome: 'C6 Bank',
+    cor: '#000000',
+    logo: '🏦'
+  },
+  'cartao-credito': {
+    nome: 'Cartão de Crédito',
+    cor: '#8b5cf6',
+    logo: '💳'
+  },
+  outro: {
+    nome: 'Outra Instituição',
+    cor: '#64748b',
+    logo: '🏢'
+  }
 }
 
 export default function Dividas() {
@@ -31,6 +96,7 @@ export default function Dividas() {
     nome: '',
     valor: '',
     categoria: '',
+    instituicao: '', // Nova propriedade
     tipo: 'normal', // 'normal' ou 'parcelada'
     valorParcela: '',
     numParcelas: '',
@@ -86,6 +152,7 @@ export default function Dividas() {
       nome: '',
       valor: '',
       categoria: '',
+      instituicao: '',
       tipo: 'normal',
       valorParcela: '',
       numParcelas: '',
@@ -103,6 +170,7 @@ export default function Dividas() {
       nome: divida.nome,
       valor: divida.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       categoria: divida.categoria || '',
+      instituicao: divida.instituicao || '',
       tipo: divida.tipo || 'normal',
       valorParcela: divida.valorParcela ? divida.valorParcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '',
       numParcelas: divida.numParcelas?.toString() || '',
@@ -142,6 +210,7 @@ export default function Dividas() {
       const dadosUpdate = {
         nome: formData.nome,
         categoria: formData.categoria,
+        instituicao: formData.instituicao,
         tipo: formData.tipo,
         valor: valorNumerico,
         status: formData.status,
@@ -169,6 +238,7 @@ export default function Dividas() {
       const dadosInsert = {
         nome: formData.nome,
         categoria: formData.categoria,
+        instituicao: formData.instituicao,
         tipo: formData.tipo,
         valor: valorNumerico,
         status: formData.status,
@@ -352,6 +422,21 @@ export default function Dividas() {
                     onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
                     placeholder="Ex: Aluguel, Fornecedor, Serviços"
                   />
+                </div>
+                <div className="dividas-form-field">
+                  <label>Instituição Financeira</label>
+                  <select
+                    value={formData.instituicao}
+                    onChange={(e) => setFormData({ ...formData, instituicao: e.target.value })}
+                    className="dividas-select-instituicao"
+                  >
+                    <option value="">Selecione (opcional)</option>
+                    {Object.entries(INSTITUICOES_FINANCEIRAS).map(([key, inst]) => (
+                      <option key={key} value={key}>
+                        {inst.logo} {inst.nome}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="dividas-form-field">
                   <label>Tipo</label>
@@ -548,8 +633,15 @@ export default function Dividas() {
         {dividas.map((divida) => {
           const statusConfig = getStatusConfig(divida.status);
           const StatusIcon = statusConfig.icon;
+          const instituicaoInfo = divida.instituicao ? INSTITUICOES_FINANCEIRAS[divida.instituicao] : null;
           return (
             <div key={divida.id} className={`divida-card ${divida.status}`}>
+              {instituicaoInfo && (
+                <div className="divida-instituicao-badge" style={{ background: instituicaoInfo.cor + '15', borderColor: instituicaoInfo.cor + '40' }}>
+                  <span className="divida-instituicao-logo">{instituicaoInfo.logo}</span>
+                  <span className="divida-instituicao-nome" style={{ color: instituicaoInfo.cor }}>{instituicaoInfo.nome}</span>
+                </div>
+              )}
               <div className="divida-card-header">
                 <div className="divida-card-title">
                   <StatusIcon className="h-5 w-5" />
@@ -592,6 +684,54 @@ export default function Dividas() {
                       <span className="divida-info-label">Valor Restante:</span>
                       <span className="divida-info-value highlight">{formatCurrency(divida.valorRestante ?? divida.valor)}</span>
                     </div>
+                    
+                    {/* Parcela do Mês em Destaque */}
+                    {(() => {
+                      const hoje = new Date();
+                      hoje.setHours(0, 0, 0, 0);
+                      const parcelaMes = (divida.datasParcelas || []).findIndex((data, idx) => {
+                        const dataParcela = new Date(data);
+                        dataParcela.setHours(0, 0, 0, 0);
+                        const isPaga = divida.parcelasPagas && divida.parcelasPagas[idx];
+                        const isMesAtual = dataParcela.getMonth() === hoje.getMonth() && 
+                                           dataParcela.getFullYear() === hoje.getFullYear();
+                        return isMesAtual && !isPaga;
+                      });
+
+                      if (parcelaMes !== -1) {
+                        const data = divida.datasParcelas![parcelaMes];
+                        const dataParcela = new Date(data);
+                        dataParcela.setHours(0, 0, 0, 0);
+                        const isVencida = dataParcela < hoje;
+
+                        return (
+                          <div className={`divida-parcela-destaque ${isVencida ? 'vencida' : ''}`}>
+                            <div className="divida-parcela-destaque-header">
+                              <span className="divida-parcela-destaque-label">Parcela do Mês</span>
+                              <span className="divida-parcela-destaque-numero">#{parcelaMes + 1}</span>
+                            </div>
+                            <div className="divida-parcela-destaque-info">
+                              <div className="divida-parcela-destaque-valor">
+                                {formatCurrency(divida.valorParcela || 0)}
+                              </div>
+                              <div className="divida-parcela-destaque-data">
+                                Vencimento: {dataParcela.toLocaleDateString('pt-BR')}
+                              </div>
+                            </div>
+                            {canEdit && divida.status !== 'quitado' && (
+                              <button
+                                className={`dividas-btn-pagar ${isVencida ? 'urgent' : ''}`}
+                                onClick={() => handlePagar(divida)}
+                              >
+                                <DollarSign className="h-3 w-3" />
+                                Pagar Agora
+                              </button>
+                            )}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
                     
                     {/* Seção de Parcelas */}
                     <div className="divida-parcelas-section">

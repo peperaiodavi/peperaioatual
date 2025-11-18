@@ -651,22 +651,22 @@ export default function Obras() {
     doc.setTextColor(148, 163, 184); // #94a3b8 - Texto secundário
     doc.text(`${percentualGasto.toFixed(1)}% do orçamento`, 22 + cardWidth + cardSpacing, yPos + 18);
     
-    // Card 3 - Lucro Real
-    const lucroColor = lucroReal >= 0 ? [52, 211, 153] : [248, 113, 113]; // Verde ou vermelho
+    // Card 3 - Lucro Projetado
+    const lucroColor = lucroProjetado >= 0 ? [52, 211, 153] : [248, 113, 113]; // Verde ou vermelho
     doc.setFillColor(21, 26, 46); // #151a2e - Fundo do card
     doc.setDrawColor(lucroColor[0], lucroColor[1], lucroColor[2]); // Borda colorida
     doc.roundedRect(20 + (cardWidth + cardSpacing) * 2, yPos, cardWidth, cardHeight, 2, 2, 'FD');
     doc.setFontSize(8);
     doc.setTextColor(lucroColor[0], lucroColor[1], lucroColor[2]); // Label colorida
-    doc.text('LUCRO REAL', 22 + (cardWidth + cardSpacing) * 2, yPos + 5);
+    doc.text(obra.finalizada ? 'LUCRO FINAL' : 'LUCRO PROJETADO', 22 + (cardWidth + cardSpacing) * 2, yPos + 5);
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(lucroColor[0], lucroColor[1], lucroColor[2]); // Valor colorido destaque
-    doc.text(formatCurrency(lucroReal), 22 + (cardWidth + cardSpacing) * 2, yPos + 12);
+    doc.text(formatCurrency(lucroProjetado), 22 + (cardWidth + cardSpacing) * 2, yPos + 12);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(148, 163, 184); // #94a3b8 - Texto secundário
-    doc.text(`Recebido - Gastos`, 22 + (cardWidth + cardSpacing) * 2, yPos + 18);
+    doc.text(`Orçamento - Gastos`, 22 + (cardWidth + cardSpacing) * 2, yPos + 18);
 
     // ===== GRÁFICO DE PROGRESSO =====
     yPos += 30;
@@ -795,6 +795,56 @@ export default function Obras() {
     doc.setTextColor(248, 113, 113);
     doc.text(formatCurrency(totalGastos), 190, yPos + 8, { align: 'right' });
 
+    // ===== RESUMO FINANCEIRO FINAL =====
+    yPos += 20;
+    if (yPos > 240) {
+      doc.addPage();
+      yPos = 20;
+    }
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(96, 165, 250);
+    doc.text('RESUMO FINANCEIRO', 20, yPos);
+
+    yPos += 8;
+    const resumoBoxHeight = 40;
+    doc.setFillColor(21, 26, 46);
+    doc.setDrawColor(96, 165, 250);
+    doc.setLineWidth(1);
+    doc.roundedRect(15, yPos, 180, resumoBoxHeight, 3, 3, 'FD');
+
+    yPos += 8;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(148, 163, 184);
+    doc.text('Orçamento Total:', 20, yPos);
+    doc.setTextColor(230, 238, 248);
+    doc.setFont('helvetica', 'bold');
+    doc.text(formatCurrency(obra.orcamento), 185, yPos, { align: 'right' });
+
+    yPos += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(148, 163, 184);
+    doc.text('Total de Gastos:', 20, yPos);
+    doc.setTextColor(248, 113, 113);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`- ${formatCurrency(totalGastos)}`, 185, yPos, { align: 'right' });
+
+    yPos += 2;
+    doc.setDrawColor(96, 165, 250);
+    doc.setLineWidth(0.5);
+    doc.line(20, yPos, 185, yPos);
+
+    yPos += 8;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(148, 163, 184);
+    doc.text(obra.finalizada ? 'Lucro Final:' : 'Lucro Projetado:', 20, yPos);
+    doc.setFontSize(13);
+    doc.setTextColor(lucroColor[0], lucroColor[1], lucroColor[2]);
+    doc.text(formatCurrency(lucroProjetado), 185, yPos, { align: 'right' });
+
     // ===== RODAPÉ =====
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -896,19 +946,17 @@ export default function Obras() {
             <span className="obras-stat-label">Valor Recebido</span>
             <span className="obras-stat-value positive">{formatCurrency(valorRecebido)}</span>
           </div>
+          <div className="obras-stat-item">
+            <span className="obras-stat-label">{obra.finalizada ? 'Lucro Final' : 'Lucro Projetado'}</span>
+            <span className={`obras-stat-value ${lucroProjetado >= 0 ? 'positive' : 'negative'}`}>
+              {formatCurrency(lucroProjetado)}
+            </span>
+          </div>
           {!obra.finalizada && (
             <div className="obras-stat-item">
               <span className="obras-stat-label">A Receber do Cliente</span>
               <span className={`obras-stat-value ${aReceberDoCliente > 0 ? 'warning' : 'positive'}`}>
                 {formatCurrency(aReceberDoCliente)}
-              </span>
-            </div>
-          )}
-          {obra.finalizada && (
-            <div className="obras-stat-item">
-              <span className="obras-stat-label">Lucro Final</span>
-              <span className={`obras-stat-value ${lucroReal >= 0 ? 'positive' : 'negative'}`}>
-                {formatCurrency(lucroReal)}
               </span>
             </div>
           )}

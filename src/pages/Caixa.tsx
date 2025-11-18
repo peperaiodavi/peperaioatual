@@ -10,10 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Minus, TrendingUp, TrendingDown, FileDown, Wallet, Trash2, Tag, ChevronLeft, ChevronRight, History, RotateCcw } from 'lucide-react';
+import { Plus, Minus, TrendingUp, TrendingDown, FileDown, Wallet, Trash2, Tag, ChevronLeft, ChevronRight, History, RotateCcw, AlertTriangle, Archive, Folder, FolderOpen, Download, Calendar } from 'lucide-react';
 import { formatCurrency } from '../utils/formatCurrency';
 import jsPDF from 'jspdf';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import CaixaArquivos from '../components/CaixaArquivos';
 import './Caixa.css';
 import './Caixa-fab.css';
 
@@ -74,6 +75,7 @@ interface Transacao {
 interface TransacaoExcluida extends Transacao {
   data_exclusao: string;
   excluido_por?: string;
+  motivo_exclusao?: string;
 }
 
 interface Categoria {
@@ -93,7 +95,8 @@ export default function Caixa() {
   const [isEntradaDialogOpen, setIsEntradaDialogOpen] = useState(false);
   const [isSaidaDialogOpen, setIsSaidaDialogOpen] = useState(false);
   const [isCategoriaDialogOpen, setIsCategoriaDialogOpen] = useState(false);
-  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState<{ isOpen: boolean; id: string | null }>({ isOpen: false, id: null });
+  const [deleteJustificativaDialog, setDeleteJustificativaDialog] = useState<{ isOpen: boolean; id: string | null; justificativa: string }>({ isOpen: false, id: null, justificativa: '' });
+  const [confirmDeleteHistoricoDialog, setConfirmDeleteHistoricoDialog] = useState<{ isOpen: boolean; id: string | null }>({ isOpen: false, id: null });
   const [filtroTipo, setFiltroTipo] = useState<'data' | 'mes'>('data');
   const [filtroData, setFiltroData] = useState('');
   const [filtroMes, setFiltroMes] = useState('');
@@ -119,11 +122,18 @@ export default function Caixa() {
     tipo: 'ambos' as 'entrada' | 'saida' | 'ambos',
   });
 
+  // Estados para Sistema de Arquivamento (dados carregados pelo componente CaixaArquivos)
+  const [arquivos, setArquivos] = useState<{mes: string; ano: string; total_entradas: number; total_saidas: number; quantidade: number}[]>([]);
+  
+  // Estados para controle de visualização
+  const [viewMode, setViewMode] = useState<'caixa' | 'historico' | 'arquivos'>('caixa');
+
   useEffect(() => {
     loadTransacoes();
     loadCategorias();
     loadResumoFinanceiro();
     loadHistorico();
+    loadArquivos();
   }, []);
 
   const loadResumoFinanceiro = async () => {
@@ -175,11 +185,45 @@ export default function Caixa() {
   };
 
   const loadHistorico = () => {
+    console.log('loadHistorico chamado');
     supabase.from('transacoes_excluidas').select('*').order('data_exclusao', { ascending: false }).then(({ data, error }) => {
+      console.log('Dados recebidos do histórico:', data);
+      console.log('Erro ao carregar histórico:', error);
       if (!error && data) {
+        console.log('Atualizando estado do histórico com', data.length, 'itens');
         setHistorico(data);
       }
     });
+  };
+
+  // Função auxiliar para carregar arquivos (usada pelo componente CaixaArquivos)
+  const loadArquivos = async () => {
+    const { data, error } = await supabase
+      .from('transacoes_arquivadas')
+      .select('mes_referencia, total_entradas, total_saidas')
+      .order('mes_referencia', { ascending: false });
+    
+    if (!error && data) {
+      // Agrupa por mês e calcula totais
+      const arquivosMap = new Map();
+      data.forEach((item: any) => {
+        const key = item.mes_referencia;
+        if (!arquivosMap.has(key)) {
+          arquivosMap.set(key, {
+            mes: key.split('-')[1],
+            ano: key.split('-')[0],
+            total_entradas: 0,
+            total_saidas: 0,
+            quantidade: 0
+          });
+        }
+        const arquivo = arquivosMap.get(key);
+        arquivo.total_entradas += item.total_entradas || 0;
+        arquivo.total_saidas += item.total_saidas || 0;
+        arquivo.quantidade += 1;
+      });
+      setArquivos(Array.from(arquivosMap.values()));
+    }
   };
 
   const saveTransacoes = (data: Transacao[]) => {
@@ -677,30 +721,36 @@ export default function Caixa() {
   // Função para excluir transação
   function handleDeleteTransacao(id: string) {
     if (!canDelete) return;
-    setConfirmDeleteDialog({ isOpen: true, id });
+    setDeleteJustificativaDialog({ isOpen: true, id, justificativa: '' });
   }
 
   async function confirmDelete() {
-    if (!confirmDeleteDialog.id) return;
+    if (!deleteJustificativaDialog.id || !deleteJustificativaDialog.justificativa.trim()) {
+      toast.error('Por favor, informe o motivo da exclusão!');
+      return;
+    }
     
-    const transacaoParaExcluir = transacoes.find(t => t.id === confirmDeleteDialog.id);
+    const transacaoParaExcluir = transacoes.find(t => t.id === deleteJustificativaDialog.id);
     if (!transacaoParaExcluir) {
       toast.error('Transação não encontrada!');
       return;
     }
 
-    // Salva no histórico antes de excluir
+    // Salva no histórico antes de excluir (com justificativa)
     const { error: historicoError } = await supabase.from('transacoes_excluidas').insert({
       ...transacaoParaExcluir,
       data_exclusao: new Date().toISOString(),
+      motivo_exclusao: deleteJustificativaDialog.justificativa,
     });
 
     if (historicoError) {
       console.error('Erro ao salvar no histórico:', historicoError);
+      toast.error('Erro ao salvar no histórico!');
+      return;
     }
 
     // Exclui a transação
-    const { error } = await supabase.from('transacoes').delete().eq('id', confirmDeleteDialog.id);
+    const { error } = await supabase.from('transacoes').delete().eq('id', deleteJustificativaDialog.id);
     if (!error) {
       loadTransacoes();
       loadHistorico();
@@ -709,11 +759,73 @@ export default function Caixa() {
       toast.error('Erro ao remover transação!');
     }
 
-    setConfirmDeleteDialog({ isOpen: false, id: null });
+    setDeleteJustificativaDialog({ isOpen: false, id: null, justificativa: '' });
   }
 
   function cancelDelete() {
-    setConfirmDeleteDialog({ isOpen: false, id: null });
+    setDeleteJustificativaDialog({ isOpen: false, id: null, justificativa: '' });
+  }
+
+  // Função para excluir permanentemente do histórico
+  function handleDeleteHistorico(id: string) {
+    console.log('handleDeleteHistorico chamado com ID:', id);
+    setConfirmDeleteHistoricoDialog({ isOpen: true, id });
+  }
+
+  async function confirmDeleteHistorico() {
+    console.log('confirmDeleteHistorico chamado');
+    console.log('Estado atual:', confirmDeleteHistoricoDialog);
+    
+    if (!confirmDeleteHistoricoDialog.id) {
+      console.log('ID não encontrado, abortando');
+      return;
+    }
+
+    console.log('Tentando excluir ID:', confirmDeleteHistoricoDialog.id);
+    
+    try {
+      const { error, status } = await supabase
+        .from('transacoes_excluidas')
+        .delete()
+        .eq('id', confirmDeleteHistoricoDialog.id);
+
+      console.log('Status da exclusão:', status);
+      console.log('Erro:', error);
+
+      if (!error) {
+        console.log('Exclusão bem-sucedida, aguardando um momento...');
+        
+        // Aguarda um pouco para garantir que o banco processou a exclusão
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Atualiza o estado localmente removendo o item
+        setHistorico(prev => {
+          const novoHistorico = prev.filter(item => item.id !== confirmDeleteHistoricoDialog.id);
+          console.log('Histórico atualizado localmente. Itens restantes:', novoHistorico.length);
+          return novoHistorico;
+        });
+        
+        // Depois recarrega do banco para garantir sincronização
+        setTimeout(() => {
+          console.log('Recarregando do banco de dados...');
+          loadHistorico();
+        }, 500);
+        
+        toast.success('Registro excluído permanentemente do histórico!');
+      } else {
+        console.error('Erro ao excluir do histórico:', error);
+        toast.error('Erro ao excluir registro do histórico!');
+      }
+    } catch (err) {
+      console.error('Exceção ao excluir:', err);
+      toast.error('Erro ao excluir registro do histórico!');
+    }
+
+    setConfirmDeleteHistoricoDialog({ isOpen: false, id: null });
+  }
+
+  function cancelDeleteHistorico() {
+    setConfirmDeleteHistoricoDialog({ isOpen: false, id: null });
   }
 
   // Função para reverter exclusão do histórico
@@ -801,11 +913,12 @@ export default function Caixa() {
 
   return (
     <div className="caixa-container">
-      {/* Cards de resumo financeiro */}
-      <div className="caixa-summary-grid">
-        <div className="caixa-summary-card saldo">
-          <div className="caixa-summary-header">
-            <span className="caixa-summary-label">Saldo do Caixa</span>
+      {/* Cards de resumo financeiro - Apenas no modo Caixa */}
+      {viewMode === 'caixa' && (
+        <div className="caixa-summary-grid">
+          <div className="caixa-summary-card saldo">
+            <div className="caixa-summary-header">
+              <span className="caixa-summary-label">Saldo do Caixa</span>
             <div className="caixa-summary-icon blue">
               <Wallet />
             </div>
@@ -835,18 +948,54 @@ export default function Caixa() {
           <div className="caixa-summary-value red">{formatCurrency(dividasAtivas)}</div>
         </div>
       </div>
+      )}
 
       <div className="caixa-header">
         <div className="caixa-header-content">
-          <h1>Caixa</h1>
-          <p>Controle de fluxo financeiro</p>
+          <h1>
+            {viewMode === 'caixa' && 'Caixa'}
+            {viewMode === 'historico' && 'Histórico de Exclusões'}
+            {viewMode === 'arquivos' && 'Arquivos'}
+          </h1>
+          <p>
+            {viewMode === 'caixa' && 'Controle de fluxo financeiro'}
+            {viewMode === 'historico' && 'Transações excluídas do sistema'}
+            {viewMode === 'arquivos' && 'Transações organizadas por mês'}
+          </p>
         </div>
         <div className="caixa-header-actions">
-          <button className="caixa-btn caixa-btn-outline" onClick={exportarExtrato}>
-            <FileDown className="h-4 w-4" />
-            Exportar
-          </button>
-          {canCreate && (
+          {viewMode !== 'caixa' && (
+            <button 
+              className="caixa-btn caixa-btn-outline" 
+              onClick={() => setViewMode('caixa')}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Voltar ao Caixa
+            </button>
+          )}
+          {viewMode === 'caixa' && (
+            <>
+              <button 
+                className="caixa-btn caixa-btn-outline" 
+                onClick={() => setViewMode('historico')}
+              >
+                <History className="h-4 w-4" />
+                Histórico ({historico.length})
+              </button>
+              <button 
+                className="caixa-btn caixa-btn-outline" 
+                onClick={() => setViewMode('arquivos')}
+              >
+                <Archive className="h-4 w-4" />
+                Arquivos ({arquivos.length})
+              </button>
+              <button className="caixa-btn caixa-btn-outline" onClick={exportarExtrato}>
+                <FileDown className="h-4 w-4" />
+                Exportar
+              </button>
+            </>
+          )}
+          {canCreate && viewMode === 'caixa' && (
             <>
               <Dialog open={isEntradaDialogOpen} onOpenChange={setIsEntradaDialogOpen}>
                 <DialogTrigger asChild>
@@ -1077,9 +1226,12 @@ export default function Caixa() {
         </div>
       </div>
 
-      {/* Filtro */}
-      <div className="caixa-filter-card">
-        <div className="caixa-filter-buttons">
+      {/* Filtros e Tabs - Apenas no modo Caixa */}
+      {viewMode === 'caixa' && (
+        <>
+          {/* Filtro */}
+          <div className="caixa-filter-card">
+            <div className="caixa-filter-buttons">
           <button
             className={`caixa-btn ${filtroTipo === 'data' ? 'caixa-btn-primary' : 'caixa-btn-outline'}`}
             onClick={() => {
@@ -1157,10 +1309,6 @@ export default function Caixa() {
             <TabsTrigger value="saidas" className="caixa-tab-trigger">
               Saídas ({saidas.length})
             </TabsTrigger>
-            <TabsTrigger value="historico" className="caixa-tab-trigger">
-              <History size={16} />
-              <span>Histórico ({historico.length})</span>
-            </TabsTrigger>
           </TabsList>
           <TabsContent value="todas" className="space-y-4">
             {renderTransacoes(todasTransacoes)}
@@ -1174,15 +1322,22 @@ export default function Caixa() {
             {renderTransacoes(saidas)}
             {renderPagination(saidas)}
           </TabsContent>
-          <TabsContent value="historico" className="space-y-4">
-            <div className="caixa-historico">
-              {historico.length === 0 ? (
-                <div className="caixa-empty">
-                  <History size={48} style={{ opacity: 0.3, margin: '0 auto 1rem' }} />
-                  <p>Nenhum item excluído ainda</p>
-                </div>
-              ) : (
-                historico.map((item) => (
+        </Tabs>
+      </div>
+        </>
+      )}
+
+      {/* Visualização de Histórico */}
+      {viewMode === 'historico' && (
+        <div className="caixa-historico">
+          {historico.length === 0 ? (
+            <div className="caixa-empty">
+              <History size={48} style={{ opacity: 0.3, margin: '0 auto 1rem' }} />
+              <p>Nenhum item excluído ainda</p>
+            </div>
+          ) : (
+            <div className="caixa-historico-list">
+                {historico.map((item) => (
                   <div key={item.id} className="caixa-historico-item">
                     <div className="caixa-historico-header">
                       <span className={`caixa-historico-tipo ${item.tipo}`}>
@@ -1198,6 +1353,11 @@ export default function Caixa() {
                         <strong>{item.origem}</strong>
                         {item.categoria && <span className="caixa-tag">{item.categoria}</span>}
                         <p className="caixa-historico-obs">{item.observacao}</p>
+                        {item.motivo_exclusao && (
+                          <p className="caixa-historico-motivo">
+                            <strong>Motivo:</strong> {item.motivo_exclusao}
+                          </p>
+                        )}
                         <small>Data original: {new Date(item.data).toLocaleDateString('pt-BR')}</small>
                       </div>
                       <div className="caixa-historico-valor">
@@ -1215,21 +1375,80 @@ export default function Caixa() {
                       </button>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* Diálogo de Confirmação */}
+      {/* Visualização de Arquivos */}
+      {viewMode === 'arquivos' && (
+        <CaixaArquivos 
+          arquivos={arquivos} 
+          onReload={() => {
+            loadTransacoes();
+            loadArquivos();
+          }} 
+        />
+      )}
+
+      {/* Diálogo de Justificativa de Exclusão */}
+      <Dialog open={deleteJustificativaDialog.isOpen} onOpenChange={(open) => !open && cancelDelete()}>
+        <DialogContent className="caixa-dialog-justificativa">
+          <div className="caixa-dialog-header">
+            <h2 className="caixa-dialog-title">
+              <AlertTriangle size={24} />
+              Justificar Exclusão
+            </h2>
+          </div>
+          <div className="caixa-justificativa-content">
+            <p className="caixa-justificativa-message">
+              ⚠️ Por favor, informe o motivo da exclusão desta transação.
+              Ela será movida para o histórico com a justificativa registrada.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="motivo-exclusao" style={{ color: '#cbd5e1', fontWeight: 600 }}>
+                Motivo da Exclusão *
+              </Label>
+              <Textarea
+                id="motivo-exclusao"
+                placeholder="Ex: Lançamento duplicado, erro de digitação, pagamento cancelado, etc..."
+                value={deleteJustificativaDialog.justificativa}
+                onChange={(e) => setDeleteJustificativaDialog(prev => ({ ...prev, justificativa: e.target.value }))}
+                rows={5}
+                className="caixa-textarea-justificativa"
+              />
+            </div>
+          </div>
+          <div className="caixa-justificativa-actions">
+            <button
+              type="button"
+              onClick={cancelDelete}
+              className="caixa-btn-cancel"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={confirmDelete}
+              className="caixa-btn-confirm-delete"
+              disabled={!deleteJustificativaDialog.justificativa.trim()}
+            >
+              <Trash2 size={18} />
+              Confirmar Exclusão
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo de Confirmação de Exclusão Permanente */}
       <ConfirmDialog
-        isOpen={confirmDeleteDialog.isOpen}
-        title="Confirmar Exclusão"
-        message="Tem certeza que deseja excluir esta transação? Ela será movida para o histórico."
-        onConfirm={confirmDelete}
-        onCancel={cancelDelete}
-        confirmText="Sim, excluir"
+        isOpen={confirmDeleteHistoricoDialog.isOpen}
+        title="Excluir Permanentemente"
+        message="Tem certeza que deseja excluir este registro permanentemente? Esta ação não pode ser desfeita!"
+        onConfirm={confirmDeleteHistorico}
+        onCancel={cancelDeleteHistorico}
+        confirmText="Sim, excluir permanentemente"
         cancelText="Cancelar"
       />
     </div>
