@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { PiggyBank, Wallet, FileBarChart2, CreditCard, ChevronRight, TrendingUp } from 'lucide-react';
+import { usePermissao } from '../context/PermissaoContext';
 import ParticlesBackground from '../components/ParticlesBackground';
 import './FinanceiroHub.css';
 
@@ -14,9 +15,11 @@ interface HubCard {
 
 export default function FinanceiroHub() {
   const navigate = useNavigate();
+  const permissoes = usePermissao();
 
+  // Criar cards dinamicamente baseado nas permissões
   const cards: HubCard[] = [
-    {
+    permissoes.pode_acessar_caixa && {
       icon: Wallet,
       title: 'Caixa',
       description: 'Gerencie entradas e saídas',
@@ -24,7 +27,7 @@ export default function FinanceiroHub() {
       color: '#10b981',
       gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
     },
-    {
+    permissoes.isAdmin && {
       icon: FileBarChart2,
       title: 'A Receber',
       description: 'Controle de recebíveis',
@@ -32,7 +35,7 @@ export default function FinanceiroHub() {
       color: '#3b82f6',
       gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
     },
-    {
+    permissoes.isAdmin && {
       icon: CreditCard,
       title: 'Dívidas',
       description: 'Gestão de contas a pagar',
@@ -40,7 +43,9 @@ export default function FinanceiroHub() {
       color: '#ef4444',
       gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
     },
-  ];
+  ].filter(Boolean) as HubCard[];
+
+  console.log('💰 FinanceiroHub: Cards visíveis:', cards.length, cards.map(c => c.title));
 
   const handleCardClick = (path: string) => {
     navigate(path);

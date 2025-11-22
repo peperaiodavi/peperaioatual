@@ -1,0 +1,414 @@
+/* ===============================================
+   MINHA CONTA & FUNCIONARIOS - iOS PREMIUM STYLE
+   =============================================== */
+
+:root {
+  --ios-premium-primary: #007AFF;
+  --ios-premium-success: #34C759;
+  --ios-premium-warning: #FF9500;
+  --ios-premium-danger: #FF3B30;
+  --ios-premium-purple: #AF52DE;
+  --ios-premium-bg: #000000;
+  --ios-premium-card: rgba(28, 28, 30, 0.95);
+  --ios-premium-card-hover: rgba(44, 44, 46, 0.95);
+  --ios-premium-border: rgba(255, 255, 255, 0.12);
+  --ios-premium-text: #FFFFFF;
+  --ios-premium-text-secondary: rgba(255, 255, 255, 0.65);
+  --ios-premium-blur: 30px;
+  --ios-premium-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --ios-premium-glow: 0 0 20px rgba(0, 122, 255, 0.3);
+}
+
+/* ===== MELHORIAS GLOBAIS iOS ===== */
+.minha-conta-container,
+.funcionarios-container {
+  background: linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #141414 100%);
+}
+
+/* ===== CARDS iOS STYLE ===== */
+.minha-conta-profile-card,
+.funcionarios-header,
+.funcionario-card-wrapper {
+  background: var(--ios-premium-card);
+  backdrop-filter: blur(var(--ios-premium-blur));
+  -webkit-backdrop-filter: blur(var(--ios-premium-blur));
+  border: 1px solid var(--ios-premium-border);
+  box-shadow: var(--ios-premium-shadow), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.minha-conta-profile-card:hover,
+.funcionario-card-wrapper:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 25px 70px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    var(--ios-premium-glow);
+}
+
+/* ===== HEADER MODERNO ===== */
+.minha-conta-header h1,
+.funcionarios-header-content h1 {
+  background: linear-gradient(135deg, #FFFFFF 0%, #E0E7FF 40%, #C7D2FE 70%, #A78BFA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 12px rgba(139, 92, 246, 0.4));
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+/* ===== AVATAR iOS ===== */
+.minha-conta-avatar,
+.ios-user-avatar,
+.funcionario-avatar {
+  position: relative;
+  border: 3px solid var(--ios-premium-primary);
+  box-shadow: 
+    0 8px 24px rgba(0, 122, 255, 0.4),
+    0 0 40px rgba(0, 122, 255, 0.2),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.minha-conta-avatar:hover,
+.ios-user-avatar:hover,
+.funcionario-avatar:hover {
+  transform: scale(1.05);
+  border-color: var(--ios-premium-success);
+  box-shadow: 
+    0 12px 32px rgba(52, 199, 89, 0.5),
+    0 0 50px rgba(52, 199, 89, 0.3),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+/* ===== BOTÕES iOS PREMIUM ===== */
+.minha-conta-edit-btn,
+.minha-conta-avatar-upload-btn,
+.ios-btn-primary,
+.ios-btn-secondary,
+.funcionarios-btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efeito de brilho nos botões */
+.minha-conta-edit-btn::before,
+.ios-btn-primary::before,
+.funcionarios-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.minha-conta-edit-btn:hover::before,
+.ios-btn-primary:hover::before,
+.funcionarios-btn:hover::before {
+  transform: translateX(100%);
+}
+
+/* ===== INFO ITEMS iOS ===== */
+.minha-conta-info-item {
+  background: linear-gradient(135deg, rgba(28, 28, 30, 0.8) 0%, rgba(44, 44, 46, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--ios-premium-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.minha-conta-info-item:hover {
+  transform: translateX(8px);
+  background: linear-gradient(135deg, rgba(44, 44, 46, 0.9) 0%, rgba(58, 58, 60, 0.9) 100%);
+  border-left-width: 4px;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(0, 122, 255, 0.2);
+}
+
+.minha-conta-info-item:nth-child(1) {
+  border-left-color: var(--ios-premium-primary);
+}
+
+.minha-conta-info-item:nth-child(2) {
+  border-left-color: var(--ios-premium-purple);
+}
+
+.minha-conta-info-item:nth-child(3) {
+  border-left-color: var(--ios-premium-success);
+}
+
+/* ===== BADGES iOS ===== */
+.minha-conta-badge,
+.funcionario-badge,
+.ios-permissions-badge {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.2) 0%, rgba(0, 81, 213, 0.2) 100%);
+  border: 1.5px solid rgba(0, 122, 255, 0.4);
+  box-shadow: 
+    0 4px 12px rgba(0, 122, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.minha-conta-badge.proprietario {
+  background: linear-gradient(135deg, 
+    rgba(255, 215, 0, 0.25) 0%, 
+    rgba(255, 193, 7, 0.25) 100%);
+  border: 1.5px solid rgba(255, 215, 0, 0.5);
+  box-shadow: 
+    0 4px 16px rgba(255, 215, 0, 0.4),
+    0 0 30px rgba(255, 215, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: badge-glow-gold 2s ease-in-out infinite;
+}
+
+@keyframes badge-glow-gold {
+  0%, 100% {
+    box-shadow: 
+      0 4px 16px rgba(255, 215, 0, 0.4),
+      0 0 30px rgba(255, 215, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 6px 24px rgba(255, 215, 0, 0.6),
+      0 0 40px rgba(255, 215, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* ===== LOGOUT BUTTON iOS ===== */
+.minha-conta-logout-btn {
+  background: linear-gradient(135deg, rgba(255, 59, 48, 0.15) 0%, rgba(255, 45, 85, 0.15) 100%);
+  border: 1.5px solid rgba(255, 59, 48, 0.3);
+  box-shadow: 
+    0 4px 16px rgba(255, 59, 48, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.minha-conta-logout-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 59, 48, 0.25) 0%, rgba(255, 45, 85, 0.25) 100%);
+  border-color: rgba(255, 59, 48, 0.5);
+  box-shadow: 
+    0 8px 24px rgba(255, 59, 48, 0.4),
+    0 0 30px rgba(255, 59, 48, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+/* ===== INFO CARD iOS ===== */
+.minha-conta-info-card {
+  background: linear-gradient(135deg, 
+    rgba(0, 122, 255, 0.08) 0%, 
+    rgba(88, 86, 214, 0.08) 100%);
+  border: 1px solid rgba(0, 122, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+/* ===== FUNCIONÁRIOS GRID iOS ===== */
+.funcionarios-grid-tech {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.funcionario-card-wrapper {
+  border-radius: 20px;
+  overflow: visible;
+}
+
+/* ===== ANIMAÇÕES iOS ===== */
+@keyframes ios-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ios-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.minha-conta-profile-card,
+.funcionario-card-wrapper {
+  animation: ios-fade-in-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+/* ===== SCROLL SUAVE iOS ===== */
+.minha-conta-container,
+.funcionarios-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== GLASSMORPHISM AVANÇADO ===== */
+.minha-conta-card-header,
+.funcionarios-header {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== DIVISORES SUTIS ===== */
+.minha-conta-info-section::before,
+.funcionarios-tabs::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.1) 20%, 
+    rgba(255, 255, 255, 0.1) 80%, 
+    transparent 100%);
+  margin: 2rem 0;
+}
+
+/* ===== TABS iOS ===== */
+.funcionarios-tab {
+  position: relative;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.funcionarios-tab.active {
+  background: rgba(0, 122, 255, 0.15);
+  box-shadow: 
+    0 4px 12px rgba(0, 122, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.funcionarios-tab:not(.active):hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ===== MICRO-INTERAÇÕES ===== */
+.minha-conta-edit-btn,
+.ios-btn-primary,
+.ios-btn-secondary,
+.funcionarios-btn {
+  position: relative;
+}
+
+.minha-conta-edit-btn:active,
+.ios-btn-primary:active,
+.funcionarios-btn:active {
+  transform: scale(0.96);
+}
+
+/* ===== RESPONSIVO iOS ===== */
+@media (max-width: 768px) {
+  .funcionarios-grid-tech {
+    grid-template-columns: 1fr;
+  }
+  
+  .minha-conta-container,
+  .funcionarios-container {
+    padding: 1rem;
+  }
+}
+
+/* ===== EFEITO DE PROFUNDIDADE ===== */
+.minha-conta-profile-card::after,
+.funcionario-card-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.minha-conta-profile-card:hover::after,
+.funcionario-card-wrapper:hover::after {
+  opacity: 1;
+}
+
+/* ===== LOADING STATES iOS ===== */
+@keyframes ios-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.minha-conta-loading,
+.funcionarios-loading {
+  animation: ios-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ===== FOCUS STATES iOS ===== */
+.minha-conta-form-field input:focus,
+.funcionario-dialog-input:focus {
+  outline: none;
+  border-color: var(--ios-premium-primary);
+  box-shadow: 
+    0 0 0 4px rgba(0, 122, 255, 0.15),
+    0 4px 12px rgba(0, 122, 255, 0.2);
+}
+
+/* ===== SKELETON LOADING (OPCIONAL) ===== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

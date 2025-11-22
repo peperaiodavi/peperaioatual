@@ -15,10 +15,11 @@ interface HubCard {
 
 export default function ObrasHub() {
   const navigate = useNavigate();
-  const { isAdmin } = usePermissao();
+  const permissoes = usePermissao();
 
-  const cards: HubCard[] = isAdmin ? [
-    {
+  // Criar cards dinamicamente baseado nas permissões
+  const cards: HubCard[] = [
+    permissoes.pode_acessar_obras && {
       icon: Building2,
       title: 'Obras',
       description: 'Gerencie todas as obras cadastradas',
@@ -26,7 +27,7 @@ export default function ObrasHub() {
       color: '#3b82f6',
       gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
     },
-    {
+    permissoes.pode_acessar_obras && permissoes.isAdmin && {
       icon: HardHat,
       title: 'Gestão de Obras',
       description: 'Acompanhamento e controle de obras',
@@ -34,16 +35,7 @@ export default function ObrasHub() {
       color: '#8b5cf6',
       gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
     },
-    {
-      icon: FileText,
-      title: 'Propostas',
-      description: 'Crie e gerencie propostas comerciais',
-      path: '/propostas',
-      color: '#10b981',
-      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-    },
-  ] : [
-    {
+    permissoes.pode_acessar_minhas_obras && !permissoes.isAdmin && {
       icon: HardHat,
       title: 'Minhas Obras',
       description: 'Visualize suas obras',
@@ -51,15 +43,17 @@ export default function ObrasHub() {
       color: '#3b82f6',
       gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
     },
-    {
+    permissoes.pode_acessar_propostas && {
       icon: FileText,
       title: 'Propostas',
-      description: 'Visualize propostas',
+      description: 'Crie e gerencie propostas comerciais',
       path: '/propostas',
       color: '#10b981',
       gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
     },
-  ];
+  ].filter(Boolean) as HubCard[];
+
+  console.log('🏗️ ObrasHub: Cards visíveis:', cards.length, cards.map(c => c.title));
 
   const handleCardClick = (path: string) => {
     navigate(path);

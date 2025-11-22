@@ -11,6 +11,7 @@ import { FuncionarioCard } from '../components/FuncionarioCard';
 import { formatCurrency } from '../utils/formatCurrency';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Funcionarios.css';
+import '../styles/ios-premium.css';
 
 interface Vale {
   id: string;
@@ -371,6 +372,13 @@ function DiariasTab({ funcionarios, canCreate, loadFuncionarios }: {
       {/* Diálogo para adicionar diária */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent aria-describedby="dialog-description-diaria" className="funcionario-dialog-content">
+          <button 
+            className="funcionario-dialog-close"
+            onClick={() => setIsAddDialogOpen(false)}
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
           <div className="funcionario-dialog-header">
             <h2 className="funcionario-dialog-title">
               <CalendarIcon className="funcionario-dialog-title-icon" />
@@ -918,38 +926,122 @@ export default function Funcionarios() {
 
   // Removido: duplicidade da função handleAddSaida
 
-  // CORRIGIDO: Usa Supabase para deletar vale (E REMOVIDA A DUPLICATA)
-  const handleDeleteVale = async (_funcionarioId: string, valeId: string) => {
+  // CORRIGIDO: Deleta vale E remove do caixa
+  const handleDeleteVale = async (funcionarioId: string, valeId: string) => {
     if (!canDelete) return;
-    if (!window.confirm('Tem certeza que deseja excluir este vale? Esta ação não pode ser desfeita.')) {
+    if (!window.confirm('Tem certeza que deseja excluir este vale? Esta ação irá remover o lançamento do caixa e do card do funcionário. Não pode ser desfeita.')) {
       return;
     }
-    const { error } = await supabase
-      .from('vales')
-      .delete()
-      .eq('id', valeId);
-    if (!error) {
-      toast.success('Vale removido com sucesso!');
+
+    try {
+      // 1. Buscar o vale para pegar os dados
+      const { data: vale, error: valeError } = await supabase
+        .from('vales')
+        .select('*')
+        .eq('id', valeId)
+        .single();
+
+      if (valeError) {
+        console.error('Erro ao buscar vale:', valeError);
+        toast.error('Erro ao buscar dados do vale.');
+        return;
+      }
+
+      // 2. Buscar nome do funcionário
+      const { data: funcionario } = await supabase
+        .from('funcionarios')
+        .select('nome')
+        .eq('id', funcionarioId)
+        .single();
+
+      const nomeFuncionario = funcionario?.nome || 'Funcionário';
+
+      // 3. Remover do caixa (transacoes) - buscar por data, valor e observação contendo "Vale"
+      const { error: caixaError } = await supabase
+        .from('transacoes')
+        .delete()
+        .eq('data', vale.data)
+        .eq('valor', vale.valor)
+        .eq('tipo', 'saida')
+        .ilike('observacao', `%Vale%${nomeFuncionario}%`);
+
+      if (caixaError) {
+        console.warn('Aviso ao remover do caixa:', caixaError);
+        // Continua mesmo se não encontrar no caixa
+      }
+
+      // 4. Remover o vale do card do funcionário
+      const { error: deleteError } = await supabase
+        .from('vales')
+        .delete()
+        .eq('id', valeId);
+
+      if (deleteError) {
+        console.error('Erro ao deletar vale:', deleteError);
+        toast.error('Erro ao remover vale.');
+        return;
+      }
+
+      toast.success('Vale removido com sucesso do card e do caixa!');
       loadFuncionarios();
-    } else {
+    } catch (error) {
+      console.error('Erro ao excluir vale:', error);
       toast.error('Erro ao remover vale.');
     }
   };
 
-  // CORRIGIDO: Usa Supabase para deletar saida (E REMOVIDA A DUPLICATA)
+  // CORRIGIDO: Deleta saida E remove do caixa
   const handleDeleteSaida = async (_funcionarioId: string, saidaId: string) => {
     if (!canDelete) return;
-    if (!window.confirm('Tem certeza que deseja excluir esta saída? ATENÇÃO: Isso NÃO reverterá o lançamento no caixa. Esta ação não pode ser desfeita.')) {
+    if (!window.confirm('Tem certeza que deseja excluir esta saída? Esta ação irá remover o lançamento do caixa e do card do funcionário. Não pode ser desfeita.')) {
       return;
     }
-    const { error } = await supabase
-      .from('saidas_dono')
-      .delete()
-      .eq('id', saidaId);
-    if (!error) {
-      toast.success('Saída removida com sucesso!');
+
+    try {
+      // 1. Buscar a saída para pegar o valor e a transação associada
+      const { data: saida, error: saidaError } = await supabase
+        .from('saidas_dono')
+        .select('*')
+        .eq('id', saidaId)
+        .single();
+
+      if (saidaError) {
+        console.error('Erro ao buscar saída:', saidaError);
+        toast.error('Erro ao buscar dados da saída.');
+        return;
+      }
+
+      // 2. Remover do caixa (transacoes) - buscar por data, valor e observação
+      const observacaoSaida = saida.observacao || 'Saída de Dono';
+      const { error: caixaError } = await supabase
+        .from('transacoes')
+        .delete()
+        .eq('data', saida.data)
+        .eq('valor', saida.valor)
+        .eq('tipo', 'saida')
+        .ilike('observacao', `%${observacaoSaida}%`);
+
+      if (caixaError) {
+        console.warn('Aviso ao remover do caixa:', caixaError);
+        // Continua mesmo se não encontrar no caixa
+      }
+
+      // 3. Remover a saída do card do funcionário
+      const { error: deleteError } = await supabase
+        .from('saidas_dono')
+        .delete()
+        .eq('id', saidaId);
+
+      if (deleteError) {
+        console.error('Erro ao deletar saída:', deleteError);
+        toast.error('Erro ao remover saída.');
+        return;
+      }
+
+      toast.success('Saída removida com sucesso do card e do caixa!');
       loadFuncionarios();
-    } else {
+    } catch (error) {
+      console.error('Erro ao excluir saída:', error);
       toast.error('Erro ao remover saída.');
     }
   };

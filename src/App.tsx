@@ -3,7 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { PermissaoProvider } from './context/PermissaoContext';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
-import IOSHomePage from './pages/IOSHomePage';
+import Inicio from './pages/Inicio';
 import DashboardSelector from './pages/DashboardSelector';
 import FinanceiroPessoal from './pages/FinanceiroPessoal';
 import DividasPessoais from './pages/DividasPessoais';
@@ -24,6 +24,8 @@ import ObrasHub from './pages/ObrasHub';
 import FinanceiroHub from './pages/FinanceiroHub';
 import MainLayout from './components/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import PepIA from './pages/pepIA';
+import PepIASection from './pages/PepIASection';
 import { useAuth } from './context/AuthContext';
 import { Toaster } from 'sonner';
 import ReloadPrompt from './ReloadPrompt';
@@ -56,8 +58,8 @@ export default function App() {
               
               {/* Rotas com MainLayout (Bottom Tab Bar) */}
               <Route element={<MainLayout><Outlet /></MainLayout>}>
-                {/* Dashboard iOS Home Screen */}
-                <Route path="/dashboard" element={<IOSHomePage />} />
+                {/* Dashboard - Página Inicial */}
+                <Route path="/dashboard" element={<Inicio />} />
                 {/* Dashboard antigo ainda acessível */}
                 <Route path="/dashboard-legacy" element={<Dashboard />} />
                 
@@ -85,7 +87,12 @@ export default function App() {
                 <Route path="/funcionarios" element={<Funcionarios />} />
                 <Route path="/automacao-pdf" element={<AutomacaoPdf />} />
                 <Route path="/minha-conta" element={<MinhaConta />} />
-                
+
+                {/* Página da IA */}
+                <Route path="/pepIA" element={<PepIA />} />
+                {/* Seção completa da IA com abas */}
+                <Route path="/pepIA-section" element={<PepIASection />} />
+
                 {/* Redirect padrão */}
                 <Route path="/" element={<Navigate to="/dashboard-selector" replace />} />
               </Route>

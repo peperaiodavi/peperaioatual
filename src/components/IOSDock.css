@@ -1,0 +1,207 @@
+/* ===============================================
+   IOS DOCK - BARRA INFERIOR
+   =============================================== */
+
+.ios-dock-wrapper {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 90;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  width: auto;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.ios-dock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 20px;
+  padding: 12px 20px;
+  
+  /* Glassmorphism Premium */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 10px 25px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  
+  width: auto;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.ios-dock::-webkit-scrollbar {
+  display: none;
+}
+
+.ios-dock .ios-app-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  min-width: 56px;
+  box-sizing: border-box;
+}
+
+.ios-dock .ios-app-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 13px;
+  position: relative;
+  overflow: visible;
+  
+  /* Glassmorphism Effect */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.4),
+    0 3px 10px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+.ios-app-item:hover .ios-app-icon {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(50px) saturate(200%);
+  -webkit-backdrop-filter: blur(50px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 8px 20px rgba(0, 0, 0, 0.4),
+    inset 0 2px 2px rgba(255, 255, 255, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 0 40px rgba(139, 92, 246, 0.4);
+  
+  animation: none;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+  }
+  50% {
+    filter: brightness(1.1) drop-shadow(0 0 20px rgba(139, 92, 246, 0.8));
+  }
+}
+
+/* Shine overlay no ícone - mais sutil */
+.ios-dock .ios-app-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.03) 100%
+  );
+  border-radius: 13px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Conteúdo do ícone */
+.ios-dock .ios-app-icon-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.ios-dock .ios-app-icon-content svg,
+.ios-dock .ios-app-icon-content ion-icon {
+  width: 28px !important;
+  height: 28px !important;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+  transition: all 0.3s ease;
+}
+
+.ios-app-item:hover .ios-app-icon-content svg,
+.ios-app-item:hover .ios-app-icon-content ion-icon {
+  filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 20px currentColor);
+  transform: scale(1.05);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .ios-dock-wrapper {
+    max-width: calc(100vw - 16px);
+    bottom: 4px;
+  }
+
+  .ios-dock {
+    gap: 16px;
+    padding: 10px 16px;
+  }
+
+  .ios-dock .ios-app-icon {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ios-dock-wrapper {
+    max-width: calc(100vw - 8px);
+  }
+
+  .ios-dock {
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 16px;
+  }
+
+  .ios-dock .ios-app-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ios-dock {
+    gap: 10px;
+    padding: 6px 10px;
+  }
+
+  .ios-dock .ios-app-icon {
+    width: 44px;
+    height: 44px;
+  }
+}

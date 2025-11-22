@@ -1,84 +1,25 @@
-/* ===== OBRAS PAGE - PREMIUM IOS STYLE WITH GLASSMORPHISM ===== */
+/* ===== OBRAS PAGE - iOS PREMIUM DESIGN ===== */
 
 .obras-container {
   padding: 2rem 1.5rem;
   min-height: calc(100vh - 64px);
-  background: 
-    linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(17, 24, 39, 0.98) 50%, rgba(30, 41, 59, 0.95) 100%),
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background: linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #141414 100%);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
   animation: obras-fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Partículas de Poeira Flutuantes */
+/* Efeito sutil de gradiente iOS */
 .obras-container::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background-image: 
-    radial-gradient(circle, rgba(99, 102, 241, 0.4) 1px, transparent 1px),
-    radial-gradient(circle, rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-    radial-gradient(circle, rgba(168, 85, 247, 0.25) 1px, transparent 1px),
-    radial-gradient(circle, rgba(244, 114, 182, 0.2) 1px, transparent 1px);
-  background-size: 
-    200px 200px,
-    300px 300px,
-    150px 150px,
-    250px 250px;
-  background-position: 
-    0 0,
-    40px 60px,
-    80px 20px,
-    120px 100px;
-  animation: float-particles 60s linear infinite;
-  pointer-events: none;
-  opacity: 0.6;
-  z-index: 0;
-}
-
-/* Efeito de luz ambiente - DESATIVADO */
-.obras-container::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(ellipse at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-    radial-gradient(ellipse at 80% 70%, rgba(168, 85, 247, 0.06) 0%, transparent 40%),
-    radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+  height: 300px;
+  background: radial-gradient(ellipse at top, rgba(0, 122, 255, 0.08) 0%, transparent 70%);
   pointer-events: none;
-  /* animation: ambient-light 15s ease-in-out infinite; */
   z-index: 0;
-}
-
-@keyframes float-particles {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  100% {
-    transform: translate(50px, 50px) rotate(360deg);
-  }
-}
-
-@keyframes ambient-light {
-  0%, 100% { 
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  33% { 
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-  66% { 
-    opacity: 0.7;
-    transform: scale(0.98);
-  }
 }
 
 @keyframes obras-fade-in {
@@ -92,61 +33,57 @@
   }
 }
 
-/* ===== HEADER - COM PARTÍCULAS ===== */
+/* ===== HEADER iOS PREMIUM ===== */
 .obras-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   position: relative;
   z-index: 1;
   animation: obras-header-slide 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 2rem;
-  background: 
-    linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(28, 28, 30, 0.95);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Partículas decorativas no header */
+.obras-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 25px 70px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 0 20px rgba(0, 122, 255, 0.2);
+}
+
+/* Efeito de profundidade no header */
 .obras-header::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
-  animation: header-particles 10s ease-in-out infinite;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
   pointer-events: none;
-  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-@keyframes header-particles {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.5;
-  }
-  25% {
-    transform: translate(10px, -10px) scale(1.1);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translate(-5px, 5px) scale(0.9);
-    opacity: 0.6;
-  }
-  75% {
-    transform: translate(-10px, -5px) scale(1.05);
-    opacity: 0.8;
-  }
+.obras-header:hover::before {
+  opacity: 1;
 }
 
 @keyframes obras-header-slide {
@@ -166,34 +103,27 @@
 }
 
 .obras-header-content h1 {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 30%, #c7d2fe 60%, #a5b4fc 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #E0E7FF 40%, #C7D2FE 70%, #A78BFA 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0 0 0.5rem 0;
-  letter-spacing: -0.5px;
-  animation: title-glow 4s ease-in-out infinite;
-  filter: drop-shadow(0 2px 12px rgba(99, 102, 241, 0.3));
+  letter-spacing: -0.03em;
+  filter: drop-shadow(0 2px 12px rgba(139, 92, 246, 0.4));
   position: relative;
-}
-
-.obras-header-content h1::after {
-  content: '✨';
-  position: absolute;
-  right: -40px;
-  top: 0;
-  font-size: 1.5rem;
-  animation: sparkle 2s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 @keyframes title-glow {
   0%, 100% { 
-    filter: drop-shadow(0 2px 12px rgba(99, 102, 241, 0.3)) brightness(1);
+    filter: drop-shadow(0 2px 12px rgba(139, 92, 246, 0.4));
   }
   50% { 
-    filter: drop-shadow(0 4px 20px rgba(139, 92, 246, 0.5)) brightness(1.1);
+    filter: drop-shadow(0 4px 20px rgba(139, 92, 246, 0.6));
   }
 }
 

@@ -17,6 +17,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import CaixaArquivos from '../components/CaixaArquivos';
 import './Caixa.css';
 import './Caixa-fab.css';
+import '../styles/ios-premium.css';
 
 // Função auxiliar para detectar mobile
 const isMobileDevice = () => {
@@ -125,24 +126,46 @@ export default function Caixa() {
   // Estados para Sistema de Arquivamento (dados carregados pelo componente CaixaArquivos)
   const [arquivos, setArquivos] = useState<{mes: string; ano: string; total_entradas: number; total_saidas: number; quantidade: number}[]>([]);
   
+  // Estado para saldo real (incluindo transações arquivadas)
+  const [saldoTotal, setSaldoTotal] = useState<number>(0);
+  
   // Estados para controle de visualização
   const [viewMode, setViewMode] = useState<'caixa' | 'historico' | 'arquivos'>('caixa');
 
   useEffect(() => {
     loadTransacoes();
+    loadSaldoTotal();
     loadCategorias();
     loadResumoFinanceiro();
     loadHistorico();
     loadArquivos();
+    
+    // Listener para atualizar saldo quando arquivar/restaurar
+    const handleAtualizacao = () => {
+      console.log('🔄 Evento de atualização detectado - recarregando saldo');
+      loadSaldoTotal();
+      loadArquivos();
+    };
+    
+    window.addEventListener('transacao-atualizada', handleAtualizacao);
+    return () => window.removeEventListener('transacao-atualizada', handleAtualizacao);
   }, []);
 
+
+  // Corrigir valor a receber: soma de todos os valores que ainda faltam receber das obras
   const loadResumoFinanceiro = async () => {
-    // Busca recebiveis
-    const { data: receber } = await supabase.from('recebiveis').select('*');
-    const receberData = receber || [];
-    const totalReceberCalc = receberData.reduce((acc: number, r: any) => {
-      return acc + (Number(r.valor_total) || 0) - (Number(r.valor_pago) || 0);
-    }, 0);
+    // Busca todas as obras
+    const { data: obras, error } = await supabase.from('obras').select('valor_total, valor_recebido, status');
+    let totalReceberCalc = 0;
+    if (!error && obras) {
+      totalReceberCalc = obras
+        .filter((obra: any) => obra.status !== 'Finalizada' && obra.status !== 'Cancelada')
+        .reduce((acc: number, obra: any) => {
+          const valorTotal = Number(obra.valor_total) || 0;
+          const valorRecebido = Number(obra.valor_recebido) || 0;
+          return acc + (valorTotal - valorRecebido);
+        }, 0);
+    }
     setTotalReceber(totalReceberCalc);
 
     // Busca dividas
@@ -169,19 +192,39 @@ export default function Caixa() {
   setCategorias(data);
   };
 
+  // Carregar saldo total (incluindo arquivadas)
+  const loadSaldoTotal = async () => {
+    const { data, error } = await supabase
+      .from('transacoes')
+      .select('tipo, valor');
+
+    if (!error && data) {
+      const saldo = data.reduce((acc, t) => t.tipo === 'entrada' ? acc + t.valor : acc - t.valor, 0);
+      console.log('💰 Saldo total (incluindo arquivadas):', saldo);
+      setSaldoTotal(saldo);
+    }
+  };
+
   const loadTransacoes = () => {
+    console.log('🔄 Recarregando transações do caixa...');
     supabase
       .from('transacoes')
       .select('*')
+      .eq('arquivado', false) // Só mostrar transações NÃO arquivadas
       .order('data', { ascending: false })
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (!error && data) {
+          console.log('✅ Transações visíveis:', data.length, 'itens');
           setTransacoes(data);
         } else {
+          console.error('❌ Erro ao buscar transações:', error);
           toast.error('Erro ao buscar transações!');
         }
       });
+    
+    // Sempre atualizar saldo total
+    loadSaldoTotal();
   };
 
   const loadHistorico = () => {
@@ -198,31 +241,49 @@ export default function Caixa() {
 
   // Função auxiliar para carregar arquivos (usada pelo componente CaixaArquivos)
   const loadArquivos = async () => {
-    const { data, error } = await supabase
-      .from('transacoes_arquivadas')
-      .select('mes_referencia, total_entradas, total_saidas')
-      .order('mes_referencia', { ascending: false });
-    
-    if (!error && data) {
+    try {
+      const { data, error } = await supabase
+        .from('transacoes_arquivadas')
+        .select('*')
+        .order('mes_referencia', { ascending: false });
+      
+      if (error) {
+        console.error('Erro ao carregar arquivos:', error);
+        if (error.code === 'PGRST204' || error.message?.includes('schema cache')) {
+          console.warn('Tabela transacoes_arquivadas não existe. Execute o SQL.');
+        }
+        return;
+      }
+      
+      if (!data) return;
+      
       // Agrupa por mês e calcula totais
       const arquivosMap = new Map();
       data.forEach((item: any) => {
         const key = item.mes_referencia;
         if (!arquivosMap.has(key)) {
+          const [ano, mes] = key.split('-');
+          console.log('📁 Criando arquivo:', { mes_referencia: key, ano, mes });
           arquivosMap.set(key, {
-            mes: key.split('-')[1],
-            ano: key.split('-')[0],
+            mes: mes,
+            ano: ano,
             total_entradas: 0,
             total_saidas: 0,
             quantidade: 0
           });
         }
         const arquivo = arquivosMap.get(key);
-        arquivo.total_entradas += item.total_entradas || 0;
-        arquivo.total_saidas += item.total_saidas || 0;
+        // Calcula totais baseado no tipo da transação
+        if (item.tipo === 'entrada') {
+          arquivo.total_entradas += item.valor || 0;
+        } else {
+          arquivo.total_saidas += item.valor || 0;
+        }
         arquivo.quantidade += 1;
       });
       setArquivos(Array.from(arquivosMap.values()));
+    } catch (err) {
+      console.error('Erro ao processar arquivos:', err);
     }
   };
 
@@ -325,9 +386,8 @@ export default function Caixa() {
 
   // Funções de cálculo e renderização
   const calcularSaldo = () => {
-    return transacoes.reduce((acc, t) => {
-      return t.tipo === 'entrada' ? acc + t.valor : acc - t.valor;
-    }, 0);
+    // Retornar saldo total (incluindo arquivadas)
+    return saldoTotal;
   };
 
   const calcularTotalEntradas = () => {
@@ -737,15 +797,24 @@ export default function Caixa() {
     }
 
     // Salva no histórico antes de excluir (com justificativa)
-    const { error: historicoError } = await supabase.from('transacoes_excluidas').insert({
-      ...transacaoParaExcluir,
+    const dadosHistorico = {
+      tipo: transacaoParaExcluir.tipo,
+      valor: transacaoParaExcluir.valor,
+      origem: transacaoParaExcluir.origem,
+      data: transacaoParaExcluir.data,
+      observacao: transacaoParaExcluir.observacao,
+      categoria: transacaoParaExcluir.categoria,
       data_exclusao: new Date().toISOString(),
       motivo_exclusao: deleteJustificativaDialog.justificativa,
-    });
+    };
+    
+    const { error: historicoError } = await supabase
+      .from('transacoes_excluidas')
+      .insert(dadosHistorico);
 
     if (historicoError) {
       console.error('Erro ao salvar no histórico:', historicoError);
-      toast.error('Erro ao salvar no histórico!');
+      toast.error('Erro ao salvar no histórico: ' + historicoError.message);
       return;
     }
 
@@ -837,12 +906,15 @@ export default function Caixa() {
 
     try {
       // Remove campos específicos do histórico antes de reinserir
-      const { data_exclusao, excluido_por, ...transacaoRestaurada } = transacaoExcluida;
+      const { id, data_exclusao, motivo_exclusao, excluido_por, created_at, ...transacaoRestaurada } = transacaoExcluida;
 
-      // Reinsere a transação na tabela principal
+      // Reinsere a transação na tabela principal (sem id para gerar novo)
       const { error: insertError } = await supabase
         .from('transacoes')
-        .insert(transacaoRestaurada);
+        .insert({
+          ...transacaoRestaurada,
+          arquivado: false // Garantir que volta como não arquivada
+        });
 
       if (insertError) {
         console.error('Erro ao restaurar transação:', insertError);

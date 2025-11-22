@@ -9,33 +9,38 @@ export default function MainNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-  const { isAdmin } = usePermissao();
+  const permissoes = usePermissao();
 
-  // Menu para Admin
-  const adminMenuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-    { icon: Users, label: 'Funcionários', href: '/funcionarios' },
-    { icon: FileText, label: 'Propostas', href: '/propostas' },
-    { icon: Building2, label: 'Obras', href: '/obras' },
-    { icon: HardHat, label: 'Gestão de Obras', href: '/gestao-obras' },
-    { icon: Wallet, label: 'Caixa', href: '/caixa' },
-    { icon: FileBarChart2, label: 'A Receber', href: '/receber' },
-    { icon: CreditCard, label: 'Dívidas', href: '/dividas' },
-    { icon: FileCog, label: 'Automação PDF', href: '/automacao-pdf' },
+  // Debug: Log das permissões quando carregadas
+  useEffect(() => {
+    if (!permissoes.loading) {
+      console.log('🎨 MainNavbar: Permissões carregadas:', {
+        pode_acessar_dashboard: permissoes.pode_acessar_dashboard,
+        pode_acessar_obras: permissoes.pode_acessar_obras,
+        pode_acessar_caixa: permissoes.pode_acessar_caixa,
+        pode_acessar_funcionarios: permissoes.pode_acessar_funcionarios,
+        pode_acessar_propostas: permissoes.pode_acessar_propostas,
+        isAdmin: permissoes.isAdmin
+      });
+    }
+  }, [permissoes.loading]);
+
+  // Criar menu dinamicamente baseado nas permissões
+  const menuItems = [
+    permissoes.pode_acessar_dashboard && { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
+    permissoes.pode_acessar_funcionarios && { icon: Users, label: 'Funcionários', href: '/funcionarios' },
+    permissoes.pode_acessar_propostas && { icon: FileText, label: 'Propostas', href: '/propostas' },
+    permissoes.pode_acessar_obras && { icon: Building2, label: 'Obras', href: '/obras' },
+    permissoes.pode_acessar_obras && permissoes.isAdmin && { icon: HardHat, label: 'Gestão de Obras', href: '/gestao-obras' },
+    permissoes.pode_acessar_minhas_obras && !permissoes.isAdmin && { icon: HardHat, label: 'Minhas Obras', href: '/minhas-obras' },
+    permissoes.pode_acessar_caixa && { icon: Wallet, label: 'Caixa', href: '/caixa' },
+    permissoes.isAdmin && { icon: FileBarChart2, label: 'A Receber', href: '/receber' },
+    permissoes.isAdmin && { icon: CreditCard, label: 'Dívidas', href: '/dividas' },
+    permissoes.pode_acessar_propostas && { icon: FileCog, label: 'Automação PDF', href: '/automacao-pdf' },
     { icon: User, label: 'Minha Conta', href: '/minha-conta' },
-  ];
+  ].filter(Boolean) as { icon: any; label: string; href: string }[];
 
-  // Menu para Visualizador
-  const visualizadorMenuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-  { icon: HardHat, label: 'Minhas Obras', href: '/minhas-obras' },
-  { icon: Wallet, label: 'Caixa', href: '/caixa' },
-  { icon: FileCog, label: 'Automação PDF', href: '/automacao-pdf' },
-  { icon: FileText, label: 'Propostas', href: '/propostas' },
-  { icon: User, label: 'Minha Conta', href: '/minha-conta' },
-  ];
-
-  const menuItems = isAdmin ? adminMenuItems : visualizadorMenuItems;
+  console.log('🎨 MainNavbar: Total de itens no menu:', menuItems.length, menuItems.map(i => i.label));
 
   return (
     <nav className="peperaio-navbar">

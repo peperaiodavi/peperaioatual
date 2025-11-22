@@ -1,6 +1,5 @@
 /* ===============================================
-   iOS HOME SCREEN - PIXEL PERFECT
-   Baseado em iPhone 14 Pro layout
+   iOS HOME SCREEN - REFATORADO
    =============================================== */
 
 :root {
@@ -19,14 +18,19 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  background-color: #1a4d7a;
   background: 
     linear-gradient(180deg, rgba(135, 206, 250, 0.3) 0%, rgba(0, 191, 255, 0.2) 50%, transparent 100%),
     linear-gradient(0deg, rgba(0, 100, 200, 0.15) 0%, transparent 60%),
     #1a4d7a;
   background-attachment: fixed;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  touch-action: none; /* Desativa gestos padrão */
 }
 
 /* Wallpaper blur effect */
@@ -41,6 +45,45 @@
   -webkit-backdrop-filter: blur(100px);
   pointer-events: none;
   z-index: 0;
+}
+
+/* Overlay preventivo para cliques */
+.ios-home-screen::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Container de Páginas */
+.ios-pages-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  width: 200vw;
+  will-change: transform;
+  z-index: 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* Cada Página Individual */
+.ios-page {
+  width: 100vw;
+  height: 100%;
+  flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  background-color: transparent;
+  pointer-events: auto; /* Permitir interação nas páginas */
+  touch-action: pan-y; /* Permitir apenas scroll vertical */
 }
 
 /* --- STATUS BAR (topo) --- */
@@ -62,6 +105,8 @@
   z-index: 100;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  animation: fadeIn 0.4s ease-out;
+  pointer-events: none;
 }
 
 .ios-status-time {
@@ -79,6 +124,7 @@
   padding: var(--ios-padding-top) 24px var(--ios-padding-bottom);
   max-width: 430px;
   margin: 0 auto;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (max-width: 390px) {
@@ -97,8 +143,37 @@
   gap: 8px;
   cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
   position: relative;
+  animation: fadeInUp 0.5s ease-out backwards;
+  animation-delay: calc(var(--item-index, 0) * 0.03s);
+  z-index: 10;
+  transition: transform 0.2s ease;
+}
+
+.ios-app-item:hover {
+  transform: translateY(-4px) scale(1.05);
+}
+
+.ios-app-item:active {
+  transform: scale(0.92);
+  transition: transform 0.1s ease;
+}
+
+.ios-app-item:hover .ios-app-icon {
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.ios-app-item:active .ios-app-icon {
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* --- ÍCONE DO APP --- */
@@ -113,13 +188,16 @@
     0 4px 12px rgba(0, 0, 0, 0.35),
     0 1px 3px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: transform 0.1s ease;
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
+  transition: box-shadow 0.2s ease;
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
 }
 
 .ios-app-icon:active {
   transform: scale(0.92);
+  transition: transform 0.1s ease;
 }
 
 /* Shine overlay no ícone */
@@ -183,6 +261,7 @@
   transform: translateX(-50%);
   z-index: 90;
   padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: slideUpFade 0.6s ease-out 0.3s backwards;
 }
 
 .ios-dock {
@@ -199,6 +278,15 @@
     0 20px 40px rgba(0, 0, 0, 0.4),
     0 10px 20px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.ios-dock:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 24px 48px rgba(0, 0, 0, 0.45),
+    0 12px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .ios-dock .ios-app-icon {
@@ -268,6 +356,37 @@
 }
 
 /* --- ANIMAÇÕES --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 @keyframes iconExpand {
   0% {
     transform: scale(1);
@@ -313,5 +432,505 @@
   :root {
     --ios-icon-size: 68px;
     --ios-icon-radius: 15px;
+  }
+}
+
+/* --- INDICADORES DE PÁGINA --- */
+.ios-page-indicators {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  z-index: 200;
+  padding: 2px 5px;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 8px;
+}
+
+.ios-page-indicator {
+  min-width: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+.ios-page-indicator.active {
+  background: rgba(255, 255, 255, 0.9);
+  min-width: 14px;
+  width: 14px;
+  border-radius: 2px;
+}
+
+.ios-page-indicator:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.ios-page-indicator:active {
+  transform: scale(0.85);
+}
+
+/* --- PÁGINA DE WIDGETS --- */
+.ios-widgets-page {
+  padding-top: 60px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-widgets-container {
+  padding: 20px;
+  max-width: 430px;
+  margin: 0 auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-widgets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 1rem;
+}
+
+.ios-widgets-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.98);
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: -0.5px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ios-widgets-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: 12px;
+  border: none;
+  background: rgba(10, 132, 255, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-widgets-add-btn:hover {
+  background: rgba(10, 132, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+}
+
+.ios-widgets-add-btn:active {
+  transform: translateY(0);
+}
+
+/* --- WIDGET BASE --- */
+.ios-widget {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-radius: 20px;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ios-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 36px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.ios-widget-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.98);
+  font-size: 16px;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ios-widget-header svg {
+  width: 20px !important;
+  height: 20px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.ios-widget-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ios-widget-edit-btn,
+.ios-widget-remove-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-widget-edit-btn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ios-widget-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.ios-widget-edit-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.ios-widget-remove-btn {
+  background: rgba(255, 59, 48, 0.15);
+}
+
+.ios-widget-remove-btn:hover {
+  background: rgba(255, 59, 48, 0.3);
+  color: #FF3B30;
+  transform: scale(1.05);
+}
+
+.ios-widget-remove-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 59, 48, 0.2);
+}
+
+.ios-widget-content {
+  color: rgba(255, 255, 255, 0.9);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ios-widget-placeholder {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 20px 0;
+  font-style: italic;
+}
+
+/* --- WIDGET CALENDÁRIO --- */
+.ios-widget-calendar {
+  min-height: 120px;
+}
+
+/* --- WIDGET FINANÇAS --- */
+.ios-widget-finances {
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.2) 0%, rgba(48, 209, 88, 0.15) 100%);
+}
+
+.ios-widget-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.ios-widget-stat:last-child {
+  border-bottom: none;
+}
+
+.ios-widget-stat-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ios-widget-stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.98);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.ios-widget-stat-value.positive {
+  color: #34C759;
+}
+
+.ios-widget-stat-value.negative {
+  color: #FF3B30;
+}
+
+/* --- WIDGET OBRAS --- */
+.ios-widget-obras {
+  background: linear-gradient(135deg, rgba(175, 82, 222, 0.2) 0%, rgba(142, 60, 201, 0.15) 100%);
+  min-height: 100px;
+}
+
+/* ===== MODAL DE EDIÇÃO DE WIDGET ===== */
+
+.ios-widget-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ios-widget-modal {
+  background: rgba(28, 28, 30, 0.95);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 20px;
+  max-width: 450px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.ios-widget-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ios-widget-modal-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.ios-widget-modal-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-widget-modal-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.ios-widget-modal-close:active {
+  transform: scale(0.92);
+}
+
+.ios-widget-modal-body {
+  padding: 1.5rem;
+}
+
+.ios-widget-modal-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.ios-widget-modal-select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.ios-widget-modal-select:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ios-widget-modal-select:focus {
+  border-color: rgba(10, 132, 255, 0.5);
+  box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15);
+}
+
+.ios-widget-modal-select option {
+  background: #1c1c1e;
+  color: #ffffff;
+  padding: 0.5rem;
+}
+
+.ios-widget-modal-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(10, 132, 255, 0.1);
+  border: 1px solid rgba(10, 132, 255, 0.2);
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.ios-widget-modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ios-widget-modal-btn {
+  flex: 1;
+  padding: 0.875rem;
+  border-radius: 12px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-widget-modal-btn-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ios-widget-modal-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.ios-widget-modal-btn-cancel:active {
+  transform: scale(0.96);
+}
+
+.ios-widget-modal-btn-save {
+  background: linear-gradient(135deg, #0A84FF 0%, #0051D5 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+}
+
+.ios-widget-modal-btn-save:hover {
+  box-shadow: 0 6px 20px rgba(10, 132, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.ios-widget-modal-btn-save:active {
+  transform: translateY(0);
+}
+
+/* Responsividade do Modal */
+@media screen and (max-width: 480px) {
+  .ios-widget-modal {
+    max-width: calc(100% - 32px);
+    margin: 16px;
+  }
+
+  .ios-widget-modal-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .ios-widget-modal-body {
+    padding: 1.25rem;
+  }
+
+  .ios-widget-modal-footer {
+    padding: 1rem 1.25rem;
+    flex-direction: column;
+  }
+
+  .ios-widget-modal-btn {
+    width: 100%;
   }
 }

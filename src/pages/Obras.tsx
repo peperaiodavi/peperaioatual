@@ -12,6 +12,7 @@ import { Plus, Edit2, Trash2, FileDown, CheckCircle, DollarSign, Link2, Send } f
 import { formatCurrency } from '../utils/formatCurrency';
 import jsPDF from 'jspdf';
 import './Obras.css';
+import '../styles/ios-premium.css';
 import { useCardsDeObra } from '../hooks/useCardsDeObra';
 import type { CardDeObra } from '../types/financeiro';
 

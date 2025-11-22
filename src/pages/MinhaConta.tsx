@@ -2,16 +2,20 @@ import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { usePermissao } from '../context/PermissaoContext';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
 import { LogOut, Edit2, Camera, Shield, Info } from 'lucide-react';
+import GerenciamentoPermissoes from '../components/GerenciamentoPermissoes';
 import './MinhaConta.css';
+import '../styles/ios-premium.css';
 
 export default function MinhaConta() {
   const { user, logout, updateUser } = useAuth();
+  const { isAdmin } = usePermissao();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -229,6 +233,13 @@ export default function MinhaConta() {
           </div>
         </div>
 
+        {/* Permission Management (Admin Only) */}
+        {isAdmin && (
+          <div className="minha-conta-permissions-section">
+            <GerenciamentoPermissoes />
+          </div>
+        )}
+
         {/* Info Card */}
         <div className="minha-conta-info-card">
           <h3>
@@ -237,12 +248,17 @@ export default function MinhaConta() {
           </h3>
           <div className="minha-conta-info-card-content">
             <p>
-              <strong>Administrador:</strong> Acesso completo ao sistema, pode criar, editar e
-              excluir dados.
+              <strong>Proprietário:</strong> Acesso completo ao sistema, pode criar, editar e
+              excluir dados. Pode gerenciar permissões de outros usuários.
             </p>
             <p>
-              <strong>Visualizador:</strong> Pode visualizar todos os dados, mas não pode fazer
-              alterações.
+              <strong>Visualizador:</strong> Pode visualizar dados específicos e criar propostas/compromissos,
+              mas não pode fazer alterações críticas no sistema.
+            </p>
+            <p style={{marginTop: '0.75rem', color: '#60a5fa'}}>
+              💡 {isAdmin ? 
+                'Você pode gerenciar permissões de usuários acima, definindo exatamente o que cada um pode fazer.' : 
+                'Entre em contato com um proprietário para solicitar alterações em suas permissões.'}
             </p>
           </div>
         </div>

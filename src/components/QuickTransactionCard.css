@@ -476,3 +476,149 @@
     order: 1;
   }
 }
+
+/* ===== RESPONSIVIDADE DESKTOP/TABLET ===== */
+
+/* Desktop - Telas maiores que 768px */
+@media screen and (min-width: 769px) {
+  .quick-transaction-card {
+    max-width: 600px;
+    margin: 1rem auto;
+    padding: 2rem;
+  }
+
+  .quick-card-header {
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .quick-card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+  }
+
+  .quick-card-info h3 {
+    font-size: 1rem;
+  }
+
+  .quick-card-info p {
+    font-size: 0.875rem;
+  }
+
+  .quick-card-actions {
+    gap: 1rem;
+  }
+
+  .quick-btn {
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+  }
+}
+
+/* Tablet - Entre 768px e 480px */
+@media screen and (max-width: 768px) {
+  .quick-transaction-card {
+    padding: 1.25rem;
+    border-radius: 20px;
+    margin-bottom: 0.875rem;
+  }
+
+  .quick-card-header {
+    gap: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  .quick-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+  }
+
+  .quick-card-info h3 {
+    font-size: 0.8125rem;
+  }
+
+  .quick-card-info p {
+    font-size: 0.6875rem;
+  }
+
+  .quick-card-actions {
+    gap: 0.625rem;
+  }
+
+  .quick-btn {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8125rem;
+    border-radius: 14px;
+  }
+}
+
+/* Mobile - Menor que 480px */
+@media screen and (max-width: 480px) {
+  .quick-transaction-card {
+    padding: 1rem;
+    border-radius: 18px;
+    margin-bottom: 0.75rem;
+  }
+
+  .quick-card-header {
+    gap: 0.75rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .quick-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+
+  .quick-card-info h3 {
+    font-size: 0.75rem;
+  }
+
+  .quick-card-info p {
+    font-size: 0.625rem;
+  }
+
+  .quick-card-actions {
+    gap: 0.5rem;
+  }
+
+  .quick-btn {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.75rem;
+    border-radius: 12px;
+    gap: 0.375rem;
+  }
+}
+
+/* Mini Mobile - Menor que 360px */
+@media screen and (max-width: 360px) {
+  .quick-transaction-card {
+    padding: 0.875rem;
+    border-radius: 16px;
+  }
+
+  .quick-card-header {
+    gap: 0.625rem;
+  }
+
+  .quick-card-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .quick-card-info h3 {
+    font-size: 0.6875rem;
+  }
+
+  .quick-card-info p {
+    font-size: 0.5625rem;
+  }
+
+  .quick-btn {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.6875rem;
+  }
+}

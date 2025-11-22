@@ -1,12 +1,13 @@
 -- Tabela para histórico de transações excluídas do caixa
 CREATE TABLE IF NOT EXISTS transacoes_excluidas (
-  id UUID PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tipo VARCHAR(10) NOT NULL CHECK (tipo IN ('entrada', 'saida')),
   valor NUMERIC(10, 2) NOT NULL,
   origem VARCHAR(255) NOT NULL,
   data DATE NOT NULL,
   observacao TEXT,
   categoria VARCHAR(100),
+  motivo_exclusao TEXT,
   data_exclusao TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   excluido_por UUID REFERENCES auth.users(id),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

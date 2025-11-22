@@ -1,48 +1,23 @@
-/* ===== CAIXA PAGE - PREMIUM IOS TECH STYLE ===== */
+/* ===== CAIXA PAGE - iOS PREMIUM DESIGN ===== */
 
 .caixa-container {
   padding: 2rem 1.5rem;
   min-height: calc(100vh - 64px);
-  background: 
-    linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(17, 24, 39, 0.98) 50%, rgba(30, 41, 59, 0.95) 100%),
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background: linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #141414 100%);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
   animation: caixa-fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Efeito de scanner tecnológico */
+/* Efeito sutil de gradiente iOS */
 .caixa-container::before {
-  content: '';
-  position: absolute;
-  top: -100%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(16, 185, 129, 0.015) 50%,
-    transparent 100%
-  );
-  animation: tech-scan 18s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Partículas de dados flutuantes */
-.caixa-container::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 15% 25%, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 85% 65%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 45% 85%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
-  animation: data-particles 15s ease-in-out infinite;
+  height: 300px;
+  background: radial-gradient(ellipse at top, rgba(52, 199, 89, 0.08) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -58,39 +33,7 @@
   }
 }
 
-@keyframes tech-scan {
-  0%, 100% {
-    top: -100%;
-    opacity: 0;
-  }
-  15% {
-    opacity: 0.6;
-  }
-  85% {
-    opacity: 0.6;
-  }
-  100% {
-    top: 100%;
-    opacity: 0;
-  }
-}
-
-@keyframes data-particles {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1) rotate(0deg);
-  }
-  33% {
-    opacity: 0.8;
-    transform: scale(1.1) rotate(120deg);
-  }
-  66% {
-    opacity: 0.7;
-    transform: scale(0.95) rotate(240deg);
-  }
-}
-
-/* ===== HEADER - TECH PREMIUM ===== */
+/* ===== HEADER iOS PREMIUM ===== */
 .caixa-header {
   display: flex;
   justify-content: space-between;
@@ -99,35 +42,48 @@
   gap: 1.5rem;
   margin-bottom: 2rem;
   padding: 2rem;
-  background: 
-    linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(28, 28, 30, 0.95);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   position: relative;
   z-index: 1;
   overflow: hidden;
-  animation: header-enter 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: header-enter 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Linha de progresso animada */
+.caixa-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 25px 70px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 0 20px rgba(52, 199, 89, 0.2);
+}
+
+/* Efeito de profundidade no header */
 .caixa-header::before {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
+  inset: 0;
+  border-radius: inherit;
   background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(16, 185, 129, 0.6) 25%,
-    rgba(59, 130, 246, 0.6) 50%,
-    rgba(139, 92, 246, 0.6) 75%,
-    transparent 100%
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 100%
   );
-  animation: progress-line 3s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.caixa-header:hover::before {
+  opacity: 1;
 }
 
 @keyframes header-enter {
@@ -141,53 +97,38 @@
   }
 }
 
-@keyframes progress-line {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
 .caixa-header-content {
   position: relative;
   z-index: 1;
 }
 
 .caixa-header-content h1 {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 30%, #34d399 60%, #10b981 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #E0E7FF 40%, #C7D2FE 70%, #34C759 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0 0 0.5rem 0;
-  letter-spacing: -0.5px;
-  filter: drop-shadow(0 2px 12px rgba(16, 185, 129, 0.3));
+  letter-spacing: -0.03em;
+  filter: drop-shadow(0 2px 12px rgba(52, 199, 89, 0.4));
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.caixa-header-content h1::before {
-  content: '💰';
-  font-size: 1.5rem;
-  animation: coin-spin 3s ease-in-out infinite;
-}
-
 @keyframes coin-spin {
   0%, 100% {
-    transform: rotateY(0deg) scale(1);
+    transform: scale(1);
   }
   50% {
-    transform: rotateY(180deg) scale(1.1);
+    transform: scale(1.05);
   }
 }
 
 .caixa-header-content p {
-  color: #cbd5e1;
-  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.9375rem;
   margin: 0;
   font-weight: 500;
 }
@@ -2366,6 +2307,7 @@
 .caixa-pasta-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   padding: 1.5rem;
   background: rgba(15, 23, 42, 0.6);
@@ -2373,6 +2315,38 @@
   -webkit-backdrop-filter: blur(40px);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+}
+
+.caixa-pasta-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.caixa-btn-restaurar {
+  background: rgba(34, 197, 94, 0.15) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(34, 197, 94, 0.3) !important;
+}
+
+.caixa-btn-restaurar:hover {
+  background: rgba(34, 197, 94, 0.25) !important;
+  border-color: rgba(34, 197, 94, 0.5) !important;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.caixa-btn-deletar {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.caixa-btn-deletar:hover {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .caixa-btn-voltar {
@@ -2467,6 +2441,127 @@
   font-size: 1.5rem;
   font-weight: 800;
   color: #ffffff;
+}
+
+/* Lista de Transações Arquivadas */
+.caixa-transacoes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.caixa-transacao-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.caixa-transacao-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.caixa-transacao-card.entrada {
+  border-left: 3px solid #34d399;
+}
+
+.caixa-transacao-card.saida {
+  border-left: 3px solid #fb7185;
+}
+
+.caixa-transacao-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.caixa-transacao-tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.caixa-transacao-card.entrada .caixa-transacao-tipo-badge {
+  background: rgba(34, 197, 94, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.caixa-transacao-card.saida .caixa-transacao-tipo-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fb7185;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.caixa-transacao-info strong {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0.25rem 0;
+}
+
+.caixa-transacao-info .caixa-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 6px;
+  color: #c084fc;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.caixa-transacao-info small {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.caixa-observacao {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-style: italic;
+  margin: 0.5rem 0 0 0;
+  line-height: 1.5;
+}
+
+.caixa-transacao-valor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: right;
+  white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.caixa-transacao-card.entrada .caixa-transacao-valor {
+  color: #34d399;
+}
+
+.caixa-transacao-card.saida .caixa-transacao-valor {
+  color: #fb7185;
 }
 
 /* Empty State */

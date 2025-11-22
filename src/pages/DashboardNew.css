@@ -424,7 +424,7 @@ body {
     font-size: 1.75rem;
   }
 }
-}
+
 .chart-card.wide {
   grid-column: 1/-1;
   min-height: 360px;

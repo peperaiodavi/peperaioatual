@@ -1,0 +1,630 @@
+/* ===============================================
+   GERENCIAMENTO DE PERMISSÕES - IOS STYLE
+   =============================================== */
+
+:root {
+  --ios-perm-primary: #007AFF;
+  --ios-perm-success: #34C759;
+  --ios-perm-warning: #FF9500;
+  --ios-perm-danger: #FF3B30;
+  --ios-perm-gold: #FFD700;
+  --ios-perm-bg: #000000;
+  --ios-perm-card-bg: rgba(28, 28, 30, 0.98);
+  --ios-perm-card-border: rgba(255, 255, 255, 0.1);
+  --ios-perm-text: #FFFFFF;
+  --ios-perm-text-secondary: rgba(255, 255, 255, 0.6);
+  --ios-perm-blur: 20px;
+}
+
+/* ===== CONTAINER PRINCIPAL ===== */
+.ios-permissions-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+/* ===== LOADING STATE ===== */
+.ios-permissions-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1.5rem;
+}
+
+.ios-loading-spinner {
+  color: var(--ios-perm-primary);
+  filter: drop-shadow(0 0 20px rgba(0, 122, 255, 0.5));
+}
+
+.ios-permissions-loading p {
+  color: var(--ios-perm-text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ===== HEADER ===== */
+.ios-permissions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: var(--ios-perm-card-bg);
+  border: 1px solid var(--ios-perm-card-border);
+  border-radius: 20px;
+  backdrop-filter: blur(var(--ios-perm-blur));
+  -webkit-backdrop-filter: blur(var(--ios-perm-blur));
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.ios-permissions-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ios-permissions-header-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--ios-perm-primary) 0%, #0051D5 100%);
+  border-radius: 12px;
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+}
+
+.ios-permissions-header-content h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ios-perm-text);
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+.ios-permissions-header-content p {
+  font-size: 0.9375rem;
+  color: var(--ios-perm-text-secondary);
+  margin: 0;
+}
+
+.ios-permissions-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  color: var(--ios-perm-text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+/* ===== INFO CARD ===== */
+.ios-permissions-info-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(0, 81, 213, 0.1) 100%);
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(var(--ios-perm-blur));
+  -webkit-backdrop-filter: blur(var(--ios-perm-blur));
+}
+
+.ios-permissions-info-card .info-icon {
+  flex-shrink: 0;
+  color: var(--ios-perm-primary);
+}
+
+.ios-permissions-info-card .info-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ios-perm-text);
+  margin: 0 0 0.5rem 0;
+}
+
+.ios-permissions-info-card .info-content p {
+  font-size: 0.875rem;
+  color: var(--ios-perm-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ===== LISTA DE USUÁRIOS ===== */
+.ios-permissions-users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ===== CARD DE USUÁRIO ===== */
+.ios-permission-user-card {
+  background: var(--ios-perm-card-bg);
+  border: 1px solid var(--ios-perm-card-border);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(var(--ios-perm-blur));
+  -webkit-backdrop-filter: blur(var(--ios-perm-blur));
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ios-permission-user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 15px 50px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Header do Card do Usuário */
+.ios-user-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ios-user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.ios-user-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--ios-perm-primary);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.ios-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ios-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--ios-perm-primary) 0%, #0051D5 100%);
+  color: #FFFFFF;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.ios-user-details h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ios-perm-text);
+  margin: 0 0 0.25rem 0;
+}
+
+.ios-user-details p {
+  font-size: 0.875rem;
+  color: var(--ios-perm-text-secondary);
+  margin: 0 0 0.5rem 0;
+}
+
+.ios-permissions-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: var(--ios-perm-text-secondary);
+  font-weight: 500;
+}
+
+/* Actions do Card */
+.ios-user-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Botões iOS Style */
+.ios-btn-primary,
+.ios-btn-secondary,
+.ios-btn-save,
+.ios-btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ios-btn-primary {
+  background: linear-gradient(135deg, var(--ios-perm-primary) 0%, #0051D5 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.ios-btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.5);
+}
+
+.ios-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ios-perm-text);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.ios-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.ios-btn-save {
+  background: linear-gradient(135deg, var(--ios-perm-success) 0%, #28A745 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+}
+
+.ios-btn-save:hover {
+  box-shadow: 0 6px 20px rgba(52, 199, 89, 0.5);
+}
+
+.ios-btn-cancel {
+  background: rgba(255, 59, 48, 0.1);
+  color: var(--ios-perm-danger);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+}
+
+.ios-btn-cancel:hover {
+  background: rgba(255, 59, 48, 0.2);
+}
+
+/* Barra de Progresso */
+.ios-permissions-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ios-perm-primary) 0%, var(--ios-perm-success) 100%);
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ios-perm-text);
+  min-width: 45px;
+  text-align: right;
+}
+
+/* Conteúdo Expandido */
+.ios-user-permissions-content {
+  overflow: hidden;
+}
+
+/* Seção de Presets */
+.ios-presets-section {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ios-presets-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ios-perm-text);
+  margin: 0 0 1rem 0;
+}
+
+.ios-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.ios-preset-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ios-preset-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.ios-preset-btn.preset-gold {
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.ios-preset-btn.preset-gold:hover {
+  background: rgba(255, 215, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.2);
+}
+
+.ios-preset-btn.preset-blue {
+  border-color: rgba(0, 122, 255, 0.3);
+}
+
+.ios-preset-btn.preset-blue:hover {
+  background: rgba(0, 122, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.2);
+}
+
+.preset-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.preset-info strong {
+  font-size: 0.9375rem;
+  color: var(--ios-perm-text);
+}
+
+.preset-info span {
+  font-size: 0.75rem;
+  color: var(--ios-perm-text-secondary);
+}
+
+/* Categorias de Permissões */
+.ios-permissions-categories {
+  padding: 1.5rem;
+}
+
+.ios-permission-category {
+  margin-bottom: 1rem;
+}
+
+.ios-permission-category:last-child {
+  margin-bottom: 0;
+}
+
+.ios-category-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.75rem;
+}
+
+.ios-category-header:disabled {
+  cursor: default;
+}
+
+.ios-category-header:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.category-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ios-perm-text);
+}
+
+.ios-category-header svg.rotated {
+  transform: rotate(180deg);
+  transition: transform 0.2s ease;
+}
+
+/* Grid de Permissões */
+.ios-permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+/* Item de Permissão */
+.ios-permission-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ios-permission-item:not(.disabled):hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ios-permission-item.active {
+  background: rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.4);
+}
+
+.ios-permission-item.disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.permission-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--ios-perm-text-secondary);
+  flex-shrink: 0;
+}
+
+.ios-permission-item.active .permission-icon {
+  background: var(--ios-perm-primary);
+  color: #FFFFFF;
+}
+
+.permission-label {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ios-perm-text);
+}
+
+/* Toggle Switch iOS */
+.permission-toggle {
+  width: 44px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.permission-toggle.active {
+  background: var(--ios-perm-success);
+}
+
+.toggle-circle {
+  width: 20px;
+  height: 20px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.permission-toggle.active .toggle-circle {
+  transform: translateX(20px);
+}
+
+/* Estado Vazio */
+.ios-permissions-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--ios-perm-text-secondary);
+}
+
+.ios-permissions-empty svg {
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.ios-permissions-empty h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ios-perm-text);
+  margin: 0 0 0.5rem 0;
+}
+
+.ios-permissions-empty p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+  .ios-permissions-container {
+    padding: 1rem;
+  }
+
+  .ios-permissions-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .ios-user-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .ios-user-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .ios-user-actions button {
+    flex: 1;
+  }
+
+  .ios-presets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ios-permissions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .ios-permissions-header-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .ios-permissions-header-content p,
+  .ios-permissions-stats span {
+    font-size: 0.8125rem;
+  }
+
+  .ios-btn-primary,
+  .ios-btn-secondary,
+  .ios-btn-save,
+  .ios-btn-cancel {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}

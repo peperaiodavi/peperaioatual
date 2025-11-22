@@ -344,23 +344,25 @@
 }
 
 .func-actions-tech {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+  position: relative;
   display: flex;
+  justify-content: flex-end;
   gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   z-index: 3;
 }
 
 .func-action-btn-tech {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   backdrop-filter: blur(10px);

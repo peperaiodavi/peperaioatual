@@ -2,8 +2,8 @@
 import { ReactNode } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import MacOSDock from './MacOSDock';
 import SwipeNavigation from './SwipeNavigation';
+import IOSDock from './IOSDock';
 import { useCompromissosNotification } from '../hooks/useCompromissosNotification';
 
 interface MainLayoutProps {
@@ -81,7 +81,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)',
           paddingLeft: 'env(safe-area-inset-left, 0px)',
           paddingRight: 'env(safe-area-inset-right, 0px)',
-          paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 0px))', // Ajustado para o dock
+          paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 0px))',
           position: 'relative',
           overflow: 'auto',
           overflowX: 'hidden',
@@ -105,16 +105,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               overflow: 'visible',
             }}
           >
-            <SwipeNavigation enableBackSwipe={depth > 0}>
+            {location.pathname === '/dashboard' ? (
               <Outlet />
-            </SwipeNavigation>
+            ) : (
+              <SwipeNavigation enableBackSwipe={depth > 0 && location.pathname !== '/dashboard'}>
+                <Outlet />
+              </SwipeNavigation>
+            )}
           </motion.div>
         </AnimatePresence>
       </main>
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100 }}>
-        <MacOSDock />
-      </div>
-      {/* Dock antigo removido para o novo launcher estilo iOS */}
+      <IOSDock />
       <NotificationDialog />
     </div>
   );
